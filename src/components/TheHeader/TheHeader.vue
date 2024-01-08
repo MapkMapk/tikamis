@@ -1,5 +1,5 @@
 <template>
-  <header class="flex w-full border-b border-gray-dcdcdc h-the-header mb-the-header">
+  <header class="flex w-full border-b border-gray-dcdcdc h-the-header">
     <div class="flex h-full pl-[30px] pr-[30px] justify-center items-center border-r border-gray-dcdcdc">
       <SvgIcon name="burger-menu" class="w-[30px] h-[30px]"/>
     </div>

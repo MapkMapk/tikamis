@@ -1,7 +1,7 @@
 <template>
   <TheHeader />
   <section :class="{'!h-auto':isPostsVisible}"
-           class="flex flex-col w-full h-[calc(100vh-theme('height.the-header')-theme('margin.the-header')-theme('margin.5'))] items-center justify-center mb-5">
+           class="flex flex-col w-full h-[calc(100vh-theme('height.the-header')-theme('padding.10')-theme('margin.10'))] items-center justify-center mb-10 pt-10">
     <span class="flex justify-center text-center text-4xl font-medium">Выберите номер поста</span>
     <div class="relative">
       <div :class="{'border-green': isPostsVisible}"

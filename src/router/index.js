@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Auth from '../pages/Auth/Auth.vue'
 import PostSelector from '@/pages/PostSelector/PostSelector.vue'
-import PostOpener from '@/pages/PostOpener/PostOpener.vue'
+import MechanicSelector from '@/pages/MechanicSelector/MechanicSelector.vue'
+import Order from '@/pages/Order/Order.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,10 +18,15 @@ const router = createRouter({
       component: PostSelector
     },
     {
-      path: '/post-opener',
+      path: '/mechanic-selector',
       name: 'Post Opener',
-      component: PostOpener
+      component: MechanicSelector
     },
+    {
+      path: '/order',
+      name: 'Order',
+      component: Order
+    }
     // {
       // path: '/about',
       // name: 'about',

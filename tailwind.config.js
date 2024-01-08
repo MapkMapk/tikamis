@@ -5,12 +5,9 @@ export default {
     './src/**/*.{vue,js,ts,jsx,tsx}',
   ],
   theme: {
-    extend: {
-      height: {
-        'the-header': '60px'
-      },
-      margin: {
-        'the-header': '40px',
+    container: {
+      padding: {
+        DEFAULT: '30px',
       }
     },
     screens: {
@@ -40,6 +37,14 @@ export default {
       'black': {
         DEFAULT: '#080808',
         'true': '#000000',
+      }
+    },
+    extend: {
+      height: {
+        'the-header': '60px'
+      },
+      margin: {
+        'the-header': '40px',
       }
     },
   },
