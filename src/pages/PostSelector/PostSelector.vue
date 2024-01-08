@@ -26,14 +26,14 @@
         </div>
       </div>
     </div>
-    <ButtonGreen class="w-[337px]">Войти</ButtonGreen>
+    <BaseButton class="w-[337px] bg-green text-white mt-[30px]">Войти</BaseButton>
   </section>
 </template>
 <script setup>
 import TheHeader from '@/components/TheHeader/TheHeader.vue'
 import SvgIcon from '@/components/SvgIcon/SvgIcon.vue'
-import ButtonGreen from '@/components/Button/ButtonGreen.vue'
 import { ref } from 'vue'
+import BaseButton from '@/components/BaseButton/BaseButton.vue'
 
 let isPostSelected = ref(false)
 let isPostsVisible = ref(false)

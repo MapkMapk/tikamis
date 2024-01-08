@@ -1,6 +1,6 @@
 <template>
-  <OrderModalRemoveService/>
-  <OrderModalStartNextOrder/>
+  <OrderModalRemoveService v-if="removeServiceCall" />
+  <OrderModalStartNextOrder />
   <TheHeader />
   <section class="flex flex-col container lg:container mt-[60px] mb-10 h-[calc(100vh-160px)]">
     <div class="w-full flex">
@@ -31,26 +31,26 @@
       </div>
       <div class="flex items-center justify-between px-[30px] border-t h-[80px] border-gray-a1a4ad">
         <span class="text-black text-2xl">Замена масла</span>
-        <SvgIcon name="trash-bin" class="w-[22px] h-[25px] cursor-pointer"></SvgIcon>
+        <SvgIcon @click="removeServiceCall=true" name="trash-bin" class="w-[22px] h-[25px] cursor-pointer"></SvgIcon>
       </div>
       <div class="flex items-center justify-between px-[30px] border-t h-[80px] border-gray-a1a4ad">
         <span class="text-black text-2xl">Замена масла</span>
-        <SvgIcon name="trash-bin" class="w-[22px] h-[25px] cursor-pointer"></SvgIcon>
+        <SvgIcon @click="removeServiceCall=true" name="trash-bin" class="w-[22px] h-[25px] cursor-pointer"></SvgIcon>
       </div>
     </div>
     <div class="flex mt-auto">
       <div class="flex flex-1 justify-center items-center border border-green cursor-pointer">
-        <SvgIcon name="plus-in-circle" class="w-[26px] h-[26px]"/>
+        <SvgIcon name="plus-in-circle" class="w-[26px] h-[26px]" />
         <span class="font-semibold text-[21px] ml-4">Добавить услугу</span>
       </div>
-      <ButtonGreen class="flex-1 ml-4 mr-4 text-[21px]">Начать выполнение</ButtonGreen>
+      <BaseButton class="flex-1 ml-4 mr-4 text-[21px] bg-green text-white">Начать выполнение</BaseButton>
       <div v-if="false" class="flex flex-1 justify-center items-center border border-red">
         <span class="text-red font-semibold text-[21px]">Введите пробег, км</span>
-        <SvgIcon name="warning-sign-in-triangle" class="w-[26px] h-[26px]"/>
+        <SvgIcon name="warning-sign-in-triangle" class="w-[26px] h-[26px]" />
       </div>
       <div class="flex flex-1 justify-center items-center bg-gray-2c2d2f cursor-pointer">
         <span class="text-white font-semibold text-[21px] mr-4">Следующий заказ</span>
-        <SvgIcon name="arrow-right-in-circle" class="w-[26px] h-[26px]"/>
+        <SvgIcon name="arrow-right-in-circle" class="w-[26px] h-[26px]" />
       </div>
     </div>
   </section>
@@ -58,7 +58,12 @@
 <script setup>
 import TheHeader from '@/components/TheHeader/TheHeader.vue'
 import SvgIcon from '@/components/SvgIcon/SvgIcon.vue'
-import ButtonGreen from '@/components/Button/ButtonGreen.vue'
 import OrderModalRemoveService from '@/pages/Order/components/OrderModalRemoveService.vue'
 import OrderModalStartNextOrder from '@/pages/Order/components/OrderModalStartNextOrder.vue'
+import BaseButton from '@/components/BaseButton/BaseButton.vue'
+import { ref } from 'vue'
+
+
+let removeServiceCall = ref(false);
+
 </script>

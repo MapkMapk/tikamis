@@ -3,6 +3,7 @@ import Auth from '../pages/Auth/Auth.vue'
 import PostSelector from '@/pages/PostSelector/PostSelector.vue'
 import MechanicSelector from '@/pages/MechanicSelector/MechanicSelector.vue'
 import Order from '@/pages/Order/Order.vue'
+import OrderAddService from '@/pages/Order/OrderAddService/OrderAddService.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       path: '/order',
       name: 'Order',
       component: Order
+    },
+    {
+      path: '/order/add-service',
+      name: 'Order add service',
+      component: OrderAddService
     }
     // {
       // path: '/about',

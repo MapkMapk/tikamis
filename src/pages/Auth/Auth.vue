@@ -13,7 +13,7 @@
             <SvgIcon @click="isPasswordVisible = !isPasswordVisible" name="password-eye"
                      class="absolute w-6 h-6 right-5 top-1/2 cursor-pointer transition-all"></SvgIcon>
           </div>
-          <ButtonGreen class="w-full">Войти</ButtonGreen>
+          <BaseButton class="w-full bg-green text-white mt-[30px]">Войти</BaseButton>
         </form>
       </div>
     </div>
@@ -23,7 +23,7 @@
 <script setup>
 import SvgIcon from '@/components/svgIcon/SvgIcon.vue'
 import { computed, ref } from 'vue'
-import ButtonGreen from '@/components/Button/ButtonGreen.vue'
+import BaseButton from '@/components/BaseButton/BaseButton.vue'
 
 let isPasswordVisible = ref(false)
 let passwordInputType = computed(() => isPasswordVisible.value ? 'text' : 'password')
