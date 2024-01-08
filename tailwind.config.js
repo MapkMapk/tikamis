@@ -5,10 +5,14 @@ export default {
     './src/**/*.{vue,js,ts,jsx,tsx}',
   ],
   theme: {
-    extend: {},
-    // container: {
-    //   center: true,
-    // },
+    extend: {
+      height: {
+        'the-header': '60px'
+      },
+      margin: {
+        'the-header': '40px',
+      }
+    },
     screens: {
       '2xl': {'max': '1535px'},
       'xl': {'max': '1279px'},
@@ -26,10 +30,11 @@ export default {
         'light': '#FDF3F4',
       },
       'gray': {
-        '100': '#2C2D2F',
-        '80': '#848484',
-        '60': '#A1A4AD',
-        '40': '#F5F5F5',
+        '2c2d2f': '#2C2D2F',
+        '848484': '#848484',
+        'a1a4ad': '#A1A4AD',
+        'f5f5f5': '#F5F5F5',
+        'dcdcdc': '#DCDCDC'
       },
       'white': '#FFFFFF',
       'black': {
