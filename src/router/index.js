@@ -3,7 +3,7 @@ import MechanicAuth from '@/pages/Mechanic/MechanicAuth/MechanicAuth.vue'
 import MechanicPostSelector from '@/pages/Mechanic/MechanicPostSelector/MechanicPostSelector.vue'
 import MechanicHumanSelector from '@/pages/Mechanic/MechanicHumanSelector/MechanicHumanSelector.vue'
 import MechanicOrder from '@/pages/Mechanic/MechanicOrder/MechanicOrder.vue'
-import MechanicOrderServiceAdd from '@/pages/Mechanic/MechanicOrder/MechanicOrderServiceAdd/MechanicOrderServiceAdd.vue'
+import MechanicOrderWorkAdd from '@/pages/Mechanic/MechanicOrder/MechanicOrderWorkAdd/MechanicOrderWorkAdd.vue'
 import MechanicPaymentQr from '@/pages/Mechanic/MechanicPaymentQr/MechanicPaymentQr.vue'
 
 const router = createRouter({
@@ -33,9 +33,9 @@ const router = createRouter({
       component: MechanicOrder
     },
     {
-      path: '/mechanic/order/service-add',
-      name: 'Mechanic order service add',
-      component: MechanicOrderServiceAdd
+      path: '/mechanic/order/work-add',
+      name: 'Mechanic order work add',
+      component: MechanicOrderWorkAdd
     },
     {
       path: '/mechanic/payment-qr',

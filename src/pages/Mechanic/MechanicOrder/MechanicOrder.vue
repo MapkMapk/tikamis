@@ -29,27 +29,27 @@
         <div class="text-gray-a1a4ad px-[30px] py-4">Список услуг в заказе</div>
       </div>
       <div class="flex items-center justify-between px-[30px] border-t h-[80px] border-gray-a1a4ad">
-        <span class="text-black text-2xl">Замена масла</span>
-        <SvgIcon name="trash-bin" class="w-[22px] h-[25px] cursor-pointer"></SvgIcon>
+        <span class="text-black text-2xl">{{ name }}</span>
+        <SvgIcon @click="removeService" name="trash-bin" class="w-[22px] h-[25px] cursor-pointer"></SvgIcon>
       </div>
       <div class="flex items-center justify-between px-[30px] border-t h-[80px] border-gray-a1a4ad">
-        <span class="text-black text-2xl">Замена масла</span>
-        <SvgIcon name="trash-bin" class="w-[22px] h-[25px] cursor-pointer"></SvgIcon>
+        <span class="text-black text-2xl">{{ name }}</span>
+        <SvgIcon @click="removeService" name="trash-bin" class="w-[22px] h-[25px] cursor-pointer"></SvgIcon>
       </div>
     </div>
     <div class="flex mt-auto">
-      <button class="flex flex-1 justify-center items-center border border-green cursor-pointer">
-        <SvgIcon name="plus-in-circle" class="w-[26px] h-[26px]" />
-        <span class="font-semibold text-[21px] ml-4 text-green">Добавить услугу</span>
+      <button class="flex flex-1 justify-center items-center border border-green cursor-pointer py-5">
+        <SvgIcon name="plus-in-circle" class="w-[26px] h-[26px] lg:w-[18px] lg:h-[18px]" />
+        <span class="font-semibold text-[21px] ml-4 text-green lg:!text-base lg:ml-3">Добавить услугу</span>
       </button>
-      <BaseButton class="flex-1 ml-4 mr-4 text-[21px] bg-green text-white">Начать выполнение</BaseButton>
+      <BaseButton class="flex-1 ml-4 mr-4 !text-[21px] bg-green text-white !px-0 lg:!text-base">Начать выполнение</BaseButton>
       <button v-if="false" class="flex flex-1 justify-center items-center border border-red">
         <span class="text-red font-semibold text-[21px]">Введите пробег, км</span>
         <SvgIcon name="warning-sign-in-triangle" class="w-[26px] h-[26px]" />
       </button>
-      <button class="flex flex-1 justify-center items-center bg-gray-2c2d2f cursor-pointer">
-        <span class="text-white font-semibold text-[21px] mr-4">Следующий заказ</span>
-        <SvgIcon name="arrow-right-in-circle" class="w-[26px] h-[26px]" />
+      <button class="flex flex-1 justify-center items-center bg-gray-2c2d2f cursor-pointer py-5">
+        <span class="text-white font-semibold text-[21px] mr-4 lg:!text-base lg:mr-3">Следующий заказ</span>
+        <SvgIcon name="arrow-right-in-circle" class="w-[26px] h-[26px] lg:w-[18px] lg:h-[18px]" />
       </button>
     </div>
   </section>
@@ -59,4 +59,9 @@ import TheHeader from '@/components/TheHeader/TheHeader.vue'
 import SvgIcon from '@/components/SvgIcon/SvgIcon.vue'
 import BaseButton from '@/components/BaseButton/BaseButton.vue'
 import BaseModalConfirm from '@/components/BaseModalConfirm/BaseModalConfirm.vue'
+import MechanicOrderWork from '@/pages/Mechanic/MechanicOrder/components/MechanicOrderWork.vue'
+
+function removeService(event) {
+  event.target.closest()
+};
 </script>
