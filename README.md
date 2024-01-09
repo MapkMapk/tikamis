@@ -1,6 +1,6 @@
 ### Перед запуском
 
-Обязательно установить node.js https://nodejs.org/en
+Обязательно установить node.js перед тем как пытаться запустить проект - https://nodejs.org/en
 
 ### Установка зависимостей (node_modules)
 
@@ -19,3 +19,6 @@ npm run dev
 ```sh
 npm run build
 ```
+### Справка
+
+Роуты указаны в папке ./router/index.js
