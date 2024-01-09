@@ -2,8 +2,8 @@
   <section class="z-50 flex justify-center items-center absolute w-full h-screen left-0 top-0 bg-gray-848484">
     <div class="flex flex-col items-center bg-white w-[520px] h-[288px]">
       <div class="flex flex-col items-center mt-[70px] mb-[60px]">
-        <div class="font-medium text-3xl">Удалить услугу из заказа?</div>
-        <div class="text-lg mt-6">Вы можете её снова включить в заказ</div>
+        <span class="font-medium text-3xl">Удалить услугу из заказа?</span>
+        <span class="text-lg mt-6">Вы можете её снова включить в заказ</span>
       </div>
       <div class="flex w-full mt-auto">
         <BaseButton class="flex-1 bg-red text-white">Да, удалить</BaseButton>
