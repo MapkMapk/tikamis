@@ -1,9 +1,9 @@
 <template>
-  <div class="h-screen w-full flex justify-center items-center bg-gray-f5f5f5">
+  <section class="h-screen w-full flex justify-center items-center bg-gray-f5f5f5">
     <div class="flex justify-center items-center w-[531px] bg-white">
       <div class="flex flex-col w-full items-center pt-[44px] pl-[92px] pr-[92px] pb-[70px]">
         <SvgIcon name="logo" class="w-[86px] h-[84px]" />
-        <span class="text-4xl font-medium pt-6">Вход в сервис</span>
+        <h1 class="text-4xl font-medium pt-6">Вход в сервис</h1>
         <form class="w-full flex flex-col items-center pt-4">
           <input type="text" placeholder="Введите логин" autocomplete="off"
                  class="text-lg w-full pl-5 pr-5 pt-4 pb-4 border-gray-a1a4ad placeholder:text-gray-60 text-black border">
@@ -17,7 +17,7 @@
         </form>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup>

@@ -2,7 +2,7 @@
   <TheHeader />
   <section :class="{'!h-auto':isPostsVisible}"
            class="flex flex-col w-full h-[calc(100vh-theme('height.the-header')-theme('padding.10')-theme('margin.10'))] items-center justify-center mb-10 pt-10">
-    <span class="flex justify-center text-center text-4xl font-medium">Выберите номер поста</span>
+    <h1 class="flex justify-center text-center text-4xl font-medium">Выберите номер поста</h1>
     <div class="relative">
       <div :class="{'border-green': isPostsVisible}"
            class="border-2 border-gray-a1a4ad mt-7 flex justify-between w-[337px]">
@@ -13,15 +13,24 @@
         </div>
       </div>
       <div v-if="isPostsVisible" class="flex flex-col">
-        <div class="border-t-0 flex items-center pl-5 pr-5 h-[76px] border border-gray-a1a4ad cursor-pointer hover:bg-gray-2c2d2f hover:text-white">БРИК-3П-126</div>
-        <div class="border-t-0 flex items-center pl-5 pr-5 h-[76px] border border-gray-a1a4ad cursor-pointer hover:bg-gray-2c2d2f hover:text-white">БИНДЖ-ЛЙА-РЕТТЕ
+        <div
+          class="border-t-0 flex items-center pl-5 pr-5 h-[76px] border border-gray-a1a4ad cursor-pointer hover:bg-gray-2c2d2f hover:text-white">
+          БРИК-3П-126
         </div>
-        <div class="border-t-0 flex items-center pl-5 pr-5 h-[76px] border border-gray-a1a4ad cursor-pointer hover:bg-gray-2c2d2f hover:text-white">ДЕМО-ЛАА-РЕТЙТЕ
+        <div
+          class="border-t-0 flex items-center pl-5 pr-5 h-[76px] border border-gray-a1a4ad cursor-pointer hover:bg-gray-2c2d2f hover:text-white">
+          БИНДЖ-ЛЙА-РЕТТЕ
         </div>
-        <div class="border-t-0 flex items-center pl-5 pr-5 h-[76px] border border-gray-a1a4ad cursor-pointer hover:bg-gray-2c2d2f hover:text-white">
+        <div
+          class="border-t-0 flex items-center pl-5 pr-5 h-[76px] border border-gray-a1a4ad cursor-pointer hover:bg-gray-2c2d2f hover:text-white">
+          ДЕМО-ЛАА-РЕТЙТЕ
+        </div>
+        <div
+          class="border-t-0 flex items-center pl-5 pr-5 h-[76px] border border-gray-a1a4ad cursor-pointer hover:bg-gray-2c2d2f hover:text-white">
           КИРКГИ-МЛА-РЫВВЕТТЕ
         </div>
-        <div class="border-t-0 flex items-center pl-5 pr-5 h-[76px] border border-gray-a1a4ad cursor-pointer hover:bg-gray-2c2d2f hover:text-white">
+        <div
+          class="border-t-0 flex items-center pl-5 pr-5 h-[76px] border border-gray-a1a4ad cursor-pointer hover:bg-gray-2c2d2f hover:text-white">
           КИРКГИ-МЛА-РЫВВЕТТЕ
         </div>
       </div>

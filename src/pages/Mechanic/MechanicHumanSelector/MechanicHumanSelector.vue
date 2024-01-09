@@ -2,7 +2,7 @@
   <TheHeader />
   <section :class="{'!h-auto':isMechanicsVisible}"
            class="flex flex-col w-full h-[calc(100vh-theme('height.the-header')-theme('padding.10')-theme('margin.10'))] items-center justify-center mb-10 pt-10">
-    <span class="flex justify-center text-center text-4xl font-medium">Выберите механика</span>
+    <h1 class="flex justify-center text-center text-4xl font-medium">Выберите механика</h1>
     <div class="relative">
       <div :class="{'border-green': isMechanicsVisible}"
            class="border-2 border-gray-a1a4ad mt-7 flex justify-between w-[705px]">
