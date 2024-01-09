@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import SvgIcon from '@/components/svgIcon/SvgIcon.vue'
+import SvgIcon from '@/components/SvgIcon/SvgIcon.vue'
 import { computed, ref } from 'vue'
 import BaseButton from '@/components/BaseButton/BaseButton.vue'
 

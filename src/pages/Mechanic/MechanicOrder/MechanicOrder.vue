@@ -1,6 +1,5 @@
 <template>
-  <OrderModalRemoveService v-if="removeServiceCall" />
-  <OrderModalStartNextOrder />
+  <BaseModalConfirm v-if="false" />
   <TheHeader />
   <section class="flex flex-col container lg:container mt-[60px] mb-10 h-[calc(100vh-160px)]">
     <div class="w-full flex">
@@ -31,11 +30,11 @@
       </div>
       <div class="flex items-center justify-between px-[30px] border-t h-[80px] border-gray-a1a4ad">
         <span class="text-black text-2xl">Замена масла</span>
-        <SvgIcon @click="removeServiceCall=true" name="trash-bin" class="w-[22px] h-[25px] cursor-pointer"></SvgIcon>
+        <SvgIcon name="trash-bin" class="w-[22px] h-[25px] cursor-pointer"></SvgIcon>
       </div>
       <div class="flex items-center justify-between px-[30px] border-t h-[80px] border-gray-a1a4ad">
         <span class="text-black text-2xl">Замена масла</span>
-        <SvgIcon @click="removeServiceCall=true" name="trash-bin" class="w-[22px] h-[25px] cursor-pointer"></SvgIcon>
+        <SvgIcon name="trash-bin" class="w-[22px] h-[25px] cursor-pointer"></SvgIcon>
       </div>
     </div>
     <div class="flex mt-auto">
@@ -58,12 +57,6 @@
 <script setup>
 import TheHeader from '@/components/TheHeader/TheHeader.vue'
 import SvgIcon from '@/components/SvgIcon/SvgIcon.vue'
-import OrderModalRemoveService from '@/pages/Order/components/OrderModalRemoveService.vue'
-import OrderModalStartNextOrder from '@/pages/Order/components/OrderModalStartNextOrder.vue'
 import BaseButton from '@/components/BaseButton/BaseButton.vue'
-import { ref } from 'vue'
-
-
-let removeServiceCall = ref(false);
-
+import BaseModalConfirm from '@/components/BaseModalConfirm/BaseModalConfirm.vue'
 </script>

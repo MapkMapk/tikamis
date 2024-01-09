@@ -1,47 +1,65 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Auth from '../pages/Auth/Auth.vue'
-import PostSelector from '@/pages/PostSelector/PostSelector.vue'
-import MechanicSelector from '@/pages/MechanicSelector/MechanicSelector.vue'
-import Order from '@/pages/Order/Order.vue'
-import OrderAddService from '@/pages/Order/OrderAddService/OrderAddService.vue'
+import MechanicAuth from '@/pages/Mechanic/MechanicAuth/MechanicAuth.vue'
+import MechanicPostSelector from '@/pages/Mechanic/MechanicPostSelector/MechanicPostSelector.vue'
+import MechanicHumanSelector from '@/pages/Mechanic/MechanicHumanSelector/MechanicHumanSelector.vue'
+import MechanicOrder from '@/pages/Mechanic/MechanicOrder/MechanicOrder.vue'
+import MechanicOrderServiceAdd from '@/pages/Mechanic/MechanicOrder/MechanicOrderServiceAdd/MechanicOrderServiceAdd.vue'
+import MechanicPaymentQr from '@/pages/Mechanic/MechanicPaymentQr/MechanicPaymentQr.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+
+    // Mechanic routes
+
     {
-      path: '/',
-      name: 'Auth',
-      component: Auth
+      path: '/mechanic/auth',
+      name: 'Mechanic auth',
+      component: MechanicAuth
     },
     {
-      path: '/post-selector',
-      name: 'Post Selector',
-      component: PostSelector
+      path: '/mechanic/post-selector',
+      name: 'Mechanic post selector',
+      component: MechanicPostSelector
     },
     {
-      path: '/mechanic-selector',
-      name: 'Post Opener',
-      component: MechanicSelector
+      path: '/mechanic/human-selector',
+      name: 'Mechanic human selector',
+      component: MechanicHumanSelector
     },
     {
-      path: '/order',
-      name: 'Order',
-      component: Order
+      path: '/mechanic/order',
+      name: 'Mechanic order',
+      component: MechanicOrder
     },
     {
-      path: '/order/add-service',
-      name: 'Order add service',
-      component: OrderAddService
-    }
-    // {
-      // path: '/about',
-      // name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      // component: () => import('../views/AboutView.vue')
-    // }
+      path: '/mechanic/order/service-add',
+      name: 'Mechanic order service add',
+      component: MechanicOrderServiceAdd
+    },
+    {
+      path: '/mechanic/payment-qr',
+      name: 'Mechanic payment QR',
+      component: MechanicPaymentQr
+    },
+
+    // Sadmin routes
+
+    // Director routes
+
   ]
 })
+
+
+
+
+// {
+// path: '/about',
+// name: 'about',
+// route level code-splitting
+// this generates a separate chunk (About.[hash].js) for this route
+// which is lazy-loaded when the route is visited.
+// component: () => import('../views/AboutView.vue')
+// }
 
 export default router

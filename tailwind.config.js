@@ -31,7 +31,8 @@ export default {
         '848484': '#848484',
         'a1a4ad': '#A1A4AD',
         'f5f5f5': '#F5F5F5',
-        'dcdcdc': '#DCDCDC'
+        'dcdcdc': '#DCDCDC',
+        'c8c8c8': '#C8C8C8'
       },
       'white': '#FFFFFF',
       'black': {
