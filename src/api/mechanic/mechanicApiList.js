@@ -1,10 +1,7 @@
-<script>
 import axios from 'axios'
-export default function(orderId, workIds) {
-  axios.delete('/mechanic-api/order', {
-    orderId,
-    workIds
-  })
+
+export default function() {
+  axios.get('/mechanic-api/list')
     .then((response) => {
       console.log(response.data)
       console.log(response.status)
@@ -14,4 +11,3 @@ export default function(orderId, workIds) {
       console.log(error)
     })
 }
-</script>

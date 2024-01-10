@@ -1,10 +1,8 @@
-<script>
 import axios from 'axios'
-export default function(login, password, postNumber) {
-  axios.post('/mechanic-api/authenticate-panel', {
-    login,
-    password,
-    postNumber
+
+export default function(orderId) {
+  axios.post('/mechanic-api/order/cancel', {
+    orderId
   })
     .then((response) => {
       console.log(response.data)
@@ -15,4 +13,3 @@ export default function(login, password, postNumber) {
       console.log(error)
     })
 }
-</script>

@@ -1,8 +1,8 @@
-<script>
 import axios from 'axios'
-export default function(odometer) {
-  axios.post('/mechanic-api/order/complete', {
-    odometer
+
+export default function(mechanicId) {
+  axios.post('/mechanic-api/mechanic-login', {
+    mechanicId
   })
     .then((response) => {
       console.log(response.data)
@@ -13,4 +13,3 @@ export default function(odometer) {
       console.log(error)
     })
 }
-</script>

@@ -1,7 +1,7 @@
-<script>
 import axios from 'axios'
+
 export default function() {
-  axios.post('mechanic-api/mechanic-logout')
+  axios.post('/mechanic-api/order/get-next')
     .then((response) => {
       console.log(response.data)
       console.log(response.status)
@@ -11,4 +11,3 @@ export default function() {
       console.log(error)
     })
 }
-</script>

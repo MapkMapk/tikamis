@@ -1,7 +1,10 @@
-<script>
 import axios from 'axios'
-export default function() {
-  axios.post('/mechanic-api/refresh')
+
+export default function(orderId, workIds) {
+  axios.post('/mechanic-api/order', {
+    orderId,
+    workIds
+  })
     .then((response) => {
       console.log(response.data)
       console.log(response.status)
@@ -11,4 +14,3 @@ export default function() {
       console.log(error)
     })
 }
-</script>

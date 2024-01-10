@@ -1,11 +1,11 @@
 import axios from 'axios';
-import Refresh from './mechanicApi/_post/Refresh.vue';
+// import Refresh from './mechanicApi/mechanicApiRefresh.js';
 
 const apiClient = axios.create();
 
 apiClient.interceptors.response.use(
 
-  async(response) => {
+  // async(response) => {
     // const {responseStatus} = response;
     // if (responseStatus === 401) {
     //   const accessToken = await Refresh()
@@ -21,6 +21,6 @@ apiClient.interceptors.response.use(
     //     /// Надо разлогинить механика и редиректнуть на страницу выбора нового, но из аккаунта не выкидывать.
     //   }
     // }
-  }
+  // }
 
 )

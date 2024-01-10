@@ -1,8 +1,8 @@
-<script>
 import axios from 'axios'
-export default function(orderId) {
-  axios.post('/mechanic-api/order/cancel', {
-    orderId
+
+export default function(odometer) {
+  axios.post('/mechanic-api/order/complete', {
+    odometer
   })
     .then((response) => {
       console.log(response.data)
@@ -13,4 +13,3 @@ export default function(orderId) {
       console.log(error)
     })
 }
-</script>
