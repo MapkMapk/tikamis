@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import MechanicAuth from '@/pages/Mechanic/MechanicAuth/MechanicAuth.vue'
-import MechanicPostSelector from '@/pages/Mechanic/MechanicPostSelector/MechanicPostSelector.vue'
-import MechanicHumanSelector from '@/pages/Mechanic/MechanicHumanSelector/MechanicHumanSelector.vue'
+import MechanicHumanSelect from '@/pages/Mechanic/MechanicHumanSelect/MechanicHumanSelect.vue'
 import MechanicOrder from '@/pages/Mechanic/MechanicOrder/MechanicOrder.vue'
 import MechanicOrderWorkAdd from '@/pages/Mechanic/MechanicOrder/MechanicOrderWorkAdd/MechanicOrderWorkAdd.vue'
 import MechanicPaymentQr from '@/pages/Mechanic/MechanicPaymentQr/MechanicPaymentQr.vue'
@@ -27,14 +26,9 @@ const router = createRouter({
       component: MechanicAuth
     },
     {
-      path: '/mechanic/post-selector',
-      name: 'Mechanic post selector',
-      component: MechanicPostSelector
-    },
-    {
-      path: '/mechanic/human-selector',
-      name: 'Mechanic human selector',
-      component: MechanicHumanSelector
+      path: '/mechanic/human-select',
+      name: 'Mechanic human select',
+      component: MechanicHumanSelect
     },
     {
       path: '/mechanic/order',
