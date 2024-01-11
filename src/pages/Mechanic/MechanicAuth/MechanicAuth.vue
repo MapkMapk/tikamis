@@ -1,30 +1,35 @@
 <template>
-  <section class="h-screen w-full flex justify-center items-center bg-gray-f5f5f5">
-    <div class="flex justify-center items-center w-[531px] bg-white">
-      <div class="flex flex-col w-full items-center pt-[44px] pl-[92px] pr-[92px] pb-[70px]">
-        <SvgIcon name="logo" class="w-[86px] h-[84px]" />
-        <h1 class="text-4xl font-medium pt-6">Вход в сервис</h1>
-        <form class="w-full flex flex-col items-center pt-4">
-          <input type="text" placeholder="Введите логин" autocomplete="off"
-                 class="text-lg w-full pl-5 pr-5 pt-4 pb-4 border-gray-a1a4ad placeholder:text-gray-60 text-black border">
-          <div class="w-full relative">
-            <input :type="passwordInputType" placeholder="Введите пароль" autocomplete="off"
-                   class="text-lg w-full pl-5 pr-5 pt-4 pb-4 border-gray-a1a4ad placeholder:text-gray-60 text-black border mt-5">
-            <SvgIcon @click="isPasswordVisible = !isPasswordVisible" name="password-eye"
-                     class="absolute w-6 h-6 right-5 top-1/2 cursor-pointer transition-all"></SvgIcon>
-          </div>
-          <BaseButton class="w-full bg-green text-white mt-[30px]">Войти</BaseButton>
-        </form>
-      </div>
-    </div>
-  </section>
+  <MechanicAuthLoginAndPassForm v-if="currentStep === 1" @handler="loginAndPassFormHandler" />
+  <MechanicAuthSelectPost v-if="currentStep === 2" @handler="selectPostHandler" />
 </template>
 
 <script setup>
-import SvgIcon from '@/components/SvgIcon/SvgIcon.vue'
-import { computed, ref } from 'vue'
-import BaseButton from '@/components/BaseButton/BaseButton.vue'
+import MechanicAuthLoginAndPassForm from '@/pages/Mechanic/MechanicAuth/components/MechanicAuthLoginAndPassForm.vue'
+import MechanicAuthSelectPost from '@/pages/Mechanic/MechanicAuth/components/MechanicAuthSelectPost.vue'
+import MechanicApiAuthenticatePanel from '@/api/mechanic/mechanicApiAuthenticatePanel.js'
+import { ref } from 'vue';
 
-let isPasswordVisible = ref(false)
-let passwordInputType = computed(() => isPasswordVisible.value ? 'text' : 'password')
+let currentStep = ref(1)
+let login = ref('');
+let password = ref('')
+let postNumber = ref('')
+
+function loginAndPassFormHandler(newLogin, newPassword) {
+  currentStep.value = 2;
+  login.value = newLogin
+  password.value = newPassword
+}
+
+function selectPostHandler(newPostNumber) {
+  postNumber.value = newPostNumber
+  console.log("Login", login.value)
+  console.log("Password", password.value)
+  console.log("PostNumber", postNumber.value)
+  mainHandler()
+}
+
+function mainHandler() {
+  // MechanicApiAuthenticatePanel(login.value, password.value, postNumber.value)
+}
+
 </script>

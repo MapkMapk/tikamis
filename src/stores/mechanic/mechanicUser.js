@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 
-export const useCounterStore = defineStore('order', () => {
-  let accessToken = ref('')
-  let refreshToken = ref('')
+export const mechanicUser = defineStore('order', () => {
+  let tokens = {
+    access: '',
+    refresh: ''
+  }
 
-  return {accessToken, refreshToken}
+  return {tokens}
 })

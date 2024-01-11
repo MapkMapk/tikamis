@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 export default function(login, password, postNumber) {
-  axios.post('/mechanic-api/authenticate-panel', {
+  axios.post('http://test186.ru:9080/mechanic-api/authenticate-panel', {
     login,
     password,
     postNumber

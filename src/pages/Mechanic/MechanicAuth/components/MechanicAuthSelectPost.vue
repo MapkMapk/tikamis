@@ -1,5 +1,5 @@
 <template>
-  <TheHeader />
+  <TheHeader/>
   <section :class="{'!h-auto':isPostsVisible}"
            class="flex flex-col w-full h-[calc(100vh-theme('height.the-header')-theme('padding.10')-theme('margin.10'))] items-center justify-center mb-10 pt-10">
     <h1 class="flex justify-center text-center text-4xl font-medium">Выберите номер поста</h1>
@@ -35,7 +35,7 @@
         </div>
       </div>
     </div>
-    <BaseButton class="w-[337px] bg-green text-white mt-[30px]">Войти</BaseButton>
+    <BaseButton class="w-[337px] bg-green text-white mt-[30px]" @click="emit('handler', 2)">Войти</BaseButton>
   </section>
 </template>
 <script setup>
@@ -43,6 +43,8 @@ import TheHeader from '@/components/TheHeader/TheHeader.vue'
 import SvgIcon from '@/components/SvgIcon/SvgIcon.vue'
 import { ref } from 'vue'
 import BaseButton from '@/components/BaseButton/BaseButton.vue'
+
+const emit = defineEmits(['handler'])
 
 let isPostSelected = ref(false)
 let isPostsVisible = ref(false)

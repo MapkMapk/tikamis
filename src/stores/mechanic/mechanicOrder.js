@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 
-export const useCounterStore = defineStore('order', () => {
+export const mechanicOrder = defineStore('order', () => {
   let orderId = ref(20000382)
   let plateNumber = ref('AA000A')
   let startTime = ref('13:20')

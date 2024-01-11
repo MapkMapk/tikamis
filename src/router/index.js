@@ -5,10 +5,19 @@ import MechanicHumanSelector from '@/pages/Mechanic/MechanicHumanSelector/Mechan
 import MechanicOrder from '@/pages/Mechanic/MechanicOrder/MechanicOrder.vue'
 import MechanicOrderWorkAdd from '@/pages/Mechanic/MechanicOrder/MechanicOrderWorkAdd/MechanicOrderWorkAdd.vue'
 import MechanicPaymentQr from '@/pages/Mechanic/MechanicPaymentQr/MechanicPaymentQr.vue'
+import Index from '@/pages/index.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+
+    // Base routes
+
+    {
+      path: '/',
+      name: 'Root page',
+      component: Index
+    },
 
     // Mechanic routes
 
