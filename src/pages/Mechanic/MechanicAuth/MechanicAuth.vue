@@ -1,6 +1,6 @@
 <template>
-  <MechanicAuthLoginAndPassForm v-if="currentStep === 1" @handler="loginAndPassFormHandler" />
-  <MechanicAuthSelectPost v-if="currentStep === 2" @handler="selectPostHandler" />
+  <MechanicAuthLoginAndPassForm v-if="currentStep === 1" @return-login-and-password="setLoginAndPassword" />
+  <MechanicAuthSelectPost v-if="currentStep === 2" @return-post-number="setPostNumber" />
 </template>
 
 <script setup>
@@ -14,22 +14,19 @@ let login = ref('');
 let password = ref('')
 let postNumber = ref('')
 
-function loginAndPassFormHandler(newLogin, newPassword) {
+function setLoginAndPassword(newLogin, newPassword) {
   currentStep.value = 2;
   login.value = newLogin
   password.value = newPassword
 }
 
-function selectPostHandler(newPostNumber) {
+function setPostNumber(newPostNumber) {
   postNumber.value = newPostNumber
-  console.log("Login", login.value)
-  console.log("Password", password.value)
-  console.log("PostNumber", postNumber.value)
-  mainHandler()
+  AuthHandler()
 }
 
-function mainHandler() {
-  // MechanicApiAuthenticatePanel(login.value, password.value, postNumber.value)
+function AuthHandler() {
+  MechanicApiAuthenticatePanel(login.value, password.value, postNumber.value)
 }
 
 </script>

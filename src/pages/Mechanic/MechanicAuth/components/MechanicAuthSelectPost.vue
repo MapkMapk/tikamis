@@ -35,7 +35,7 @@
         </div>
       </div>
     </div>
-    <BaseButton class="w-[337px] bg-green text-white mt-[30px]" @click="emit('handler', 2)">Войти</BaseButton>
+    <BaseButton class="w-[337px] bg-green text-white mt-[30px]" @click="emit('returnPostNumber', 2)">Войти</BaseButton>
   </section>
 </template>
 <script setup>
@@ -44,7 +44,7 @@ import SvgIcon from '@/components/SvgIcon/SvgIcon.vue'
 import { ref } from 'vue'
 import BaseButton from '@/components/BaseButton/BaseButton.vue'
 
-const emit = defineEmits(['handler'])
+const emit = defineEmits(['returnPostNumber'])
 
 let isPostSelected = ref(false)
 let isPostsVisible = ref(false)
