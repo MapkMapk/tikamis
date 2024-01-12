@@ -14,7 +14,7 @@ const router = createRouter({
 
     {
       path: '/',
-      name: 'Root page',
+      name: 'root',
       component: Index
     },
 
@@ -22,27 +22,27 @@ const router = createRouter({
 
     {
       path: '/mechanic/auth',
-      name: 'Mechanic auth',
+      name: 'mechanic.auth',
       component: MechanicAuth
     },
     {
       path: '/mechanic/human-select',
-      name: 'Mechanic human select',
+      name: 'mechanic.humanSelect',
       component: MechanicHumanSelect
     },
     {
       path: '/mechanic/order',
-      name: 'Mechanic order',
+      name: 'mechanic.order',
       component: MechanicOrder
     },
     {
       path: '/mechanic/order/work-add',
-      name: 'Mechanic order work add',
+      name: 'mechanic.order.workAdd',
       component: MechanicOrderWorkAdd
     },
     {
       path: '/mechanic/payment-qr',
-      name: 'Mechanic payment QR',
+      name: 'mechanic.paymentQr',
       component: MechanicPaymentQr
     },
 
