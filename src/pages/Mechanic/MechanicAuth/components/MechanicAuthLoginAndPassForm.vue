@@ -15,6 +15,7 @@
           </div>
           <BaseButton @click="emit('returnLoginAndPassword', loginInput, passwordInput)" class="w-full bg-green text-white mt-[30px]">Войти
           </BaseButton>
+          <div v-if="errorText" class="text-red mt-4">{{errorText}}</div>
         </form>
       </div>
     </div>
@@ -25,7 +26,8 @@ import SvgIcon from '@/components/SvgIcon/SvgIcon.vue'
 import BaseButton from '@/components/BaseButton/BaseButton.vue'
 import { computed, ref } from 'vue'
 
-const emit = defineEmits(['return-login-and-password'])
+const props = defineProps(['errorText'])
+const emit = defineEmits(['returnLoginAndPassword'])
 
 let isPasswordVisible = ref(false)
 let passwordInputType = computed(() => isPasswordVisible.value ? 'text' : 'password')
