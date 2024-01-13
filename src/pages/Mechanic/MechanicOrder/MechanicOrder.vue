@@ -29,11 +29,11 @@
         <div class="text-gray-a1a4ad px-[30px] py-4">Список услуг в заказе</div>
       </div>
       <div class="flex items-center justify-between px-[30px] border-t h-[80px] border-gray-a1a4ad">
-        <span class="text-black text-2xl">{{ name }}</span>
+        <span class="text-black text-2xl">wefwfe</span>
         <SvgIcon @click="removeService" name="trash-bin" class="w-[22px] h-[25px] cursor-pointer"></SvgIcon>
       </div>
       <div class="flex items-center justify-between px-[30px] border-t h-[80px] border-gray-a1a4ad">
-        <span class="text-black text-2xl">{{ name }}</span>
+        <span class="text-black text-2xl">wefwefwef</span>
         <SvgIcon @click="removeService" name="trash-bin" class="w-[22px] h-[25px] cursor-pointer"></SvgIcon>
       </div>
     </div>
@@ -59,7 +59,7 @@ import TheHeader from '@/components/TheHeader/TheHeader.vue'
 import SvgIcon from '@/components/SvgIcon/SvgIcon.vue'
 import BaseButton from '@/components/BaseButton/BaseButton.vue'
 import BaseModalConfirm from '@/components/BaseModalConfirm/BaseModalConfirm.vue'
-import MechanicOrderWork from '@/pages/Mechanic/MechanicOrder/components/MechanicOrderWork.vue'
+// import MechanicOrderWork from '@/pages/Mechanic/MechanicOrder/components/MechanicOrderWork.vue'
 
 function removeService(event) {
   event.target.closest()

@@ -7,6 +7,7 @@ export default async function(login, password, postNumber) {
       password,
       postNumber
     })
+    console.log(res)
     return res.data
   }
   catch (error) {

@@ -46,14 +46,39 @@ const router = createRouter({
       component: MechanicPaymentQr
     },
 
-    // Sadmin routes
+    // 404 page
 
-    // Director routes
-
+    {
+      path: '/:pathMatch(.*)*',
+      name: '404',
+      component: Index
+    }
   ]
 })
 
+router.beforeEach((to, from, next) => {
 
+  const accessToken = localStorage.getItem('accessToken');
+
+  if (!accessToken) {
+    if (to.name === 'mechanic.auth') {
+      return next()
+    } else {
+      return next({
+        name: 'mechanic.auth'
+      })
+    }
+  }
+
+  if (accessToken) {
+    if (to.name === 'mechanic.auth') {
+      return next({
+        name: 'mechanic.humanSelect'
+      })
+    }
+    next()
+  }
+})
 
 
 // {

@@ -10,9 +10,8 @@ import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js'
 import mechanicApiGetPosts from '@/api/mechanic/mechanicApiGetPosts.js'
 import MechanicApiAuthenticatePanel from '@/api/mechanic/mechanicApiAuthenticatePanel.js'
 import { ref } from 'vue';
-import { useRouter } from 'vue-router'
+import router from '@/router/index.js'
 
-const router = useRouter()
 const mechanicUserStore = useMechanicUserStore()
 
 let currentStep = ref(1);
@@ -41,14 +40,15 @@ function setPostNumber(newPostNumber) {
 async function isLoginAndPasswordValid(newLogin, newPassword) {
   let posts = await mechanicApiGetPosts(newLogin, newPassword);
   if (posts) {updateStep(2)}
-  else {errorText.value='Не верный логин или пароль'}
+  else {
+    errorText.value='Не верный логин или пароль'
+  }
 }
 
 async function AuthHandler() {
   let data = await MechanicApiAuthenticatePanel(login.value, password.value, postNumber.value)
   if (data) {
-    mechanicUserStore.accessToken = data.accessToken;
-    mechanicUserStore.refreshToken = data.refreshToken;
+    mechanicUserStore.addTokens(data.accessToken, data.refreshToken)
     await router.push('/mechanic/human-select')
   } else {
     updateStep(1)

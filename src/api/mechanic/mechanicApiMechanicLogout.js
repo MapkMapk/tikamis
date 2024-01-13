@@ -1,13 +1,5 @@
-import axios from 'axios'
+import { mechanicApiClient } from '@/api/mechanicApiClient.js'
 
-export default function() {
-  axios.post('mechanic-api/mechanic-logout')
-    .then((response) => {
-      console.log(response.data)
-      console.log(response.status)
-      console.log(response.headers)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+export default async function() {
+  return await mechanicApiClient.post('http://test186.ru:9080/mechanic-api/mechanic-logout')
 }

@@ -1,13 +1,8 @@
-import axios from 'axios'
+import { mechanicApiClient } from '@/api/mechanicApiClient.js'
 
-export default function() {
-  axios.get('/mechanic-api/list')
-    .then((response) => {
-      console.log(response.data)
-      console.log(response.status)
-      console.log(response.headers)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
+export default async function() {
+  let { data } = await mechanicApiClient.get('http://test186.ru:9080/mechanic-api/list')
+  if (data) {
+    return data
+  }
 }

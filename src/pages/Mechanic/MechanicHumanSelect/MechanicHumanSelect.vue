@@ -16,33 +16,51 @@
         <MechanicHumanSelectItem v-for="mechanic in mechanics" @back-mechanic="pickMechanic" :key="mechanic.id" :id="mechanic.id" :name="mechanic.name" />
       </div>
     </div>
-    <BaseButton v-if="isMechanicSelected" class="w-[705px] bg-green text-white mt-[30px]">Подтвердить и продолжить</BaseButton>
+    <BaseButton v-if="isMechanicSelected" @click="mechanicLogin" class="w-[705px] bg-green text-white mt-[30px]">Подтвердить и продолжить</BaseButton>
+    <div v-if="errorText" class="text-red mt-4">{{errorText}}</div>
   </section>
 </template>
 
 <script setup>
 import TheHeader from '@/components/TheHeader/TheHeader.vue'
 import SvgIcon from '@/components/SvgIcon/SvgIcon.vue'
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import MechanicHumanSelectItem from '@/pages/Mechanic/MechanicHumanSelect/components/MechanicHumanSelectItem.vue'
 import BaseButton from '@/components/BaseButton/BaseButton.vue'
+import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js'
+import mechanicApiList from '@/api/mechanic/mechanicApiList.js'
+import mechanicApiMechanicLogin from '@/api/mechanic/mechanicApiMechanicLogin.js'
+import router from '@/router/index.js'
 
+let mechanicUserStore = useMechanicUserStore()
 let isMechanicsVisible = ref(false)
 let selectedMechanic = ref({id: '', name: ''})
 let isMechanicSelected = computed(() => selectedMechanic.value.id !== '');
+let errorText = ref('')
 
-let mechanics = ref([
-  {id: '1пб', name: 'Миша'},
-  {id: '2пб', name: 'Гриша'},
-  {id: '3пб', name: 'Никита'},
-  {id: '4пб', name: 'Алексей'},
-  {id: '5пб', name: 'Сергей'},
-  {id: '6пб', name: 'Саша'}
-]);
+let mechanics = ref([]);
+
+onMounted(async () => {
+  let data = await mechanicApiList();
+  mechanics.value = data.mechanics
+})
 
 function pickMechanic(id, name) {
   selectedMechanic.value.id = id
   selectedMechanic.value.name = name
   isMechanicsVisible.value = false
+}
+
+async function mechanicLogin() {
+  let isMechanicLoggedIn = await mechanicApiMechanicLogin(selectedMechanic.value.id);
+  if (isMechanicLoggedIn) {
+    mechanicUserStore.currentMechanic.id = selectedMechanic.value.id
+    mechanicUserStore.currentMechanic.name = selectedMechanic.value.name
+    // localStorage.setItem('selectedMechanicId', selectedMechanic.value.id);
+    // localStorage.setItem('selectedMechanicName', selectedMechanic.value.name);
+    await router.push('/mechanic/order')
+  } else {
+    errorText.value = 'Выбранный механик уже занят на другом посте или переданные данные устарели'
+  }
 }
 </script>

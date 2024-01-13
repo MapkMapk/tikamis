@@ -3,13 +3,13 @@
     <div @click="isMenuActive=!isMenuActive" :class="{'bg-gray-2c2d2f':isMenuActive}" class="relative flex bg- h-full pl-[30px] pr-[30px] justify-center items-center border-r border-gray-dcdcdc cursor-pointer">
       <SvgIcon v-if="!isMenuActive" name="burger-menu" class="w-[30px] h-[30px]"/>
       <SvgIcon v-if="isMenuActive" name="cross" class="w-[30px] h-[30px]"/>
-      <div v-if="isMenuActive" class="absolute pl-[30px] text-white w-[276px] flex items-center bg-gray-2c2d2f -bottom-[80px] left-0 h-[80px]">Выход</div>
+      <div v-if="isMenuActive" @click="mechanicLogout" class="absolute pl-[30px] text-white w-[276px] flex items-center bg-gray-2c2d2f -bottom-[80px] left-0 h-[80px]">Выход</div>
     </div>
     <div class="flex justify-between items-center w-full">
       <div class="flex items-center ml-7">
         <SvgIcon name="logo" class="w-[32px] h-[32px]"/>
         <span class="pl-[10px] font-semibold text-lg">Механик</span>
-        <span class="pl-[30px] text-lg">Шевелев Владимир Дмитриевич</span>
+        <span class="pl-[30px] text-lg">{{mechanicUserStore.currentMechanic.name}}</span>
       </div>
       <div class="pr-[30px]">
         Когалым, Проспект Нефтяников, 1а/4
@@ -20,7 +20,18 @@
 
 <script setup>
 import SvgIcon from '@/components/SvgIcon/SvgIcon.vue'
+import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js'
 import { ref } from 'vue';
+import mechanicApiMechanicLogout from '@/api/mechanic/mechanicApiMechanicLogout.js'
+import router from '@/router/index.js'
 
+let mechanicUserStore = useMechanicUserStore()
 let isMenuActive = ref(false);
+
+async function mechanicLogout() {
+  mechanicUserStore.currentMechanic.id = ''
+  mechanicUserStore.currentMechanic.name = ''
+  mechanicApiMechanicLogout();
+  await router.push('/mechanic/human-select')
+}
 </script>

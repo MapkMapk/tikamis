@@ -1,13 +1,2 @@
-import axios from 'axios'
+import { mechanicApiClient } from '@/api/mechanicApiClient.js'
 
-export default function() {
-  axios.post('/mechanic-api/order/get-next')
-    .then((response) => {
-      console.log(response.data)
-      console.log(response.status)
-      console.log(response.headers)
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-}
