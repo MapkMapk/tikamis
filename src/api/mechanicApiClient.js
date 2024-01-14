@@ -2,7 +2,8 @@ import axios from 'axios'
 import mechanicApiMechanicLogout from '@/api/mechanic/mechanicApiMechanicLogout.js'
 
 const mechanicApiClient = axios.create({
-  validateStatus: (status) => status < 500
+  validateStatus: (status) => status < 500,
+  baseURL: 'http://test186.ru:9080/mechanic-api'
 })
 
 mechanicApiClient.interceptors.request.use(config => {
@@ -15,12 +16,12 @@ mechanicApiClient.interceptors.request.use(config => {
 mechanicApiClient.interceptors.response.use(
   async (response) => {
     console.log('ЧЕКПОИНТ - 1')
-    if (response.request.responseURL === 'http://test186.ru:9080/mechanic-api/get-posts/') {
+    if (response.request.responseURL === '/get-posts') {
       return response
     }
     if (response.status === 401 && localStorage.getItem('accessToken')) {
       console.log('ЧЕКПОИНТ - 2')
-      let { data } = await axios.post('http://test186.ru:9080/mechanic-api/refresh', {}, {
+      let { data } = await axios.post('/refresh', {}, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('refreshToken')}`
         }
@@ -40,15 +41,18 @@ mechanicApiClient.interceptors.response.use(
         }
       })
     }
-    if (response.status === 401 && !localStorage.getItem('accessToken')) {
-      mechanicApiMechanicLogout()
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('refreshToken')
+    if (response.status === 401 && !localStorage.getItem('accessToken') && localStorage.getItem('mechanicUserId')) {
+      mechanicApiMechanicLogout();
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+    }
+    if (response.status === 409) {
+      console.log(response)
     }
     return response
   },
   (error) => {
-    return error
+    return Promise.reject(error)
   }
 )
 
