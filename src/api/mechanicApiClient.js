@@ -1,4 +1,5 @@
 import axios from 'axios'
+import mechanicApiMechanicLogout from '@/api/mechanic/mechanicApiMechanicLogout.js'
 
 const mechanicApiClient = axios.create({
   validateStatus: (status) => status < 500
@@ -38,6 +39,11 @@ mechanicApiClient.interceptors.response.use(
           }
         }
       })
+    }
+    if (response.status === 401 && !localStorage.getItem('accessToken')) {
+      mechanicApiMechanicLogout()
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
     }
     return response
   },

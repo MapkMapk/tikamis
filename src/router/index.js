@@ -60,8 +60,9 @@ router.beforeEach((to, from, next) => {
 
   const accessToken = localStorage.getItem('accessToken')
 
-  if (!accessToken) {
+  // Роутинг если в localStorage нету access токена
 
+  if (!accessToken) {
     if (to.name === 'mechanic.auth') {
       return next()
     } else {
@@ -69,26 +70,33 @@ router.beforeEach((to, from, next) => {
         name: 'mechanic.auth'
       })
     }
-
   }
 
-  if (accessToken) {
+  // Роутинг если в localStorage есть access токен
 
+  if (accessToken) {
+    // Если переход на страницу выбора механика, но механик уже выбран
+    // то редиректнуть на страницу заказа
     if (to.name === 'mechanic.humanSelect' && localStorage.getItem('activeMechanicId')) {
       return next({
         name: 'mechanic.order'
       })
     }
-    if (to.name === 'mechanic.order' && localStorage.getItem('activeMechanicId') == "") {
+    // Если переход на страницу заказа, но механик ещё не выбран
+    // то редиректнуть на страницу выбора механика
+    if (to.name === 'mechanic.order' && localStorage.getItem('activeMechanicId') === '') {
       return next({
         name: 'mechanic.humanSelect'
       })
     }
-    if (to.name === 'mechanic.auth') {
+    // Если переход на страницу авторизации, но человек уже авторизован
+    // То переход на страницу выбора механика
+    if (to.name === 'mechanic.auth' && localStorage.getItem('accessToken')) {
       return next({
         name: 'mechanic.humanSelect'
       })
     }
+
     next()
 
   }
