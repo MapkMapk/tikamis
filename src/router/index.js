@@ -58,9 +58,10 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
 
-  const accessToken = localStorage.getItem('accessToken');
+  const accessToken = localStorage.getItem('accessToken')
 
   if (!accessToken) {
+
     if (to.name === 'mechanic.auth') {
       return next()
     } else {
@@ -68,26 +69,29 @@ router.beforeEach((to, from, next) => {
         name: 'mechanic.auth'
       })
     }
+
   }
 
   if (accessToken) {
+
+    if (to.name === 'mechanic.humanSelect' && localStorage.getItem('activeMechanicId')) {
+      return next({
+        name: 'mechanic.order'
+      })
+    }
+    if (to.name === 'mechanic.order' && localStorage.getItem('activeMechanicId') == "") {
+      return next({
+        name: 'mechanic.humanSelect'
+      })
+    }
     if (to.name === 'mechanic.auth') {
       return next({
         name: 'mechanic.humanSelect'
       })
     }
     next()
+
   }
 })
-
-
-// {
-// path: '/about',
-// name: 'about',
-// route level code-splitting
-// this generates a separate chunk (About.[hash].js) for this route
-// which is lazy-loaded when the route is visited.
-// component: () => import('../views/AboutView.vue')
-// }
 
 export default router

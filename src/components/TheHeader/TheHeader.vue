@@ -9,7 +9,7 @@
       <div class="flex items-center ml-7">
         <SvgIcon name="logo" class="w-[32px] h-[32px]"/>
         <span class="pl-[10px] font-semibold text-lg">Механик</span>
-        <span class="pl-[30px] text-lg">{{mechanicUserStore.currentMechanic.name}}</span>
+        <span class="pl-[30px] text-lg">{{mechanicUserStore.activeMechanicName}}</span>
       </div>
       <div class="pr-[30px]">
         Когалым, Проспект Нефтяников, 1а/4
@@ -29,8 +29,8 @@ let mechanicUserStore = useMechanicUserStore()
 let isMenuActive = ref(false);
 
 async function mechanicLogout() {
-  mechanicUserStore.currentMechanic.id = ''
-  mechanicUserStore.currentMechanic.name = ''
+  mechanicUserStore.activeMechanicId = ''
+  mechanicUserStore.activeMechanicName = ''
   mechanicApiMechanicLogout();
   await router.push('/mechanic/human-select')
 }

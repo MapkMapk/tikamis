@@ -5,7 +5,7 @@ export default async function(login, password) {
     login,
     password
   })
-  if (response) {
+  if (response.data) {
     return response.data
   }
 }

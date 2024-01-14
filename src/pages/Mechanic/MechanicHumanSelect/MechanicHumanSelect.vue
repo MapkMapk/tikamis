@@ -54,10 +54,8 @@ function pickMechanic(id, name) {
 async function mechanicLogin() {
   let isMechanicLoggedIn = await mechanicApiMechanicLogin(selectedMechanic.value.id);
   if (isMechanicLoggedIn) {
-    mechanicUserStore.currentMechanic.id = selectedMechanic.value.id
-    mechanicUserStore.currentMechanic.name = selectedMechanic.value.name
-    // localStorage.setItem('selectedMechanicId', selectedMechanic.value.id);
-    // localStorage.setItem('selectedMechanicName', selectedMechanic.value.name);
+    mechanicUserStore.activeMechanicId = selectedMechanic.value.id
+    mechanicUserStore.activeMechanicName = selectedMechanic.value.name
     await router.push('/mechanic/order')
   } else {
     errorText.value = 'Выбранный механик уже занят на другом посте или переданные данные устарели'

@@ -23,6 +23,8 @@ mechanicApiClient.interceptors.response.use(
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('refreshToken')}`
         }
+      }).catch((error) => {
+        console.log(error)
       })
       console.log('ЧЕКПОИНТ - 3')
       localStorage.setItem('accessToken', data.accessToken)
@@ -31,7 +33,8 @@ mechanicApiClient.interceptors.response.use(
         ...response.config,
         headers: {
           common: {
-            ['Authorization']: `Bearer ${data.accessToken}`
+            ['Authorization']: `Bearer ${data.accessToken}`,
+            ['Content-Type']: 'application/json'
           }
         }
       })

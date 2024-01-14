@@ -38,7 +38,7 @@ function setPostNumber(newPostNumber) {
 }
 
 async function isLoginAndPasswordValid(newLogin, newPassword) {
-  let posts = await mechanicApiGetPosts(newLogin, newPassword);
+  let { posts } = await mechanicApiGetPosts(newLogin, newPassword);
   if (posts) {updateStep(2)}
   else {
     errorText.value='Не верный логин или пароль'

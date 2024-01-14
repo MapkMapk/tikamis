@@ -59,9 +59,16 @@ import TheHeader from '@/components/TheHeader/TheHeader.vue'
 import SvgIcon from '@/components/SvgIcon/SvgIcon.vue'
 import BaseButton from '@/components/BaseButton/BaseButton.vue'
 import BaseModalConfirm from '@/components/BaseModalConfirm/BaseModalConfirm.vue'
+import mechanicApiOrderGetNext from '@/api/mechanic/mechanicApiOrderGetNext.js'
+import { onMounted } from 'vue'
 // import MechanicOrderWork from '@/pages/Mechanic/MechanicOrder/components/MechanicOrderWork.vue'
 
 function removeService(event) {
   event.target.closest()
-};
+}
+
+onMounted(async () => {
+  let calls = await mechanicApiOrderGetNext()
+  console.log(calls)
+})
 </script>
