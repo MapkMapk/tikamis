@@ -1,0 +1,133 @@
+<template>
+  <!--  <BaseBooleanModal-->
+  <!--    v-if="false"-->
+  <!--    modal-title="ну тайтл"-->
+  <!--    modal-text="ну текст"-->
+  <!--    modal-left-button-text="отмена"-->
+  <!--    modal-right-button-text=""-->
+  <!--  />-->
+  <TheHeader />
+  <section class="flex flex-col container lg:container mt-[60px] mb-10 h-[calc(100vh-160px)]">
+    <div class="w-full flex">
+      <span
+        class="flex flex-1 border border-gray-a1a4ad text-5xl text-black pl-[30px] pr-[30px] py-9 leading-none"
+      >
+        Заказ {{ mechanicOrderStore.plateNumber }}
+      </span>
+      <div
+        class="relative pt-5 pb-5 flex flex-col items-center justify-center w-[242px] bg-gray-2c2d2f"
+      >
+        <div class="relative flex w-full justify-center items-center">
+          <BaseSvgIcon
+            name="watch"
+            class="absolute left-5 w-[20px] h-[20px]"
+          />
+          <span class="text-white font-medium">Начало работы</span>
+        </div>
+        <span class="font-light text-5xl text-white">{{ mechanicOrderStore.startTime }}</span>
+        <span class="text-gray-a1a4ad text-sm">{{ mechanicOrderStore.startDate }}</span>
+      </div>
+      <div
+        :class="{ '!border-red': isLowTime, '!bg-red-light': isLowTime }"
+        class="pt-5 pb-5 flex flex-col justify-center items-center bg-white w-[280px] border-gray-a1a4ad border"
+      >
+        <div class="flex flex-col w-fit items-start">
+          <div class="relative flex items-center">
+            <BaseSvgIcon
+              v-if="!isLowTime"
+              name="time-left-black"
+              class="w-[20px] h-[20px] mr-2"
+            />
+            <BaseSvgIcon
+              v-if="isLowTime"
+              name="time-left-red"
+              class="w-[20px] h-[20px] mr-2"
+            />
+            <span
+              :class="{ 'text-red': isLowTime }"
+              class="text-red font-medium text-left"
+              >Осталось</span
+            >
+          </div>
+          <span
+            :class="{ 'text-red': isLowTime }"
+            class="text-red text-5xl mb-[20px]"
+            >{{ mechanicOrderStore.formattedCompletionTime }}</span
+          >
+        </div>
+      </div>
+    </div>
+    <div class="w-full border border-gray-a1a4ad mt-10">
+      <div class="bg-gray-f5f5f5">
+        <div class="text-gray-a1a4ad px-[30px] py-4">Список услуг в заказе</div>
+      </div>
+      <MechanicOrderWork />
+    </div>
+    <div class="flex mt-auto">
+      <button
+        class="flex flex-1 justify-center items-center border border-green cursor-pointer py-5"
+      >
+        <BaseSvgIcon
+          name="plus-in-circle"
+          class="w-[26px] h-[26px] lg:w-[18px] lg:h-[18px]"
+        />
+        <span class="font-semibold text-[21px] ml-4 text-green lg:!text-base lg:ml-3"
+          >Добавить услугу</span
+        >
+      </button>
+      <BaseButtonFilledGreen class="flex-1 ml-4 mr-4 !text-[21px] !px-0 lg:!text-base"
+        >Начать выполнение
+      </BaseButtonFilledGreen>
+      <button
+        v-if="false"
+        class="flex flex-1 justify-center items-center border border-red"
+      >
+        <span class="text-red font-semibold text-[21px]">Введите пробег, км</span>
+        <BaseSvgIcon
+          name="warning-sign-in-triangle"
+          class="w-[26px] h-[26px]"
+        />
+      </button>
+      <button
+        @click="mechanicOrderStore.nextOrder()"
+        class="flex flex-1 justify-center items-center bg-gray-2c2d2f cursor-pointer py-5"
+      >
+        <span class="text-white font-semibold text-[21px] mr-4 lg:!text-base lg:mr-3"
+          >Следующий заказ</span
+        >
+        <BaseSvgIcon
+          name="arrow-right-in-circle"
+          class="w-[26px] h-[26px] lg:w-[18px] lg:h-[18px]"
+        />
+      </button>
+    </div>
+  </section>
+</template>
+<script setup>
+import TheHeader from '@/components/TheHeader.vue'
+import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
+
+import MechanicOrderWork from '@/views/Mechanic/MechanicOrder/MechanicOrderWork.vue'
+import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js'
+import { computed, onBeforeMount, onBeforeUnmount } from 'vue'
+// import BaseBooleanModal from '@/components/BaseBooleanModal.vue'
+import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue'
+
+const mechanicOrderStore = useMechanicOrderStore()
+let updateOrderInfoInterval = ''
+
+let isLowTime = computed(() => mechanicOrderStore.completionTimeHours < 1)
+
+// Интервал необходим, чтобы поддерживать данные заказа в актуальном состоянии
+// Чтобы например если клиент откажется от заказа механик тоже смог это увидеть
+onBeforeMount(async () => {
+  await mechanicOrderStore.getNext()
+  updateOrderInfoInterval = setInterval(() => mechanicOrderStore.getNext(), 30000)
+})
+
+// Удаление интервала обновления заказа в момент ухода с страницы, чтобы он не оставался в памяти
+// При повторном посещении страницы сработает вызов getNext в хуке onMount / onBeforeMount
+onBeforeUnmount(() => {
+  clearInterval(updateOrderInfoInterval)
+})
+</script>

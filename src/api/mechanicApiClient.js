@@ -3,10 +3,10 @@ import mechanicApiMechanicLogout from '@/api/mechanic/mechanicApiMechanicLogout.
 
 const mechanicApiClient = axios.create({
   validateStatus: (status) => status < 500,
-  baseURL: 'http://test186.ru:9080/mechanic-api'
+  baseURL: import.meta.env.VITE_AXIOS_BASE_URL + '/mechanic-api'
 })
 
-mechanicApiClient.interceptors.request.use(config => {
+mechanicApiClient.interceptors.request.use((config) => {
   if (localStorage.getItem('accessToken')) {
     config.headers.authorization = `Bearer ${localStorage.getItem('accessToken')}`
   }
@@ -21,13 +21,19 @@ mechanicApiClient.interceptors.response.use(
     }
     if (response.status === 401 && localStorage.getItem('accessToken')) {
       console.log('ЧЕКПОИНТ - 2')
-      let { data } = await axios.post('/refresh', {}, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('refreshToken')}`
-        }
-      }).catch((error) => {
-        console.log(error)
-      })
+      let { data } = await axios
+        .post(
+          import.meta.env.VITE_AXIOS_BASE_URL + '/mechanic-api/refresh',
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('refreshToken')}`
+            }
+          }
+        )
+        .catch((error) => {
+          console.log(error)
+        })
       console.log('ЧЕКПОИНТ - 3')
       localStorage.setItem('accessToken', data.accessToken)
       localStorage.setItem('refreshToken', data.refreshToken)
@@ -41,13 +47,17 @@ mechanicApiClient.interceptors.response.use(
         }
       })
     }
-    if (response.status === 401 && !localStorage.getItem('accessToken') && localStorage.getItem('mechanicUserId')) {
-      mechanicApiMechanicLogout();
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
+    if (
+      response.status === 401 &&
+      !localStorage.getItem('accessToken') &&
+      localStorage.getItem('mechanicUserId')
+    ) {
+      mechanicApiMechanicLogout()
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
     }
     if (response.status === 409) {
-      console.log(response)
+      alert(response.data)
     }
     return response
   },

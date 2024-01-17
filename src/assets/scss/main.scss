@@ -2,17 +2,17 @@
 // на приоритетность указания стилей.
 
 // отключение базовых стилей браузера и подключение шрифтов
-@import "reset";
-@import "fonts";
+@import 'reset';
+@import 'fonts';
 
 // tailwind базовый слой
 @tailwind base;
-@import "base";
+@import 'base';
 
 // tailwind слой компонентов
 @tailwind components;
-@import "components";
+@import 'components';
 
 // tailwind утилити слой
 @tailwind utilities;
-@import "utilities";
+@import 'utilities';
