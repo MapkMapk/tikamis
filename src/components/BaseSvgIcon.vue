@@ -8,7 +8,7 @@
 import { defineComponent, computed } from 'vue'
 
 export default defineComponent({
-  name: 'SvgIcon',
+  name: 'BaseSvgIcon',
   props: {
     prefix: {
       type: String,

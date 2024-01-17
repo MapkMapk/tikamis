@@ -1,4 +1,15 @@
 <template>
+  <teleport to="body">
+    <BaseModalBoolean
+      v-if="isModalVisible"
+      @callback="removeWork"
+      :primary-button-component="BaseButtonFilledRed"
+      main-title="Удалить услугу из заказа?"
+      main-text="Вы сможете её снова включить в заказ"
+      primary-button-text="Да, удалить"
+      secondary-button-text="Отмена"
+    />
+  </teleport>
   <div
     v-for="work in mechanicOrderStore.works"
     :key="work.id"
@@ -6,16 +17,32 @@
   >
     <span class="text-black text-2xl">{{ work.name }}</span>
     <BaseSvgIcon
+      @click="
+        workId = work.id;
+        isModalVisible = true
+      "
       name="trash-bin"
       class="w-[22px] h-[25px] cursor-pointer"
     ></BaseSvgIcon>
   </div>
 </template>
 <script setup>
+import { ref } from 'vue'
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
 import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js'
-
-// modalBooleanStore.callModal(mechanicOrderStore.removeWork, [work.id])
+import BaseButtonFilledRed from '@/components/BaseButtonFilledRed.vue'
+import BaseModalBoolean from '@/components/BaseModalBoolean.vue'
+import mechanicApiOrderWork_delete from '@/api/mechanic/mechanicApiOrderWork_delete.js'
 
 const mechanicOrderStore = useMechanicOrderStore()
+let isModalVisible = ref(false)
+let workId = ref()
+
+async function removeWork(isConfirmed) {
+  if (isConfirmed) {
+    await mechanicApiOrderWork_delete(mechanicOrderStore.orderId, workId.value)
+    await mechanicOrderStore.getNext()
+  }
+  isModalVisible.value = false
+}
 </script>

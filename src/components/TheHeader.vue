@@ -5,12 +5,12 @@
       :class="{ 'bg-gray-2c2d2f': isMenuActive }"
       class="relative flex bg- h-full pl-[30px] pr-[30px] justify-center items-center border-r border-gray-dcdcdc cursor-pointer"
     >
-      <SvgIcon
+      <BaseSvgIcon
         v-if="!isMenuActive"
         name="burger-menu"
         class="w-[30px] h-[30px]"
       />
-      <SvgIcon
+      <BaseSvgIcon
         v-if="isMenuActive"
         name="cross"
         class="w-[30px] h-[30px]"
@@ -25,7 +25,7 @@
     </div>
     <div class="flex justify-between items-center w-full">
       <div class="flex items-center ml-7">
-        <SvgIcon
+        <BaseSvgIcon
           name="logo"
           class="w-[32px] h-[32px]"
         />
@@ -38,7 +38,7 @@
 </template>
 
 <script setup>
-import SvgIcon from '@/components/BaseSvgIcon.vue'
+import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
 import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js'
 import { ref } from 'vue'
 import mechanicApiMechanicLogout from '@/api/mechanic/mechanicApiMechanicLogout.js'

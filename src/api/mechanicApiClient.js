@@ -59,9 +59,13 @@ mechanicApiClient.interceptors.response.use(
     if (response.status === 409) {
       alert(response.data)
     }
+    if (response.status === 400 && response.status === 403) {
+      console.log(response)
+    }
     return response
   },
   (error) => {
+    console.log(error)
     return Promise.reject(error)
   }
 )

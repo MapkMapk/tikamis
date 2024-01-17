@@ -1,11 +1,13 @@
 <template>
-  <!--  <BaseBooleanModal-->
-  <!--    v-if="false"-->
-  <!--    modal-title="ну тайтл"-->
-  <!--    modal-text="ну текст"-->
-  <!--    modal-left-button-text="отмена"-->
-  <!--    modal-right-button-text=""-->
-  <!--  />-->
+  <BaseModalBoolean
+    v-if="isModalVisible"
+    @callback="getNextOrder"
+    :primary-button-component="BaseButtonFilledDark"
+    main-title="Начать следующий заказ?"
+    main-text="К этому заказу больше нельзя будет вернуться. Он будет отменён"
+    primary-button-text="Следующий заказ"
+    secondary-button-text="Отмена"
+  />
   <TheHeader />
   <section class="flex flex-col container lg:container mt-[60px] mb-10 h-[calc(100vh-160px)]">
     <div class="w-full flex">
@@ -44,14 +46,14 @@
               class="w-[20px] h-[20px] mr-2"
             />
             <span
-              :class="{ 'text-red': isLowTime }"
-              class="text-red font-medium text-left"
+              :class="{ '!text-red': isLowTime }"
+              class="text-black font-medium text-left"
               >Осталось</span
             >
           </div>
           <span
-            :class="{ 'text-red': isLowTime }"
-            class="text-red text-5xl mb-[20px]"
+            :class="{ '!text-red': isLowTime }"
+            class="text-black text-5xl mb-[20px]"
             >{{ mechanicOrderStore.formattedCompletionTime }}</span
           >
         </div>
@@ -89,7 +91,7 @@
         />
       </button>
       <button
-        @click="mechanicOrderStore.nextOrder()"
+        @click="isModalVisible = true"
         class="flex flex-1 justify-center items-center bg-gray-2c2d2f cursor-pointer py-5"
       >
         <span class="text-white font-semibold text-[21px] mr-4 lg:!text-base lg:mr-3"
@@ -109,14 +111,23 @@ import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
 
 import MechanicOrderWork from '@/views/Mechanic/MechanicOrder/MechanicOrderWork.vue'
 import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js'
-import { computed, onBeforeMount, onBeforeUnmount } from 'vue'
-// import BaseBooleanModal from '@/components/BaseBooleanModal.vue'
+import { ref, computed, onBeforeMount, onBeforeUnmount } from 'vue'
+import BaseModalBoolean from '@/components/BaseModalBoolean.vue'
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue'
+import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue'
 
 const mechanicOrderStore = useMechanicOrderStore()
 let updateOrderInfoInterval = ''
 
+let isModalVisible = ref(false)
 let isLowTime = computed(() => mechanicOrderStore.completionTimeHours < 1)
+
+async function getNextOrder(isConfirmed) {
+  if (isConfirmed) {
+    await mechanicOrderStore.nextOrder()
+  }
+  isModalVisible.value = false
+}
 
 // Интервал необходим, чтобы поддерживать данные заказа в актуальном состоянии
 // Чтобы например если клиент откажется от заказа механик тоже смог это увидеть

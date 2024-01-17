@@ -9,7 +9,7 @@
     </h1>
     <div class="w-[438px] flex flex-col items-center h-full">
       <div class="h-full w-[438px] bg-white border-l border-r border-t border-gray-c8c8c8 mt-6">
-        <SvgIcon
+        <BaseSvgIcon
           name="qr-demo"
           class="w-full h-full"
         />
@@ -22,5 +22,5 @@
 <script setup>
 import TheHeader from '@/components/TheHeader.vue'
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue'
-import SvgIcon from '@/components/BaseSvgIcon.vue'
+import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
 </script>

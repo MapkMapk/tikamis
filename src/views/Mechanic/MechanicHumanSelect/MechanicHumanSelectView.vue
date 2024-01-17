@@ -17,7 +17,7 @@
           <span
             :class="{ '!text-black': isMechanicSelected }"
             class="text-gray-a1a4ad text-2xl"
-          >{{ isMechanicSelected ? selectedMechanic.name : 'Выберите механика' }}</span
+            >{{ isMechanicSelected ? selectedMechanic.name : 'Выберите механика' }}</span
           >
           <BaseSvgIcon
             :class="{ 'rotate-180': isMechanicsVisible }"
@@ -43,7 +43,7 @@
       v-if="isMechanicSelected"
       @click="mechanicLogin"
       class="w-[705px] bg-green text-white mt-[30px]"
-    >Подтвердить и продолжить
+      >Подтвердить и продолжить
     </BaseButtonFilledGreen>
     <div
       v-if="errorText"
