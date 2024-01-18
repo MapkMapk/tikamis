@@ -1,5 +1,5 @@
-import { mechanicApiClient } from '@/api/mechanicApiClient.js'
+import { mechanicApiClient } from '@/api/mechanicApiClient.js';
 
 export default async function () {
-  await mechanicApiClient.post('/mechanic-logout')
+  await mechanicApiClient.post('/mechanic-logout');
 }

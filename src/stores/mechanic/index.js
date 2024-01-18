@@ -1,8 +1,8 @@
-import MechanicAuth from '@/views/Mechanic/MechanicAuth/MechanicAuthView.vue'
-import MechanicHumanSelect from '@/views/Mechanic/MechanicHumanSelect/MechanicHumanSelectView.vue'
-import MechanicOrder from '@/views/Mechanic/MechanicOrder/MechanicOrderView.vue'
-import MechanicOrderWorkAdd from '@/views/Mechanic/MechanicOrderWorkAdd/MechanicOrderWorkAddView.vue'
-import MechanicPaymentQr from '@/views/Mechanic/MechanicPaymentQr/MechanicPaymentQrView.vue'
+import MechanicAuth from '@/views/Mechanic/MechanicAuth/MechanicAuthView.vue';
+import MechanicHumanSelect from '@/views/Mechanic/MechanicHumanSelect/MechanicHumanSelectView.vue';
+import MechanicOrder from '@/views/Mechanic/MechanicOrder/MechanicOrderView.vue';
+import MechanicOrderWorkAdd from '@/views/Mechanic/MechanicOrderWorkAdd/MechanicOrderWorkAddView.vue';
+import MechanicPaymentQr from '@/views/Mechanic/MechanicPaymentQr/MechanicPaymentQrView.vue';
 
 export default [
   {
@@ -30,4 +30,4 @@ export default [
     name: 'mechanic.paymentQr',
     component: MechanicPaymentQr
   }
-]
+];

@@ -48,16 +48,16 @@
   </section>
 </template>
 <script setup>
-import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
-import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue'
-import { computed, ref } from 'vue'
+import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
+import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
+import { computed, ref } from 'vue';
 
-const props = defineProps(['errorText'])
-const emit = defineEmits(['returnLoginAndPassword'])
+const props = defineProps(['errorText']);
+const emit = defineEmits(['returnLoginAndPassword']);
 
-let isPasswordVisible = ref(false)
-let passwordInputType = computed(() => (isPasswordVisible.value ? 'text' : 'password'))
+let isPasswordVisible = ref(false);
+let passwordInputType = computed(() => (isPasswordVisible.value ? 'text' : 'password'));
 
-let loginInput = ref('')
-let passwordInput = ref('')
+let loginInput = ref('');
+let passwordInput = ref('');
 </script>

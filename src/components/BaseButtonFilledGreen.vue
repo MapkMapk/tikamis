@@ -12,5 +12,5 @@ let props = defineProps({
     default: 'button',
     type: String
   }
-})
+});
 </script>

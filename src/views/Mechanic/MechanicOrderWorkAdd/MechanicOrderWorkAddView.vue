@@ -4,163 +4,112 @@
   <section class="flex flex-col w-full h-auto items-center justify-center mb-10 pt-10">
     <span class="flex justify-center text-center text-4xl font-medium">Добавить услуги</span>
     <div class="relative container w-full">
-      <div class="border-2 border-gray-a1a4ad mt-7 flex justify-between">
-        <div class="flex w-full items-center h-[80px] px-[30px] cursor-pointer">
+      <div :class="{'border-green': searchInputText.length > 0}"
+           class="border-2 border-gray-a1a4ad mt-7 flex justify-between">
+        <div class="flex w-full items-center h-[80px] px-[30px]">
           <BaseSvgIcon
-            name="loop"
+            v-if="searchInputText.length > 0"
+            name="loop-green"
+            class="w-6 h-6 mr-5"
+          />
+          <BaseSvgIcon
+            v-else
+            name="loop-black"
             class="w-6 h-6 mr-5"
           />
           <input
+            v-model="searchInputText"
             type="text"
             placeholder="Начните вводить название услуги"
             class="w-full text-2xl mr-5"
           />
           <BaseSvgIcon
+            @click="searchInputText = ''"
             name="cross-in-circle"
-            class="w-6 h-6 ml-auto"
+            class="w-6 h-6 cursor-pointer ml-auto"
           />
         </div>
       </div>
-      <div class="absolute w-[calc(100%-60px)] flex flex-col">
-        <div
-          class="border-t-0 pt-2 flex items-center px-[30px] border-l border-r border-gray-a1a4ad flex-wrap"
-        >
-          <div
-            class="flex justify-center items-center mt-1 mb-1 px-5 py-3 bg-gray-2c2d2f rounded-full whitespace-nowrap mr-2.5"
-          >
-            <div class="text-white text-sm mr-2">Проверка состояния</div>
-            <BaseSvgIcon
-              name="cross"
-              class="w-3 h-3"
-            />
-          </div>
-          <div
-            class="flex justify-center items-center mt-1 mb-1 px-5 py-3 bg-gray-2c2d2f rounded-full whitespace-nowrap mr-2.5"
-          >
-            <div class="text-white text-sm mr-2">Чистка салона</div>
-            <BaseSvgIcon
-              name="cross"
-              class="w-3 h-3"
-            />
-          </div>
-          <div
-            class="flex justify-center items-center mt-1 mb-1 px-5 py-3 bg-gray-2c2d2f rounded-full whitespace-nowrap mr-2.5"
-          >
-            <div class="text-white text-sm mr-2">Проверка тормозных шлангов</div>
-            <BaseSvgIcon
-              name="cross"
-              class="w-3 h-3"
-            />
-          </div>
-          <div
-            class="flex justify-center items-center mt-1 mb-1 px-5 py-3 bg-gray-2c2d2f rounded-full whitespace-nowrap mr-2.5"
-          >
-            <div class="text-white text-sm mr-2">Замена шин</div>
-            <BaseSvgIcon
-              name="cross"
-              class="w-3 h-3"
-            />
-          </div>
-          <div
-            class="flex justify-center items-center mt-1 mb-1 px-5 py-3 bg-gray-2c2d2f rounded-full whitespace-nowrap mr-2.5"
-          >
-            <div class="text-white text-sm mr-2">Общая диагностика</div>
-            <BaseSvgIcon
-              name="cross"
-              class="w-3 h-3"
-            />
-          </div>
+      <div class="absolute w-[calc(100%-60px)] flex flex-col border border-gray-a1a4ad border-t-0">
+        <div v-if="amountOfSelectedWorks > 0" class="flex flex-wrap ml-[26px] mr-[26px] pt-2 pb-2">
+          <MechanicOrderWorkAddCracker
+            v-for="(work, index) in works"
+            :key="work.workId"
+            @deactivate-work="deactivateWork"
+            :isSelected="work.isSelected"
+            :name="work.name"
+            :index="index"
+          />
         </div>
-        <div
-          class="border-t-0 flex items-center justify-between px-[30px] h-[66px] border border-gray-a1a4ad cursor-pointer"
-        >
-          <div class="flex items-center">
-            <div class="w-[24px] h-[24px] border-2 border-black"></div>
-            <div class="ml-6 text-lg">Проверка тормозных шлангов</div>
-          </div>
-          <div class="">1500 ₽</div>
-        </div>
-        <div
-          class="border-t-0 flex items-center justify-between px-[30px] h-[66px] border border-gray-a1a4ad cursor-pointer"
-        >
-          <div class="flex items-center">
-            <div class="w-[24px] h-[24px] border-2 border-black"></div>
-            <div class="ml-6 text-lg">Проверка тормозных шлангов</div>
-          </div>
-          <div class="">1500 ₽</div>
-        </div>
-        <div
-          class="border-t-0 flex items-center justify-between px-[30px] h-[66px] border border-gray-a1a4ad cursor-pointer"
-        >
-          <div class="flex items-center">
-            <div class="w-[24px] h-[24px] border-2 border-black"></div>
-            <div class="ml-6 text-lg">Проверка тормозных шлангов</div>
-          </div>
-          <div class="">1500 ₽</div>
-        </div>
-        <div
-          class="border-t-0 flex items-center justify-between px-[30px] h-[66px] border border-gray-a1a4ad cursor-pointer"
-        >
-          <div class="flex items-center">
-            <div class="w-[24px] h-[24px] border-2 border-black"></div>
-            <div class="ml-6 text-lg">Проверка тормозных шлангов</div>
-          </div>
-          <div class="">1500 ₽</div>
-        </div>
-        <div
-          class="border-t-0 flex items-center justify-between px-[30px] h-[66px] border border-gray-a1a4ad cursor-pointer"
-        >
-          <div class="flex items-center">
-            <div class="w-[24px] h-[24px] border-2 border-black"></div>
-            <div class="ml-6 text-lg">Проверка тормозных шлангов</div>
-          </div>
-          <div class="">1500 ₽</div>
-        </div>
-        <div
-          class="border-t-0 flex items-center justify-between px-[30px] h-[66px] border border-gray-a1a4ad cursor-pointer"
-        >
-          <div class="flex items-center">
-            <div class="w-[24px] h-[24px] border-2 border-black"></div>
-            <div class="ml-6 text-lg">Проверка тормозных шлангов</div>
-          </div>
-          <div class="">1500 ₽</div>
-        </div>
-        <div
-          class="border-t-0 flex items-center justify-between px-[30px] h-[66px] border border-gray-a1a4ad cursor-pointer"
-        >
-          <div class="flex items-center">
-            <div class="w-[24px] h-[24px] border-2 border-black"></div>
-            <div class="ml-6 text-lg">Проверка тормозных шлангов</div>
-          </div>
-          <div class="">1500 ₽</div>
-        </div>
-        <div
-          class="border-t-0 flex items-center justify-between px-[30px] h-[66px] border border-gray-a1a4ad cursor-pointer"
-        >
-          <div class="flex items-center">
-            <div class="w-[24px] h-[24px] border-2 border-black"></div>
-            <div class="ml-6 text-lg">Проверка тормозных шлангов</div>
-          </div>
-          <div class="">1500 ₽</div>
-        </div>
-        <div
-          class="border-t-0 flex items-center justify-between px-[30px] h-[66px] border border-gray-a1a4ad cursor-pointer"
-        >
-          <div class="flex items-center">
-            <div class="w-[24px] h-[24px] border-2 border-black"></div>
-            <div class="ml-6 text-lg">Проверка тормозных шлангов</div>
-          </div>
-          <div class="">1500 ₽</div>
-        </div>
+        <MechanicOrderWorkAddWork
+          v-for="(work, index) in works"
+          :key="work.workId"
+          @toggle-work-selection="toggleWorkSelection"
+          :search-input-text="searchInputText"
+          :isSelected="work.isSelected"
+          :work-id="work.workId"
+          :name="work.name"
+          :price="work.price"
+          :index="index"
+        />
       </div>
     </div>
   </section>
-  <BaseButtonFilledGreen class="fixed bottom-5 left-[calc(50%-(theme(width.52))/2)]"
-    >Добавить 1 услугу
+  <BaseButtonFilledGreen
+    @click="addWorksToOrder"
+    v-if="amountOfSelectedWorks > 0"
+    class="fixed w-[300px] bottom-5 left-[calc(50%-(theme(width.52))/2)]"
+  >Добавить
+    {{ `${amountOfSelectedWorks} ${getQuantitativeDeclination(amountOfSelectedWorks, 'услугу', 'услуги', 'услуг')}` }}
   </BaseButtonFilledGreen>
 </template>
 <script setup>
 import TheHeader from '@/components/TheMechanicHeader.vue'
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue'
+import MechanicOrderWorkAddWork from '@/views/Mechanic/MechanicOrderWorkAdd/MechanicOrderWorkAddWork.vue'
+import MechanicOrderWorkAddCracker from '@/views/Mechanic/MechanicOrderWorkAdd/MechanicOrderWorkAddCracker.vue'
+import getQuantitativeDeclination from '@/utils/getQuantitativeDeclination.js'
+import { onMounted, ref, computed } from 'vue'
+import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js'
+
+const mechanicOrderStore = useMechanicOrderStore()
+let searchInputText = ref('')
+let works = ref([])
+
+let amountOfSelectedWorks = computed(() => {
+  let counter = 0
+  works.value.forEach((work) => {
+    if (work.isSelected === true) {
+      counter++
+    }
+  })
+  return counter
+})
+
+onMounted(async () => {
+  let { works: originalWorks } = await mechanicOrderStore.workList()
+  originalWorks.forEach((work) => {
+    work.isSelected = false
+  })
+  works.value = originalWorks
+})
+
+function toggleWorkSelection(index) {
+  works.value[index].isSelected = !works.value[index].isSelected
+}
+
+function deactivateWork(index) {
+  works.value[index].isSelected = false
+}
+
+async function addWorksToOrder() {
+  let allSelectedWorkIds = []
+  works.value.forEach((work) => {
+    if (work.isSelected === true) {
+      allSelectedWorkIds.push(work.workId)
+    }
+  })
+  await mechanicOrderStore.workAdd(allSelectedWorkIds)
+}
 </script>

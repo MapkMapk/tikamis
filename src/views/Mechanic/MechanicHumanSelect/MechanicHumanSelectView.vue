@@ -55,44 +55,44 @@
 </template>
 
 <script setup>
-import TheHeader from '@/components/TheMechanicHeader.vue'
-import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
-import { computed, onMounted, ref } from 'vue'
-import MechanicHumanSelectItem from '@/views/Mechanic/MechanicHumanSelect/MechanicHumanSelectItem.vue'
+import TheHeader from '@/components/TheMechanicHeader.vue';
+import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
+import { computed, onMounted, ref } from 'vue';
+import MechanicHumanSelectItem from '@/views/Mechanic/MechanicHumanSelect/MechanicHumanSelectItem.vue';
 // import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue'
-import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js'
-import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue'
-import mechanicApiList from '@/api/mechanic/mechanicApiList.js'
-import mechanicApiMechanicLogin from '@/api/mechanic/mechanicApiMechanicLogin.js'
-import router from '@/router/index.js'
+import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js';
+import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
+import mechanicApiList from '@/api/mechanic/mechanicApiList.js';
+import mechanicApiMechanicLogin from '@/api/mechanic/mechanicApiMechanicLogin.js';
+import router from '@/router/index.js';
 
-let mechanicUserStore = useMechanicUserStore()
-let isMechanicsVisible = ref(false)
-let selectedMechanic = ref({ id: '', name: '' })
-let isMechanicSelected = computed(() => selectedMechanic.value.id !== '')
-let errorText = ref('')
+let mechanicUserStore = useMechanicUserStore();
+let isMechanicsVisible = ref(false);
+let selectedMechanic = ref({ id: '', name: '' });
+let isMechanicSelected = computed(() => selectedMechanic.value.id !== '');
+let errorText = ref('');
 
-let mechanics = ref([])
+let mechanics = ref([]);
 
 onMounted(async () => {
-  let data = await mechanicApiList()
-  mechanics.value = data.mechanics
-})
+  let data = await mechanicApiList();
+  mechanics.value = data.mechanics;
+});
 
 function pickMechanic(id, name) {
-  selectedMechanic.value.id = id
-  selectedMechanic.value.name = name
-  isMechanicsVisible.value = false
+  selectedMechanic.value.id = id;
+  selectedMechanic.value.name = name;
+  isMechanicsVisible.value = false;
 }
 
 async function mechanicLogin() {
-  let isMechanicLoggedIn = await mechanicApiMechanicLogin(selectedMechanic.value.id)
+  let isMechanicLoggedIn = await mechanicApiMechanicLogin(selectedMechanic.value.id);
   if (isMechanicLoggedIn) {
-    mechanicUserStore.activeMechanicId = selectedMechanic.value.id
-    mechanicUserStore.activeMechanicName = selectedMechanic.value.name
-    await router.push('/mechanic/order')
+    mechanicUserStore.activeMechanicId = selectedMechanic.value.id;
+    mechanicUserStore.activeMechanicName = selectedMechanic.value.name;
+    await router.push('/mechanic/order');
   } else {
-    errorText.value = 'Выбранный механик уже занят на другом посте или переданные данные устарели'
+    errorText.value = 'Выбранный механик уже занят на другом посте или переданные данные устарели';
   }
 }
 </script>

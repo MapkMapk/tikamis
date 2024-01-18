@@ -19,7 +19,7 @@
     <BaseSvgIcon
       @click="
         workId = work.id;
-        isModalVisible = true
+        isModalVisible = true;
       "
       name="trash-bin"
       class="w-[22px] h-[25px] cursor-pointer"
@@ -27,20 +27,20 @@
   </div>
 </template>
 <script setup>
-import { ref } from 'vue'
-import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
-import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js'
-import BaseButtonFilledRed from '@/components/BaseButtonFilledRed.vue'
-import BaseModalBoolean from '@/components/BaseModalBoolean.vue'
+import { ref } from 'vue';
+import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
+import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
+import BaseButtonFilledRed from '@/components/BaseButtonFilledRed.vue';
+import BaseModalBoolean from '@/components/BaseModalBoolean.vue';
 
-const mechanicOrderStore = useMechanicOrderStore()
-let isModalVisible = ref(false)
-let workId = ref()
+const mechanicOrderStore = useMechanicOrderStore();
+let isModalVisible = ref(false);
+let workId = ref();
 
 async function removeWork(isConfirmed) {
   if (isConfirmed) {
-    await mechanicOrderStore.workRemove(workId.value)
+    await mechanicOrderStore.workRemove(workId.value);
   }
-  isModalVisible.value = false
+  isModalVisible.value = false;
 }
 </script>

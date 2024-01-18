@@ -20,7 +20,7 @@
   </section>
 </template>
 <script setup>
-import TheHeader from '@/components/TheMechanicHeader.vue'
-import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue'
-import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
+import TheHeader from '@/components/TheMechanicHeader.vue';
+import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
+import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 </script>

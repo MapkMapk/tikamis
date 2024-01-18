@@ -38,19 +38,19 @@
 </template>
 
 <script setup>
-import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
-import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js'
-import { ref } from 'vue'
-import mechanicApiMechanicLogout from '@/api/mechanic/mechanicApiMechanicLogout.js'
-import router from '@/router/index.js'
+import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
+import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js';
+import { ref } from 'vue';
+import mechanicApiMechanicLogout from '@/api/mechanic/mechanicApiMechanicLogout.js';
+import router from '@/router/index.js';
 
-let mechanicUserStore = useMechanicUserStore()
-let isMenuActive = ref(false)
+let mechanicUserStore = useMechanicUserStore();
+let isMenuActive = ref(false);
 
 async function mechanicLogout() {
-  mechanicUserStore.activeMechanicId = ''
-  mechanicUserStore.activeMechanicName = ''
-  await mechanicApiMechanicLogout()
-  await router.push('/mechanic/human-select')
+  mechanicUserStore.activeMechanicId = '';
+  mechanicUserStore.activeMechanicName = '';
+  await mechanicApiMechanicLogout();
+  await router.push('/mechanic/human-select');
 }
 </script>

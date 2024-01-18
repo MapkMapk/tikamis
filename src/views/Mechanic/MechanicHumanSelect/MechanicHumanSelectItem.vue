@@ -8,10 +8,10 @@
 </template>
 
 <script setup>
-const emit = defineEmits(['backMechanic'])
+const emit = defineEmits(['backMechanic']);
 
 defineProps({
   id: String,
   name: String
-})
+});
 </script>

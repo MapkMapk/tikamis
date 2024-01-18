@@ -65,8 +65,9 @@
       </div>
       <MechanicOrderWork />
     </div>
-    <div class="flex mt-auto">
-      <button
+    <div class="flex mt-auto pt-10 pb-6">
+      <router-link
+        to="/mechanic/order/work-add"
         class="flex flex-1 justify-center items-center border border-green cursor-pointer py-5"
       >
         <BaseSvgIcon
@@ -76,8 +77,11 @@
         <span class="font-semibold text-[21px] ml-4 text-green lg:!text-base lg:ml-3"
           >Добавить услугу</span
         >
-      </button>
-      <BaseButtonFilledGreen v-if="!mechanicOrderStore.isOrderAccepted" @click="mechanicOrderStore.orderStart" class="flex-1 ml-4 mr-4 !text-[21px] !px-0 lg:!text-base"
+      </router-link>
+      <BaseButtonFilledGreen
+        v-if="!mechanicOrderStore.isOrderAccepted"
+        @click="mechanicOrderStore.orderStart"
+        class="flex-1 ml-4 mr-4 !text-[21px] !px-0 lg:!text-base"
         >Начать выполнение
       </BaseButtonFilledGreen>
       <button
@@ -106,39 +110,39 @@
   </section>
 </template>
 <script setup>
-import TheHeader from '@/components/TheMechanicHeader.vue'
-import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
+import TheHeader from '@/components/TheMechanicHeader.vue';
+import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 
-import MechanicOrderWork from '@/views/Mechanic/MechanicOrder/MechanicOrderWork.vue'
-import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js'
-import { ref, computed, onBeforeMount, onBeforeUnmount } from 'vue'
-import BaseModalBoolean from '@/components/BaseModalBoolean.vue'
-import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue'
-import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue'
+import MechanicOrderWork from '@/views/Mechanic/MechanicOrder/MechanicOrderWork.vue';
+import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
+import { ref, computed, onBeforeMount, onBeforeUnmount } from 'vue';
+import BaseModalBoolean from '@/components/BaseModalBoolean.vue';
+import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
+import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
 
-const mechanicOrderStore = useMechanicOrderStore()
-let updateOrderInfoInterval = ''
+const mechanicOrderStore = useMechanicOrderStore();
+let updateOrderInfoInterval = '';
 
-let isModalVisible = ref(false)
-let isLowTime = computed(() => mechanicOrderStore.completionTimeHours < 1)
+let isModalVisible = ref(false);
+let isLowTime = computed(() => mechanicOrderStore.completionTimeHours < 1);
 
 async function orderCancel(isConfirmed) {
   if (isConfirmed) {
-    await mechanicOrderStore.orderCancel()
+    await mechanicOrderStore.orderCancel();
   }
-  isModalVisible.value = false
+  isModalVisible.value = false;
 }
 
 // Интервал необходим, чтобы поддерживать данные заказа в актуальном состоянии
 // Чтобы например если клиент откажется от заказа механик тоже смог это увидеть
 onBeforeMount(async () => {
-  await mechanicOrderStore.orderGetNext()
-  updateOrderInfoInterval = setInterval(() => mechanicOrderStore.orderGetNext(), 30000)
-})
+  await mechanicOrderStore.orderGetNext();
+  updateOrderInfoInterval = setInterval(() => mechanicOrderStore.orderGetNext(), 30000);
+});
 
 // Удаление интервала обновления заказа в момент ухода с страницы, чтобы он не оставался в памяти
 // При повторном посещении страницы сработает вызов getNext в хуке onMount / onBeforeMount
 onBeforeUnmount(() => {
-  clearInterval(updateOrderInfoInterval)
-})
+  clearInterval(updateOrderInfoInterval);
+});
 </script>

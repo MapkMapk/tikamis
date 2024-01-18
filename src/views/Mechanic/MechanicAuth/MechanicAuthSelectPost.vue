@@ -54,38 +54,38 @@
   </section>
 </template>
 <script setup>
-import TheHeader from '@/components/TheMechanicHeader.vue'
-import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
-import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue'
-import { computed, onMounted, ref } from 'vue'
-import mechanicApiGetPosts from '@/api/mechanic/mechanicApiGetPosts.js'
+import TheHeader from '@/components/TheMechanicHeader.vue';
+import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
+import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
+import { computed, onMounted, ref } from 'vue';
+import mechanicApiGetPosts from '@/api/mechanic/mechanicApiGetPosts.js';
 
-const props = defineProps(['login', 'password'])
-const emit = defineEmits(['returnPostNumber', 'updateStep'])
+const props = defineProps(['login', 'password']);
+const emit = defineEmits(['returnPostNumber', 'updateStep']);
 
-let posts = ref(null)
-let isPostSelected = computed(() => selectedPost.value !== 0)
-let isPostsVisible = ref(false)
-let selectedPost = ref(0)
-let errorText = ref('')
+let posts = ref(null);
+let isPostSelected = computed(() => selectedPost.value !== 0);
+let isPostsVisible = ref(false);
+let selectedPost = ref(0);
+let errorText = ref('');
 
 onMounted(async () => {
-  let data = await mechanicApiGetPosts(props.login, props.password)
+  let data = await mechanicApiGetPosts(props.login, props.password);
   if (data) {
-    posts.value = data.posts
+    posts.value = data.posts;
   } else {
-    emit('updateStep', 1)
+    emit('updateStep', 1);
   }
-})
+});
 
 function formHandler() {
   isPostSelected.value
     ? emit('returnPostNumber', selectedPost.value)
-    : (errorText.value = 'Вы не выбрали пост')
+    : (errorText.value = 'Вы не выбрали пост');
 }
 
 function setPost(element) {
-  selectedPost.value = element.target.innerHTML
-  isPostsVisible.value = false
+  selectedPost.value = element.target.innerHTML;
+  isPostsVisible.value = false;
 }
 </script>
