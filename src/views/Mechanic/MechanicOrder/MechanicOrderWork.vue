@@ -32,7 +32,6 @@ import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
 import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js'
 import BaseButtonFilledRed from '@/components/BaseButtonFilledRed.vue'
 import BaseModalBoolean from '@/components/BaseModalBoolean.vue'
-import mechanicApiOrderWork_delete from '@/api/mechanic/mechanicApiOrderWork_delete.js'
 
 const mechanicOrderStore = useMechanicOrderStore()
 let isModalVisible = ref(false)
@@ -40,8 +39,7 @@ let workId = ref()
 
 async function removeWork(isConfirmed) {
   if (isConfirmed) {
-    await mechanicApiOrderWork_delete(mechanicOrderStore.orderId, workId.value)
-    await mechanicOrderStore.getNext()
+    await mechanicOrderStore.workRemove(workId.value)
   }
   isModalVisible.value = false
 }

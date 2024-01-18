@@ -1,7 +1,7 @@
 <template>
   <BaseModalBoolean
     v-if="isModalVisible"
-    @callback="getNextOrder"
+    @callback="orderCancel"
     :primary-button-component="BaseButtonFilledDark"
     main-title="Начать следующий заказ?"
     main-text="К этому заказу больше нельзя будет вернуться. Он будет отменён"
@@ -77,12 +77,12 @@
           >Добавить услугу</span
         >
       </button>
-      <BaseButtonFilledGreen class="flex-1 ml-4 mr-4 !text-[21px] !px-0 lg:!text-base"
+      <BaseButtonFilledGreen v-if="!mechanicOrderStore.isOrderAccepted" @click="mechanicOrderStore.orderStart" class="flex-1 ml-4 mr-4 !text-[21px] !px-0 lg:!text-base"
         >Начать выполнение
       </BaseButtonFilledGreen>
       <button
-        v-if="false"
-        class="flex flex-1 justify-center items-center border border-red"
+        v-if="mechanicOrderStore.isOrderAccepted"
+        class="flex flex-1 justify-center items-center border border-red ml-4 mr-4"
       >
         <span class="text-red font-semibold text-[21px]">Введите пробег, км</span>
         <BaseSvgIcon
@@ -106,7 +106,7 @@
   </section>
 </template>
 <script setup>
-import TheHeader from '@/components/TheHeader.vue'
+import TheHeader from '@/components/TheMechanicHeader.vue'
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
 
 import MechanicOrderWork from '@/views/Mechanic/MechanicOrder/MechanicOrderWork.vue'
@@ -122,9 +122,9 @@ let updateOrderInfoInterval = ''
 let isModalVisible = ref(false)
 let isLowTime = computed(() => mechanicOrderStore.completionTimeHours < 1)
 
-async function getNextOrder(isConfirmed) {
+async function orderCancel(isConfirmed) {
   if (isConfirmed) {
-    await mechanicOrderStore.nextOrder()
+    await mechanicOrderStore.orderCancel()
   }
   isModalVisible.value = false
 }
@@ -132,8 +132,8 @@ async function getNextOrder(isConfirmed) {
 // Интервал необходим, чтобы поддерживать данные заказа в актуальном состоянии
 // Чтобы например если клиент откажется от заказа механик тоже смог это увидеть
 onBeforeMount(async () => {
-  await mechanicOrderStore.getNext()
-  updateOrderInfoInterval = setInterval(() => mechanicOrderStore.getNext(), 30000)
+  await mechanicOrderStore.orderGetNext()
+  updateOrderInfoInterval = setInterval(() => mechanicOrderStore.orderGetNext(), 30000)
 })
 
 // Удаление интервала обновления заказа в момент ухода с страницы, чтобы он не оставался в памяти
