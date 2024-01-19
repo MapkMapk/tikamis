@@ -87,7 +87,7 @@
       <div
         v-if="mechanicOrderStore.isOrderAccepted"
         :class="{ '!border-gray-a1a4ad': String(odometer).length > 0 }"
-        class="flex justify-center items-center flex-1 ml-4 mr-4 border border-red"
+        class="flex flex-1 justify-center items-center ml-4 mr-4 border border-red"
       >
         <input
           type="number"
@@ -123,7 +123,7 @@
       <BaseButtonFilledGreen
         @click="orderComplete"
         v-if="mechanicOrderStore.isOrderAccepted"
-        class="flex-1"
+        class="flex flex-1 pl-0 pr-0"
         >Завершить заказ</BaseButtonFilledGreen
       >
     </div>
@@ -139,7 +139,6 @@ import { ref, computed, onBeforeMount, onBeforeUnmount } from 'vue';
 import BaseModalBoolean from '@/components/BaseModalBoolean.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
-import router from '@/router/index.js'
 
 const mechanicOrderStore = useMechanicOrderStore();
 let updateOrderInfoInterval = '';
