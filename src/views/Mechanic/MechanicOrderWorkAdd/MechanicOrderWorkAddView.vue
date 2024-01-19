@@ -4,8 +4,10 @@
   <section class="flex flex-col w-full h-auto items-center justify-center mb-10 pt-10">
     <span class="flex justify-center text-center text-4xl font-medium">Добавить услуги</span>
     <div class="relative container w-full">
-      <div :class="{'border-green': searchInputText.length > 0}"
-           class="border-2 border-gray-a1a4ad mt-7 flex justify-between">
+      <div
+        :class="{ 'border-green': searchInputText.length > 0 }"
+        class="border-2 border-gray-a1a4ad mt-7 flex justify-between"
+      >
         <div class="flex w-full items-center h-[80px] px-[30px]">
           <BaseSvgIcon
             v-if="searchInputText.length > 0"
@@ -30,8 +32,11 @@
           />
         </div>
       </div>
-      <div class="absolute w-[calc(100%-60px)] flex flex-col border border-gray-a1a4ad border-t-0">
-        <div v-if="amountOfSelectedWorks > 0" class="flex flex-wrap ml-[26px] mr-[26px] pt-2 pb-2">
+      <div class="w-full flex flex-col border border-gray-a1a4ad border-t-0">
+        <div
+          v-if="amountOfSelectedWorks > 0"
+          class="flex flex-wrap ml-[26px] mr-[26px] pt-2 pb-2"
+        >
           <MechanicOrderWorkAddCracker
             v-for="(work, index) in works"
             :key="work.workId"
@@ -41,17 +46,19 @@
             :index="index"
           />
         </div>
-        <MechanicOrderWorkAddWork
-          v-for="(work, index) in works"
-          :key="work.workId"
-          @toggle-work-selection="toggleWorkSelection"
-          :search-input-text="searchInputText"
-          :isSelected="work.isSelected"
-          :work-id="work.workId"
-          :name="work.name"
-          :price="work.price"
-          :index="index"
-        />
+        <div class="w-full flex flex-col max-h-screen overflow-y-auto">
+          <MechanicOrderWorkAddWork
+            v-for="(work, index) in works"
+            :key="work.workId"
+            @toggle-work-selection="toggleWorkSelection"
+            :search-input-text="searchInputText"
+            :isSelected="work.isSelected"
+            :work-id="work.workId"
+            :name="work.name"
+            :price="work.price"
+            :index="index"
+          />
+        </div>
       </div>
     </div>
   </section>
@@ -59,57 +66,67 @@
     @click="addWorksToOrder"
     v-if="amountOfSelectedWorks > 0"
     class="fixed w-[300px] bottom-5 left-[calc(50%-(theme(width.52))/2)]"
-  >Добавить
-    {{ `${amountOfSelectedWorks} ${getQuantitativeDeclination(amountOfSelectedWorks, 'услугу', 'услуги', 'услуг')}` }}
+    >Добавить
+    {{
+      `${amountOfSelectedWorks} ${getQuantitativeDeclination(
+        amountOfSelectedWorks,
+        'услугу',
+        'услуги',
+        'услуг'
+      )}`
+    }}
   </BaseButtonFilledGreen>
 </template>
 <script setup>
-import TheHeader from '@/components/TheMechanicHeader.vue'
-import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
-import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue'
-import MechanicOrderWorkAddWork from '@/views/Mechanic/MechanicOrderWorkAdd/MechanicOrderWorkAddWork.vue'
-import MechanicOrderWorkAddCracker from '@/views/Mechanic/MechanicOrderWorkAdd/MechanicOrderWorkAddCracker.vue'
-import getQuantitativeDeclination from '@/utils/getQuantitativeDeclination.js'
-import { onMounted, ref, computed } from 'vue'
-import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js'
+import TheHeader from '@/components/TheMechanicHeader.vue';
+import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
+import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
+import router from '@/router/index.js';
+import MechanicOrderWorkAddWork from '@/views/Mechanic/MechanicOrderWorkAdd/MechanicOrderWorkAddWork.vue';
+import MechanicOrderWorkAddCracker from '@/views/Mechanic/MechanicOrderWorkAdd/MechanicOrderWorkAddCracker.vue';
+import getQuantitativeDeclination from '@/utils/getQuantitativeDeclination.js';
+import { onMounted, ref, computed } from 'vue';
+import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
 
-const mechanicOrderStore = useMechanicOrderStore()
-let searchInputText = ref('')
-let works = ref([])
+const mechanicOrderStore = useMechanicOrderStore();
+let searchInputText = ref('');
+let works = ref([]);
 
 let amountOfSelectedWorks = computed(() => {
-  let counter = 0
+  let counter = 0;
   works.value.forEach((work) => {
     if (work.isSelected === true) {
-      counter++
+      counter++;
     }
-  })
-  return counter
-})
+  });
+  return counter;
+});
 
 onMounted(async () => {
-  let { works: originalWorks } = await mechanicOrderStore.workList()
+  let { works: originalWorks } = await mechanicOrderStore.workList();
   originalWorks.forEach((work) => {
-    work.isSelected = false
-  })
-  works.value = originalWorks
-})
+    work.isSelected = false;
+  });
+  works.value = originalWorks;
+});
 
 function toggleWorkSelection(index) {
-  works.value[index].isSelected = !works.value[index].isSelected
+  works.value[index].isSelected = !works.value[index].isSelected;
 }
 
 function deactivateWork(index) {
-  works.value[index].isSelected = false
+  works.value[index].isSelected = false;
 }
 
 async function addWorksToOrder() {
-  let allSelectedWorkIds = []
+  let allSelectedWorkIds = [];
   works.value.forEach((work) => {
     if (work.isSelected === true) {
-      allSelectedWorkIds.push(work.workId)
+      work.isSelected = false;
+      allSelectedWorkIds.push(work.workId);
     }
-  })
-  await mechanicOrderStore.workAdd(allSelectedWorkIds)
+  });
+  await mechanicOrderStore.workAdd(allSelectedWorkIds);
+  await router.push('/mechanic/order');
 }
 </script>

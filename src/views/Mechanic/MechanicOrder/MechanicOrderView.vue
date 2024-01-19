@@ -9,7 +9,7 @@
     secondary-button-text="Отмена"
   />
   <TheHeader />
-  <section class="flex flex-col container lg:container mt-[60px] mb-10 h-[calc(100vh-160px)]">
+  <section class="flex flex-col container lg:container mt-[60px] h-[calc(100vh-120px)]">
     <div class="w-full flex">
       <span
         class="flex flex-1 border border-gray-a1a4ad text-5xl text-black pl-[30px] pr-[30px] py-9 leading-none"
