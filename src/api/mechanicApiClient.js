@@ -59,7 +59,7 @@ mechanicApiClient.interceptors.response.use(
     if (response.status === 409) {
       alert(response.data);
     }
-    if (response.status === 400 && response.status === 403) {
+    if (response.status !== 200) {
       console.log(response);
     }
     return response;

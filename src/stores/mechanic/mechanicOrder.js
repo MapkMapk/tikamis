@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { mechanicApiClient } from '@/api/mechanicApiClient.js';
+import router from '@/router/index.js'
 
 export const useMechanicOrderStore = defineStore(
   'mechanicOrder',
@@ -12,6 +13,7 @@ export const useMechanicOrderStore = defineStore(
     let startDate = ref('');
     let completionTimeHours = ref();
     let works = ref();
+    let qrcode = ref();
 
     let formattedCompletionTime = computed(() => {
       let time = String(completionTimeHours.value).split('.');
@@ -32,7 +34,6 @@ export const useMechanicOrderStore = defineStore(
 
     async function orderGetNext() {
       const { data } = await mechanicApiClient.get(`/order/get-next`);
-      console.log(data);
       orderId.value = data.orderId;
       isOrderAccepted.value = data.isOrderAccepted;
       plateNumber.value = data.plateNumber;
@@ -43,10 +44,9 @@ export const useMechanicOrderStore = defineStore(
     }
 
     async function orderStart() {
-      console.log('orderStart');
       let response = await mechanicApiClient.post('/order/start', { orderId: orderId.value });
-      console.log(response);
       if (response.status === 200) {
+        qrcode.value = ''
         await orderGetNext();
       }
     }
@@ -57,8 +57,11 @@ export const useMechanicOrderStore = defineStore(
     }
 
     async function orderComplete(odometer) {
-      await mechanicApiClient.post('/order/complete', { odometer });
-      await orderGetNext();
+      const { data } = await mechanicApiClient.post('/order/complete', { odometer });
+      if (data.result) {
+        qrcode.value = data.result;
+        await router.push('/mechanic/payment-qr');
+      }
     }
 
     async function workList() {
@@ -90,6 +93,7 @@ export const useMechanicOrderStore = defineStore(
       works,
       formattedCompletionTime,
       isOrderAccepted,
+      qrcode,
       orderGetNext,
       orderStart,
       orderCancel,

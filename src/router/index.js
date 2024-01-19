@@ -5,6 +5,7 @@ import MechanicOrderView from '@/views/Mechanic/MechanicOrder/MechanicOrderView.
 import MechanicOrderWorkAddView from '@/views/Mechanic/MechanicOrderWorkAdd/MechanicOrderWorkAddView.vue';
 import MechanicPaymentQrView from '@/views/Mechanic/MechanicPaymentQr/MechanicPaymentQrView.vue';
 import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js';
+import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js'
 import Index from '@/views/index.vue';
 
 const router = createRouter({
@@ -58,7 +59,8 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const accessToken = localStorage.getItem('accessToken');
-  let mechanicUserStore = useMechanicUserStore();
+  const mechanicUserStore = useMechanicUserStore();
+  const mechanicOrderStore = useMechanicOrderStore();
 
   // Роутинг если в localStorage нету access токена
 
@@ -90,16 +92,24 @@ router.beforeEach((to, from, next) => {
       });
     }
     // Если переход на страницу авторизации, но человек уже авторизован
-    // То переход на страницу выбора механика
+    // то переход на страницу выбора механика
     if (to.name === 'mechanic.auth' && localStorage.getItem('accessToken')) {
       return next({
         name: 'mechanic.humanSelect'
       });
     }
-
+    // Если переход на страницу добавления работ в заказ, но механик ещё не выбран
+    // то редиректнуть на страницу выбора механика
     if (to.name === 'mechanic.order.workAdd' && !mechanicUserStore.activeMechanicId) {
       return next({
         name: 'mechanic.humanSelect'
+      });
+    }
+    // Если переход на страницу с QR кодом, но QR код о завершении заказа ещё не получен
+    // то редиректнуть на страницу заказа
+    if (to.name === 'mechanic.paymentQr' && !mechanicOrderStore.qrcode) {
+      return next({
+        name: 'mechanic.order'
       });
     }
 

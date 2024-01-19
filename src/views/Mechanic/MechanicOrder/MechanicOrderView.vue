@@ -84,17 +84,31 @@
         class="flex-1 ml-4 mr-4 !text-[21px] !px-0 lg:!text-base"
         >Начать выполнение
       </BaseButtonFilledGreen>
-      <button
+      <div
         v-if="mechanicOrderStore.isOrderAccepted"
-        class="flex flex-1 justify-center items-center border border-red ml-4 mr-4"
+        :class="{ '!border-gray-a1a4ad': String(odometer).length > 0 }"
+        class="flex justify-center items-center flex-1 ml-4 mr-4 border border-red"
       >
-        <span class="text-red font-semibold text-[21px]">Введите пробег, км</span>
-        <BaseSvgIcon
-          name="warning-sign-in-triangle"
-          class="w-[26px] h-[26px]"
+        <input
+          type="number"
+          v-model="odometer"
+          placeholder="Введите пробег, км"
+          v-if="mechanicOrderStore.isOrderAccepted"
+          class="w-full ml-[30px] text-[21px] flex justify-center items-center placeholder:text-red"
         />
-      </button>
+        <BaseSvgIcon
+          v-if="odometer.length <= 0"
+          name="warning-sign-in-triangle"
+          class="w-[26px] h-[26px] mr-[20px]"
+        />
+        <BaseSvgIcon
+          v-else
+          name="check-mark-in-circle"
+          class="w-[26px] h-[26px] mr-[20px]"
+        />
+      </div>
       <button
+        v-if="!mechanicOrderStore.isOrderAccepted"
         @click="isModalVisible = true"
         class="flex flex-1 justify-center items-center bg-gray-2c2d2f cursor-pointer py-5"
       >
@@ -106,6 +120,12 @@
           class="w-[26px] h-[26px] lg:w-[18px] lg:h-[18px]"
         />
       </button>
+      <BaseButtonFilledGreen
+        @click="orderComplete"
+        v-if="mechanicOrderStore.isOrderAccepted"
+        class="flex-1"
+        >Завершить заказ</BaseButtonFilledGreen
+      >
     </div>
   </section>
 </template>
@@ -119,10 +139,12 @@ import { ref, computed, onBeforeMount, onBeforeUnmount } from 'vue';
 import BaseModalBoolean from '@/components/BaseModalBoolean.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
+import router from '@/router/index.js'
 
 const mechanicOrderStore = useMechanicOrderStore();
 let updateOrderInfoInterval = '';
 
+let odometer = ref('');
 let isModalVisible = ref(false);
 let isLowTime = computed(() => mechanicOrderStore.completionTimeHours < 1);
 
@@ -131,6 +153,13 @@ async function orderCancel(isConfirmed) {
     await mechanicOrderStore.orderCancel();
   }
   isModalVisible.value = false;
+}
+
+async function orderComplete() {
+  if (odometer.value > 0) {
+    clearInterval(updateOrderInfoInterval);
+    await mechanicOrderStore.orderComplete(odometer.value);
+  }
 }
 
 // Интервал необходим, чтобы поддерживать данные заказа в актуальном состоянии

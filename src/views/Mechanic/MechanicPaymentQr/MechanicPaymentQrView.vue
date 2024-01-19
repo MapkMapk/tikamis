@@ -8,13 +8,15 @@
       если у клиента не работает приложение
     </h1>
     <div class="w-[438px] flex flex-col items-center h-full">
-      <div class="h-full w-[438px] bg-white border-l border-r border-t border-gray-c8c8c8 mt-6">
-        <BaseSvgIcon
-          name="qr-demo"
-          class="w-full h-full"
-        />
-      </div>
-      <BaseButtonFilledDark>Закрыть</BaseButtonFilledDark>
+      <QrcodeVue
+        :size="Number(250)"
+        class="mt-4 border-gray-a1a4ad"
+        :value="mechanicOrderStore.qrcode"
+      />
+      <BaseButtonFilledDark
+        @click="clearQrcode"
+        class="mt-4"
+        >Закрыть</BaseButtonFilledDark
       >
     </div>
   </section>
@@ -22,5 +24,14 @@
 <script setup>
 import TheHeader from '@/components/TheMechanicHeader.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
-import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
+import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
+import QrcodeVue from 'qrcode.vue';
+import router from '@/router/index.js';
+
+let mechanicOrderStore = useMechanicOrderStore()
+
+function clearQrcode() {
+  mechanicOrderStore.qrcode = ''
+  router.push('/mechanic/order')
+}
 </script>
