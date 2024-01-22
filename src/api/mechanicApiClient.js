@@ -1,5 +1,5 @@
 import axios from 'axios';
-import mechanicApiMechanicLogout from '@/api/mechanic/mechanicApiMechanicLogout.js';
+import router from '@/router/index.js'
 
 const mechanicApiClient = axios.create({
   validateStatus: (status) => status < 500,
@@ -21,7 +21,7 @@ mechanicApiClient.interceptors.response.use(
     }
     if (response.status === 401 && localStorage.getItem('accessToken')) {
       console.log('ЧЕКПОИНТ - 2');
-      let response = await axios
+      let { data } = await axios
         .post(
           import.meta.env.VITE_AXIOS_BASE_URL + '/mechanic-api/refresh',
           {},
@@ -31,34 +31,24 @@ mechanicApiClient.interceptors.response.use(
             }
           }
         )
-        .catch((error) => {
-          console.log(error);
+        .catch(async (error) => {
+          if (error.response.status === 401) {
+            localStorage.clear();
+            await router.push('/mechanic/auth');
+          }
         });
-      if (response.status !== 200) {
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-      }
       console.log('ЧЕКПОИНТ - 3');
-      localStorage.setItem('accessToken', response.data.accessToken);
-      localStorage.setItem('refreshToken', response.data.refreshToken);
+      localStorage.setItem('accessToken', data.accessToken);
+      localStorage.setItem('refreshToken', data.refreshToken);
       return await mechanicApiClient({
         ...response.config,
         headers: {
           common: {
-            ['Authorization']: `Bearer ${response.data.accessToken}`,
+            ['Authorization']: `Bearer ${data.accessToken}`,
             ['Content-Type']: 'application/json'
           }
         }
       });
-    }
-    if (
-      response.status === 401 &&
-      !localStorage.getItem('accessToken') &&
-      localStorage.getItem('mechanicUserId')
-    ) {
-      mechanicApiMechanicLogout();
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
     }
     if (response.status === 409) {
       alert(response.data);
