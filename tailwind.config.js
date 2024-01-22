@@ -32,7 +32,8 @@ export default {
         'a1a4ad': '#A1A4AD',
         'f5f5f5': '#F5F5F5',
         'dcdcdc': '#DCDCDC',
-        'c8c8c8': '#C8C8C8'
+        'c8c8c8': '#C8C8C8',
+        '53565b': '#53565B'
       },
       'white': '#FFFFFF',
       'black': {

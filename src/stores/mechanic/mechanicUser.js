@@ -6,13 +6,10 @@ export const useMechanicUserStore = defineStore(
   () => {
     let activeMechanicId = ref('');
     let activeMechanicName = ref('');
+    let accessToken = ref('');
+    let refreshToken = ref('');
 
-    function addTokens(accessToken, refreshToken) {
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
-    }
-
-    return { addTokens, activeMechanicId, activeMechanicName };
+    return { activeMechanicId, activeMechanicName, accessToken, refreshToken };
   },
   {
     persist: true

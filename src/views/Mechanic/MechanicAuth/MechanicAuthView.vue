@@ -58,9 +58,10 @@ async function isLoginAndPasswordValid(newLogin, newPassword) {
 }
 
 async function AuthHandler() {
-  let tokens = await MechanicApiAuthenticatePanel(login.value, password.value, postNumber.value);
-  if (tokens) {
-    mechanicUserStore.addTokens(tokens.accessToken, tokens.refreshToken);
+  let data = await MechanicApiAuthenticatePanel(login.value, password.value, postNumber.value);
+  if (data) {
+    mechanicUserStore.accessToken = data.accessToken;
+    mechanicUserStore.refreshToken = data.refreshToken
     await router.push('/mechanic/human-select');
   } else {
     updateStep(1);

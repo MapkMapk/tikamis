@@ -1,5 +1,6 @@
 import axios from 'axios';
 import router from '@/router/index.js'
+import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js'
 
 const mechanicApiClient = axios.create({
   validateStatus: (status) => status < 500,
@@ -7,27 +8,29 @@ const mechanicApiClient = axios.create({
 })
 
 mechanicApiClient.interceptors.request.use((config) => {
-  if (localStorage.getItem('accessToken')) {
-    config.headers.authorization = `Bearer ${localStorage.getItem('accessToken')}`;
+  const mechanicUserStore = useMechanicUserStore()
+  if (mechanicUserStore.accessToken) {
+    config.headers.authorization = `Bearer ${mechanicUserStore.accessToken}`;
   }
   return config;
 });
 
 mechanicApiClient.interceptors.response.use(
   async (response) => {
-    console.log('ЧЕКПОИНТ - 1');
+    const mechanicUserStore = useMechanicUserStore()
+    // console.log('ЧЕКПОИНТ - 1');
     if (response.request.responseURL === '/get-posts') {
       return response;
     }
-    if (response.status === 401 && localStorage.getItem('accessToken')) {
-      console.log('ЧЕКПОИНТ - 2');
+    if (response.status === 401 && mechanicUserStore.accessToken) {
+      // console.log('ЧЕКПОИНТ - 2');
       let { data } = await axios
         .post(
           import.meta.env.VITE_AXIOS_BASE_URL + '/mechanic-api/refresh',
           {},
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('refreshToken')}`
+              Authorization: `Bearer ${mechanicUserStore.refreshToken}`
             }
           }
         )
@@ -37,9 +40,9 @@ mechanicApiClient.interceptors.response.use(
             await router.push('/mechanic/auth');
           }
         });
-      console.log('ЧЕКПОИНТ - 3');
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      // console.log('ЧЕКПОИНТ - 3');
+      mechanicUserStore.accessToken = data.accessToken;
+      mechanicUserStore.refreshToken = data.refreshToken
       return await mechanicApiClient({
         ...response.config,
         headers: {
