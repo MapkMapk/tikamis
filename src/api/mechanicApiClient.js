@@ -44,7 +44,7 @@ mechanicApiClient.interceptors.response.use(
         ...response.config,
         headers: {
           common: {
-            ['Authorization']: `Bearer ${data.accessToken}`,
+            ['Authorization']: `Bearer ${data.accessToken} `,
             ['Content-Type']: 'application/json'
           }
         }
