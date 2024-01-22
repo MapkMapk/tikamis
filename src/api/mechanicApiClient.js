@@ -4,7 +4,7 @@ import mechanicApiMechanicLogout from '@/api/mechanic/mechanicApiMechanicLogout.
 const mechanicApiClient = axios.create({
   validateStatus: (status) => status < 500,
   baseURL: import.meta.env.VITE_AXIOS_BASE_URL + '/mechanic-api'
-});
+})
 
 mechanicApiClient.interceptors.request.use((config) => {
   if (localStorage.getItem('accessToken')) {
@@ -21,7 +21,7 @@ mechanicApiClient.interceptors.response.use(
     }
     if (response.status === 401 && localStorage.getItem('accessToken')) {
       console.log('ЧЕКПОИНТ - 2');
-      let { data } = await axios
+      let response = await axios
         .post(
           import.meta.env.VITE_AXIOS_BASE_URL + '/mechanic-api/refresh',
           {},
@@ -34,14 +34,18 @@ mechanicApiClient.interceptors.response.use(
         .catch((error) => {
           console.log(error);
         });
+      if (response.status !== 200) {
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+      }
       console.log('ЧЕКПОИНТ - 3');
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
+      localStorage.setItem('accessToken', response.data.accessToken);
+      localStorage.setItem('refreshToken', response.data.refreshToken);
       return await mechanicApiClient({
         ...response.config,
         headers: {
           common: {
-            ['Authorization']: `Bearer ${data.accessToken}`,
+            ['Authorization']: `Bearer ${response.data.accessToken}`,
             ['Content-Type']: 'application/json'
           }
         }
