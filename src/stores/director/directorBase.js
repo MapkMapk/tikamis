@@ -8,7 +8,4 @@ export const useDirectorBaseStore = defineStore(
 
     return { isMenuActive };
   },
-  {
-    persist: true
-  }
 );

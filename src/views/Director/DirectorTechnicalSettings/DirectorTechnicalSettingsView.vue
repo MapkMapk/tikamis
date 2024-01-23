@@ -1,13 +1,13 @@
 <template>
-  <TheOfficeHeader/>
+  <TheOfficeHeader />
   <div class="w-full flex">
-    <TheOfficeMenu v-if="directorBaseStore.isMenuActive" />
-
+    <TheDirectorMenu />
+    <section class="flex flex-1">
+      Технические настройки
+    </section>
   </div>
 </template>
 <script setup>
-import TheOfficeHeader from '@/components/TheOfficeHeader.vue'
-import TheOfficeMenu from '@/components/TheOfficeMenu.vue'
-import { useDirectorBaseStore } from '@/stores/director/directorBase.js'
-const directorBaseStore = useDirectorBaseStore();
+import TheOfficeHeader from '@/components/TheDirectorHeader.vue';
+import TheDirectorMenu from '@/components/TheDirectorMenu.vue';
 </script>
