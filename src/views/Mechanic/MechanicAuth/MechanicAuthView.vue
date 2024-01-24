@@ -45,7 +45,7 @@ function updateStep(n) {
 
 function setPostNumber(newPostNumber) {
   postNumber.value = newPostNumber;
-  AuthHandler();
+  authHandler();
 }
 
 async function isLoginAndPasswordValid(newLogin, newPassword) {
@@ -57,7 +57,7 @@ async function isLoginAndPasswordValid(newLogin, newPassword) {
   }
 }
 
-async function AuthHandler() {
+async function authHandler() {
   let data = await MechanicApiAuthenticatePanel(login.value, password.value, postNumber.value);
   if (data) {
     mechanicUserStore.accessToken = data.accessToken;

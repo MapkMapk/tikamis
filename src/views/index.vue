@@ -13,8 +13,8 @@
       Director
     </router-link>
     <router-link
-      to="/"
-      class="bg-red font-semibold text-white w-[300px] flex justify-center items-center rounded mb-4 py-5"
+      to="/sadmin/auth"
+      class="bg-green font-semibold text-white w-[300px] flex justify-center items-center rounded mb-4 py-5"
     >
       Sadmin
     </router-link>

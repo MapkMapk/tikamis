@@ -1,4 +1,7 @@
 // Здесь прописывать только стили для компонентного слоя Tailwind
 
 @layer components {
+  .input-regular {
+    @apply h-[60px] border border-gray-a1a4ad pl-5 pr-5;
+  }
 }

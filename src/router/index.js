@@ -12,6 +12,7 @@ import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
 // Страницы и сторы директора
 import DirectorAuthView from '@/views/Director/DirectorAuth/DirectorAuthView.vue'
 import DirectorTechnicalSettingsView from '@/views/Director/DirectorTechnicalSettings/DirectorTechnicalSettingsView.vue'
+import SadminAuthView from '@/views/Sadmin/SadminAuth/SadminAuthView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -62,6 +63,14 @@ const router = createRouter({
       path: '/director/technical-settings',
       name: 'director.technicalSettings',
       component: DirectorTechnicalSettingsView
+    },
+
+    // Sadmin routes
+
+    {
+      path: '/sadmin/auth',
+      name: 'sadmin.auth',
+      component: SadminAuthView
     },
 
     // 404 page
