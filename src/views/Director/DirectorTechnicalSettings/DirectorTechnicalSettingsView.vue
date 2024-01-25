@@ -17,19 +17,29 @@
           <h1 class="text-4xl font-medium">Технические настройки</h1>
           <div class="text-2xl font-medium mt-5">Режим работы</div>
           <div class="flex flex-col mt-4">
-            <div @click="isLiveQueue=false" class="flex items-center cursor-pointer">
+            <div
+              @click="isLiveQueue = false"
+              class="flex items-center cursor-pointer"
+            >
               <BaseRadioButton :is-active="isLiveQueue" />
               <span class="text-lg ml-2">Без записи, только живая очередь</span>
             </div>
-            <div @click="isLiveQueue=true" class="flex items-center cursor-pointer mt-3">
+            <div
+              @click="isLiveQueue = true"
+              class="flex items-center cursor-pointer mt-3"
+            >
               <BaseRadioButton :is-active="!isLiveQueue" />
               <span class="text-lg ml-2">Режим записи</span>
             </div>
           </div>
-          <div v-if="isLiveQueue" class="flex mt-6">
+          <div
+            v-if="isLiveQueue"
+            class="flex mt-6"
+          >
             <div class="flex flex-col">
               <span class="text-lg font-semibold">Время начала работы</span>
               <input
+                v-model="jobStartTime"
                 class="input-regular mt-3"
                 type="text"
               />
@@ -37,18 +47,23 @@
             <div class="flex flex-col ml-8">
               <span class="text-lg font-semibold">Время окончания работы</span>
               <input
+                v-model="jobEndTime"
                 class="input-regular mt-3"
                 type="text"
               />
             </div>
           </div>
-          <div v-if="isLiveQueue" class="flex flex-col mt-10">
+          <div
+            v-if="isLiveQueue"
+            class="flex flex-col mt-10"
+          >
             <span class="text-2xl font-medium">Часовой пояс</span>
-            <BaseSelectTimezone class="mt-3" />
+            <SelectTimezone class="mt-3" />
           </div>
           <div class="flex flex-col mt-10">
             <span class="text-2xl font-medium">Техническая оснащённость постами</span>
             <input
+              v-model="postsEquipment"
               type="number"
               class="input-regular w-36 mt-3"
             />
@@ -64,11 +79,24 @@ import TheDirectorHeader from '@/components/TheDirectorHeader.vue';
 import TheDirectorMenu from '@/components/TheDirectorMenu.vue';
 import BaseRadioButton from '@/components/BaseRadioButton.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
-import BaseSelectTimezone from '@/components/BaseSelectTimezone.vue';
+import SelectTimezone from '@/components/SelectTimezone.vue';
 import { useMainStore } from '@/stores/shared/main.js';
 import { ref } from 'vue';
 
 const mainStore = useMainStore();
-let isLiveQueue = ref(true);
 
+let isLiveQueue = ref(false);
+
+let jobStartTime = ref('');
+let jobEndTime = ref('');
+let timeZone = ref('');
+let postsEquipment = ref();
+
+// function save() {
+//   if (isLiveQueue) {
+//
+//   } else {
+//
+//   }
+// }
 </script>

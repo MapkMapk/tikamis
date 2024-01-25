@@ -61,6 +61,7 @@
             <div class="flex flex-col">
               <span class="text-lg font-semibold">Время начала работы</span>
               <input
+                v-model="jobStartTime"
                 class="input-regular mt-3"
                 type="text"
               />
@@ -68,6 +69,7 @@
             <div class="flex flex-col ml-8">
               <span class="text-lg font-semibold">Время окончания работы</span>
               <input
+                v-model="jobEndTime"
                 class="input-regular mt-3"
                 type="text"
               />
@@ -80,6 +82,7 @@
           <div class="flex flex-col mt-10">
             <span class="text-2xl font-medium">Техническая оснащённость постами</span>
             <input
+              v-model="postsEquipment"
               type="number"
               class="input-regular w-36 mt-3"
             />
@@ -88,6 +91,7 @@
             <span class="text-2xl font-medium">Производственный люфт</span>
             <span class="text-lg mt-3 mb-3">Установка значения перерыва между обслуживанием автомобилей на посту, в минутах.</span>
             <input
+              v-model="productionBacklash"
               type="number"
               class="input-regular w-36 mt-3"
             />
@@ -95,6 +99,7 @@
           <div class="flex flex-col mt-10">
             <span class="text-2xl font-medium">Установка глубины записи в днях</span>
             <input
+              v-model="recordingDepth"
               type="number"
               class="input-regular w-36 mt-3"
             />
@@ -113,11 +118,26 @@ import TheDirectorHeader from '@/components/TheDirectorHeader.vue';
 import TheDirectorMenu from '@/components/TheDirectorMenu.vue';
 import BaseRadioButton from '@/components/BaseRadioButton.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
-import BaseSelectTimezone from '@/components/BaseSelectTimezone.vue';
+import BaseSelectTimezone from '@/components/SelectTimezone.vue';
 import { useMainStore } from '@/stores/shared/main.js';
 import { ref } from 'vue';
 import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
 
 const mainStore = useMainStore();
 let isLiveQueue = ref(false);
+
+let jobStartTime = ref('');
+let jobEndTime = ref('');
+// let timeZone = ref('');
+let postsEquipment = ref('');
+let productionBacklash = ref('');
+let recordingDepth = ref('')
+
+// function save() {
+//   if (isLiveQueue) {
+//
+//   } else {
+//
+//   }
+// }
 </script>

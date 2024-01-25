@@ -32,7 +32,7 @@
             ></BaseSvgIcon>
           </div>
           <BaseButtonFilledGreen
-            @click.prevent="emit('authenticate')"
+            @click.prevent="emit('authenticate', login, password)"
             class="w-full bg-green text-white mt-[30px]"
           >Войти
           </BaseButtonFilledGreen>
