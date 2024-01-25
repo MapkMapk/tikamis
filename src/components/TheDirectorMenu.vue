@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="mainStore.isHeaderMenuOpen"
-    class="flex flex-col w-[276px] overflow-y-auto h-[calc(100vh-60px)] bg-gray-2c2d2f mr-[30px]"
+    class="flex flex-col min-w-[276px] overflow-y-auto h-[calc(100vh-60px)] bg-gray-2c2d2f mr-[30px]"
   >
     <div class="w-full flex flex-col pt-[10px]">
       <TheHeaderMenuPartition

@@ -37,7 +37,7 @@
           >Войти
           </BaseButtonFilledGreen>
           <div
-            v-if="errorText"
+            v-if="props.isErrorVisible"
             class="text-red mt-4"
           >
             {{ errorText }}
@@ -59,12 +59,16 @@ let props = defineProps({
   title: {
     type: String,
     required: true,
+  },
+  isErrorVisible: {
+    type: Boolean,
+    required: true,
   }
 })
 
 let login = ref('');
 let password = ref('');
-let errorText = ref('');
+let errorText = ref('wefwefwfe');
 let isPasswordVisible = ref(false);
 let passwordInputType = computed(() => (isPasswordVisible.value ? 'text' : 'password'));
 </script>
