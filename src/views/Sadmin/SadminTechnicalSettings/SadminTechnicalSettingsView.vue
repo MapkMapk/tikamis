@@ -1,0 +1,123 @@
+<template>
+  <TheDirectorHeader />
+  <div class="w-full flex">
+    <TheDirectorMenu />
+    <div class="flex flex-col w-full">
+      <div
+        :class="{ 'w-[calc(100%+60px)] translate-x-[-30px]': mainStore.isHeaderMenuOpen }"
+        class="w-full flex justify-center items-center bg-red text-2xl text-white font-medium h-[50px]"
+      >
+        Изменения вступят в силу начиная с 25 июня 2023 г.
+      </div>
+      <section
+        :class="{ 'pl-[122px]': !mainStore.isHeaderMenuOpen }"
+        class="mt-10 flex flex-1"
+      >
+        <div class="flex flex-col">
+          <h1 class="text-4xl leading-normal font-medium">
+            Технические настройки<br />Сургут, Аэрофлотская ул., 5/2
+          </h1>
+          <div class="flex flex-col mt-10">
+            <div class="flex">
+              <div class="flex flex-col mr-8">
+                <span class="text-lg font-semibold">Логин директора</span>
+                <input
+                  class="input-regular mt-3"
+                  type="text"
+                />
+              </div>
+              <div class="flex flex-col mr-8">
+                <span class="text-lg font-semibold">Пароль директора</span>
+                <input
+                  class="input-regular mt-3"
+                  type="password"
+                />
+              </div>
+            </div>
+            <div class="flex mt-5">
+              Изменение логина или пароля приведёт к отключению<br>
+              аккаунта с предыдущими данными.<br>
+              Изменения вступят в силу сразу.
+            </div>
+          </div>
+          <div class="text-2xl font-medium mt-5">Режим работы</div>
+          <div class="flex flex-col mt-4">
+            <div
+              @click="isLiveQueue = true"
+              class="flex items-center cursor-pointer"
+            >
+              <BaseRadioButton :is-active="!isLiveQueue" />
+              <span class="text-lg ml-2">Без записи, только живая очередь</span>
+            </div>
+            <div
+              @click="isLiveQueue = false"
+              class="flex items-center cursor-pointer mt-3"
+            >
+              <BaseRadioButton :is-active="isLiveQueue" />
+              <span class="text-lg ml-2">Режим записи</span>
+            </div>
+          </div>
+          <div v-if="!isLiveQueue" class="flex mt-6">
+            <div class="flex flex-col">
+              <span class="text-lg font-semibold">Время начала работы</span>
+              <input
+                class="input-regular mt-3"
+                type="text"
+              />
+            </div>
+            <div class="flex flex-col ml-8">
+              <span class="text-lg font-semibold">Время окончания работы</span>
+              <input
+                class="input-regular mt-3"
+                type="text"
+              />
+            </div>
+          </div>
+          <div v-if="!isLiveQueue" class="flex flex-col mt-10">
+            <span class="text-2xl font-medium">Часовой пояс</span>
+            <BaseSelectTimezone class="mt-3 max-w-[553px]" />
+          </div>
+          <div class="flex flex-col mt-10">
+            <span class="text-2xl font-medium">Техническая оснащённость постами</span>
+            <input
+              type="number"
+              class="input-regular w-36 mt-3"
+            />
+          </div>
+          <div class="flex flex-col mt-10">
+            <span class="text-2xl font-medium">Производственный люфт</span>
+            <span class="text-lg mt-3 mb-3">Установка значения перерыва между обслуживанием автомобилей на посту, в минутах.</span>
+            <input
+              type="number"
+              class="input-regular w-36 mt-3"
+            />
+          </div>
+          <div class="flex flex-col mt-10">
+            <span class="text-2xl font-medium">Установка глубины записи в днях</span>
+            <input
+              type="number"
+              class="input-regular w-36 mt-3"
+            />
+          </div>
+          <div class="w-full flex mt-14 mb-5">
+            <BaseButtonFilledGreen class="flex flex-1 mr-5">Сохранить</BaseButtonFilledGreen>
+            <BaseButtonFilledLight class="flex flex-1">Закрыть</BaseButtonFilledLight>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</template>
+<script setup>
+import TheDirectorHeader from '@/components/TheDirectorHeader.vue';
+import TheDirectorMenu from '@/components/TheDirectorMenu.vue';
+import BaseRadioButton from '@/components/BaseRadioButton.vue';
+import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
+import BaseSelectTimezone from '@/components/BaseSelectTimezone.vue';
+import { useMainStore } from '@/stores/shared/main.js';
+import { ref } from 'vue';
+import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
+
+const mainStore = useMainStore();
+let isLiveQueue = ref(false);
+</script>

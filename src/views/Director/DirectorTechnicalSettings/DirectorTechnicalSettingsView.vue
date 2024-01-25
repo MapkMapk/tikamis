@@ -3,33 +3,35 @@
   <div class="w-full flex">
     <TheDirectorMenu />
     <div class="flex flex-col w-full">
-      <div :class="{'w-[calc(100%+30px)] translate-x-[-30px]': directorBaseStore.isMenuActive}" class="w-full flex justify-center items-center bg-red text-2xl text-white font-medium h-[50px]">
+      <div
+        :class="{ 'w-[calc(100%+60px)] translate-x-[-30px]': mainStore.isHeaderMenuOpen }"
+        class="w-full flex justify-center items-center bg-red text-2xl text-white font-medium h-[50px]"
+      >
         Изменения вступят в силу начиная с 25 июня 2023 г.
       </div>
       <section
-        :class="{ 'pl-[122px]': !directorBaseStore.isMenuActive }"
+        :class="{ 'pl-[122px]': !mainStore.isHeaderMenuOpen }"
         class="mt-10 flex flex-1"
       >
         <div class="flex flex-col">
           <h1 class="text-4xl font-medium">Технические настройки</h1>
           <div class="text-2xl font-medium mt-5">Режим работы</div>
           <div class="flex flex-col mt-4">
-            <div class="flex items-center">
-              <BaseRadioButton :is-active="false" />
+            <div @click="isLiveQueue=false" class="flex items-center cursor-pointer">
+              <BaseRadioButton :is-active="isLiveQueue" />
               <span class="text-lg ml-2">Без записи, только живая очередь</span>
             </div>
-            <div class="flex items-center mt-3">
-              <BaseRadioButton :is-active="true" />
+            <div @click="isLiveQueue=true" class="flex items-center cursor-pointer mt-3">
+              <BaseRadioButton :is-active="!isLiveQueue" />
               <span class="text-lg ml-2">Режим записи</span>
             </div>
           </div>
-          <div class="flex mt-6">
+          <div v-if="isLiveQueue" class="flex mt-6">
             <div class="flex flex-col">
               <span class="text-lg font-semibold">Время начала работы</span>
               <input
                 class="input-regular mt-3"
                 type="text"
-                placeholder="08:00"
               />
             </div>
             <div class="flex flex-col ml-8">
@@ -37,11 +39,10 @@
               <input
                 class="input-regular mt-3"
                 type="text"
-                placeholder="20:00"
               />
             </div>
           </div>
-          <div class="flex flex-col mt-10">
+          <div v-if="isLiveQueue" class="flex flex-col mt-10">
             <span class="text-2xl font-medium">Часовой пояс</span>
             <BaseSelectTimezone class="mt-3" />
           </div>
@@ -61,10 +62,13 @@
 <script setup>
 import TheDirectorHeader from '@/components/TheDirectorHeader.vue';
 import TheDirectorMenu from '@/components/TheDirectorMenu.vue';
-import { useDirectorBaseStore } from '@/stores/director/directorBase.js';
 import BaseRadioButton from '@/components/BaseRadioButton.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseSelectTimezone from '@/components/BaseSelectTimezone.vue';
+import { useMainStore } from '@/stores/shared/main.js';
+import { ref } from 'vue';
 
-const directorBaseStore = useDirectorBaseStore();
+const mainStore = useMainStore();
+let isLiveQueue = ref(true);
+
 </script>

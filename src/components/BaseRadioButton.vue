@@ -1,6 +1,6 @@
 <template>
-  <div v-if="props.isActive" class="w-6 h-6 rounded-full border-2 border-gray-2c2d2f"></div>
-  <div v-if="!props.isActive" class="flex justify-center items-center w-6 h-6 rounded-full bg-green">
+  <div v-if="props.isActive" class="w-6 h-6 rounded-full border-2 border-gray-2c2d2f cursor-pointer"></div>
+  <div v-if="!props.isActive" class="flex justify-center items-center w-6 h-6 rounded-full bg-green cursor-pointer">
     <BaseSvgIcon name="check-mark-white" class="w-3 h-3" />
   </div>
 </template>

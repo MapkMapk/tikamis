@@ -31,7 +31,7 @@ import { ref } from 'vue';
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
 import BaseButtonFilledRed from '@/components/BaseButtonFilledRed.vue';
-import BaseModalBoolean from '@/components/BaseModalBoolean.vue';
+import BaseModalBoolean from '@/components/ModalBoolean.vue';
 
 const mechanicOrderStore = useMechanicOrderStore();
 let isModalVisible = ref(false);

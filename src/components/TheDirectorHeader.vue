@@ -1,17 +1,17 @@
 <template>
   <header class="flex w-full h-the-header">
     <div
-      @click="directorBaseStore.isMenuActive = !directorBaseStore.isMenuActive"
-      :class="{ 'bg-gray-2c2d2f': directorBaseStore.isMenuActive, 'border-b-0': directorBaseStore.isMenuActive }"
+      @click="mainStore.isHeaderMenuOpen = !mainStore.isHeaderMenuOpen"
+      :class="{ 'bg-gray-2c2d2f': mainStore.isHeaderMenuOpen, 'border-b-0': mainStore.isHeaderMenuOpen }"
       class="relative flex bg- h-full pl-[30px] pr-[30px] justify-center items-center border-r border-b border-gray-dcdcdc cursor-pointer"
     >
       <BaseSvgIcon
-        v-if="!directorBaseStore.isMenuActive"
+        v-if="!mainStore.isHeaderMenuOpen"
         name="burger-menu"
         class="w-[30px] h-[30px]"
       />
       <BaseSvgIcon
-        v-if="directorBaseStore.isMenuActive"
+        v-if="mainStore.isHeaderMenuOpen"
         name="cross"
         class="w-[30px] h-[30px]"
       />
@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import { useDirectorBaseStore } from '@/stores/director/directorBase.js'
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
-const directorBaseStore = useDirectorBaseStore()
+import { useMainStore } from '@/stores/shared/main.js'
+const mainStore = useMainStore()
 </script>

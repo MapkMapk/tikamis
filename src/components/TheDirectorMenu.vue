@@ -1,10 +1,10 @@
 <template>
   <div
-    v-if="directorBaseStore.isMenuActive"
+    v-if="mainStore.isHeaderMenuOpen"
     class="flex flex-col w-[276px] overflow-y-auto h-[calc(100vh-60px)] bg-gray-2c2d2f mr-[30px]"
   >
     <div class="w-full flex flex-col pt-[10px]">
-      <BaseMenuPartition
+      <TheHeaderMenuPartition
         v-for="(nav, index) in navigation"
         :index="index"
         :key="nav.partition"
@@ -23,10 +23,10 @@
 </template>
 <script setup>
 import { ref } from 'vue';
-import { useDirectorBaseStore } from '@/stores/director/directorBase.js';
-import BaseMenuPartition from '@/components/BaseMenuPartition.vue';
+import TheHeaderMenuPartition from '@/components/TheHeaderMenuPartition.vue';
+import { useMainStore } from '@/stores/shared/main.js'
 
-const directorBaseStore = useDirectorBaseStore();
+const mainStore = useMainStore();
 
 const navigation = ref([
   {

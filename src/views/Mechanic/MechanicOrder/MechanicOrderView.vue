@@ -144,7 +144,7 @@ import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 import MechanicOrderWork from '@/views/Mechanic/MechanicOrder/MechanicOrderWork.vue';
 import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
 import { ref, computed, onBeforeMount, onBeforeUnmount } from 'vue';
-import BaseModalBoolean from '@/components/BaseModalBoolean.vue';
+import BaseModalBoolean from '@/components/ModalBoolean.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
 
