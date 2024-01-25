@@ -1,14 +1,14 @@
 import axios from 'axios';
-import router from '@/router/index.js'
-import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js'
+import router from '@/router/index.js';
+import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js';
 
 const mechanicApiClient = axios.create({
   validateStatus: (status) => status < 500,
   baseURL: import.meta.env.VITE_AXIOS_BASE_URL + '/mechanic-api'
-})
+});
 
 mechanicApiClient.interceptors.request.use((config) => {
-  const mechanicUserStore = useMechanicUserStore()
+  const mechanicUserStore = useMechanicUserStore();
   if (mechanicUserStore.accessToken) {
     config.headers.authorization = `Bearer ${mechanicUserStore.accessToken}`;
   }
@@ -17,7 +17,7 @@ mechanicApiClient.interceptors.request.use((config) => {
 
 mechanicApiClient.interceptors.response.use(
   async (response) => {
-    const mechanicUserStore = useMechanicUserStore()
+    const mechanicUserStore = useMechanicUserStore();
     // console.log('ЧЕКПОИНТ - 1');
     if (response.request.responseURL === '/get-posts') {
       return response;
@@ -42,7 +42,7 @@ mechanicApiClient.interceptors.response.use(
         });
       // console.log('ЧЕКПОИНТ - 3');
       mechanicUserStore.accessToken = data.accessToken;
-      mechanicUserStore.refreshToken = data.refreshToken
+      mechanicUserStore.refreshToken = data.refreshToken;
       return await mechanicApiClient({
         ...response.config,
         headers: {
@@ -59,11 +59,13 @@ mechanicApiClient.interceptors.response.use(
     if (response.status !== 200) {
       console.log(response);
     }
-    if (response.status >= 400 && response.status <= 499 && response.status !== 409 && response.status !== 401) {
-      alert('Произошла ошибка на сервере');
-    }
-    if (response.status >= 500) {
-      alert('Произошла ошибка на сервере');
+    if (
+      response.status >= 400 &&
+      response.status <= 499 &&
+      response.status !== 409 &&
+      response.status >= 500
+    ) {
+      alert(`Произошла ошибка на сервере, код ошибки ${response.status}`);
     }
     return response;
   },
