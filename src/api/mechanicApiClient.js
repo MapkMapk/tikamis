@@ -63,7 +63,7 @@ mechanicApiClient.interceptors.response.use(
       response.status >= 400 &&
       response.status <= 499 &&
       response.status !== 409 &&
-      response.status >= 500
+      response.status !== 401
     ) {
       alert(`Произошла ошибка на сервере, код ошибки ${response.status}`);
     }
