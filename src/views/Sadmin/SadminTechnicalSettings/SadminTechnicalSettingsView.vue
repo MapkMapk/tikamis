@@ -4,7 +4,7 @@
     <TheDirectorMenu />
     <div class="flex flex-col w-full">
       <div
-        :class="{ 'w-[calc(100%+60px)] translate-x-[-30px]': mainStore.isHeaderMenuOpen }"
+        :class="{ 'w-full': mainStore.isHeaderMenuOpen }"
         class="w-full flex justify-center items-center bg-red text-2xl text-white font-medium h-[50px]"
       >
         Изменения вступят в силу начиная с 25 июня 2023 г.
