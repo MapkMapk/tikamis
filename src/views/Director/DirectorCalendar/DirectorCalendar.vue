@@ -1,0 +1,3 @@
+<template>
+  Director Calendar
+</template>

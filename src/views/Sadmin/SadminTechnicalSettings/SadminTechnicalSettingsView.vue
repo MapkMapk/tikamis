@@ -3,15 +3,15 @@
   <div class="w-full flex">
     <TheDirectorMenu />
     <div class="flex flex-col w-full">
-      <div
-        :class="{ 'w-full': mainStore.isHeaderMenuOpen }"
-        class="w-full flex justify-center items-center bg-red text-2xl text-white font-medium h-[50px]"
-      >
-        Изменения вступят в силу начиная с 25 июня 2023 г.
-      </div>
+<!--      <div-->
+<!--        :class="{'red-stripe': mainStore.isHeaderMenuOpen}"-->
+<!--        class="w-full flex justify-center items-center bg-red text-2xl text-white font-medium h-[50px]"-->
+<!--      >-->
+<!--        Изменения вступят в силу начиная с 25 июня 2023 г.-->
+<!--      </div>-->
       <section
-        :class="{ 'pl-[122px]': !mainStore.isHeaderMenuOpen }"
-        class="mt-10 flex flex-1"
+        :class="{'pl-[300px]': mainStore.isHeaderMenuOpen}"
+        class="pl-[122px] mt-[80px] flex flex-1 mr-[30px]"
       >
         <div class="flex flex-col">
           <h1 class="text-4xl leading-normal font-medium">
@@ -35,8 +35,8 @@
               </div>
             </div>
             <div class="flex mt-5">
-              Изменение логина или пароля приведёт к отключению<br>
-              аккаунта с предыдущими данными.<br>
+              Изменение логина или пароля приведёт к отключению<br />
+              аккаунта с предыдущими данными.<br />
               Изменения вступят в силу сразу.
             </div>
           </div>
@@ -57,7 +57,10 @@
               <span class="text-lg ml-2">Режим записи</span>
             </div>
           </div>
-          <div v-if="!isLiveQueue" class="flex mt-6">
+          <div
+            v-if="!isLiveQueue"
+            class="flex mt-6"
+          >
             <div class="flex flex-col">
               <span class="text-lg font-semibold">Время начала работы</span>
               <input
@@ -75,7 +78,10 @@
               />
             </div>
           </div>
-          <div v-if="!isLiveQueue" class="flex flex-col mt-10">
+          <div
+            v-if="!isLiveQueue"
+            class="flex flex-col mt-10"
+          >
             <span class="text-2xl font-medium">Часовой пояс</span>
             <BaseSelectTimezone class="mt-3 max-w-[553px]" />
           </div>
@@ -89,7 +95,10 @@
           </div>
           <div class="flex flex-col mt-10">
             <span class="text-2xl font-medium">Производственный люфт</span>
-            <span class="text-lg mt-3 mb-3">Установка значения перерыва между обслуживанием автомобилей на посту, в минутах.</span>
+            <span class="text-lg mt-3 mb-3"
+              >Установка значения перерыва между обслуживанием автомобилей на посту, в
+              минутах.</span
+            >
             <input
               v-model="productionBacklash"
               type="number"
@@ -131,7 +140,7 @@ let jobEndTime = ref('');
 // let timeZone = ref('');
 let postsEquipment = ref('');
 let productionBacklash = ref('');
-let recordingDepth = ref('')
+let recordingDepth = ref('');
 
 // function save() {
 //   if (isLiveQueue) {
@@ -141,3 +150,10 @@ let recordingDepth = ref('')
 //   }
 // }
 </script>
+
+<style scoped>
+  .red-stripe {
+    @apply -translate-x-[30px];
+    width: calc(100% + 30px);
+  }
+</style>

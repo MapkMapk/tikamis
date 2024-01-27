@@ -1,5 +1,5 @@
 <template>
-  <header class="flex w-full h-the-header">
+  <header class="fixed z-10 bg-white flex w-full h-the-header">
     <div
       @click="mainStore.isHeaderMenuOpen = !mainStore.isHeaderMenuOpen"
       :class="{ 'bg-gray-2c2d2f': mainStore.isHeaderMenuOpen, 'border-b-0': mainStore.isHeaderMenuOpen }"
