@@ -1,35 +1,33 @@
 <template>
   <TheDirectorHeader />
-  <div class="w-full flex">
-    <TheDirectorMenu />
+  <div class="w-full flex overflow-x-hidden pt-[60px]">
     <div class="flex flex-col w-full">
-<!--      <div-->
-<!--        :class="{'red-stripe': mainStore.isHeaderMenuOpen}"-->
-<!--        class="w-full flex justify-center items-center bg-red text-2xl text-white font-medium h-[50px]"-->
-<!--      >-->
-<!--        Изменения вступят в силу начиная с 25 июня 2023 г.-->
-<!--      </div>-->
-      <section
-        :class="{'pl-[300px]': mainStore.isHeaderMenuOpen}"
-        class="pl-[122px] mt-[80px] flex flex-1 mr-[30px]"
+      <div
+        class="w-full flex justify-center items-center bg-red text-2xl text-white font-medium h-[50px]"
       >
-        <div class="flex flex-col">
+        Изменения вступят в силу начиная с 25 июня 2023 г.
+      </div>
+      <section
+        :class="{ 'pl-[300px]': mainStore.isHeaderMenuOpen }"
+        class="pt-[20px] pl-[122px] flex flex-1 mr-[30px]"
+      >
+        <div class="flex flex-col w-full max-w-[540px]">
           <h1 class="text-4xl leading-normal font-medium">
             Технические настройки<br />Сургут, Аэрофлотская ул., 5/2
           </h1>
-          <div class="flex flex-col mt-10">
-            <div class="flex">
-              <div class="flex flex-col mr-8">
+          <div class="flex flex-col mt-10 w-full max-w-full">
+            <div class="flex w-full">
+              <div class="flex flex-col mr-5 w-full">
                 <span class="text-lg font-semibold">Логин директора</span>
                 <input
-                  class="input-regular mt-3"
+                  class="w-full input-regular mt-3"
                   type="text"
                 />
               </div>
-              <div class="flex flex-col mr-8">
+              <div class="flex flex-col w-full">
                 <span class="text-lg font-semibold">Пароль директора</span>
                 <input
-                  class="input-regular mt-3"
+                  class="w-full input-regular mt-3"
                   type="password"
                 />
               </div>
@@ -65,15 +63,15 @@
               <span class="text-lg font-semibold">Время начала работы</span>
               <input
                 v-model="jobStartTime"
-                class="input-regular mt-3"
+                class="w-full input-regular mt-3"
                 type="text"
               />
             </div>
             <div class="flex flex-col ml-8">
-              <span class="text-lg font-semibold">Время окончания работы</span>
+              <span class="text-lg font-semibold">Время окончания</span>
               <input
                 v-model="jobEndTime"
-                class="input-regular mt-3"
+                class="w-full input-regular mt-3"
                 type="text"
               />
             </div>
@@ -83,7 +81,7 @@
             class="flex flex-col mt-10"
           >
             <span class="text-2xl font-medium">Часовой пояс</span>
-            <BaseSelectTimezone class="mt-3 max-w-[553px]" />
+            <BaseSelectTimezone class="mt-3" />
           </div>
           <div class="flex flex-col mt-10">
             <span class="text-2xl font-medium">Техническая оснащённость постами</span>
@@ -124,7 +122,6 @@
 </template>
 <script setup>
 import TheDirectorHeader from '@/components/TheDirectorHeader.vue';
-import TheDirectorMenu from '@/components/TheDirectorMenu.vue';
 import BaseRadioButton from '@/components/BaseRadioButton.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseSelectTimezone from '@/components/SelectTimezone.vue';
@@ -142,18 +139,5 @@ let postsEquipment = ref('');
 let productionBacklash = ref('');
 let recordingDepth = ref('');
 
-// function save() {
-//   if (isLiveQueue) {
-//
-//   } else {
-//
-//   }
-// }
-</script>
 
-<style scoped>
-  .red-stripe {
-    @apply -translate-x-[30px];
-    width: calc(100% + 30px);
-  }
-</style>
+</script>

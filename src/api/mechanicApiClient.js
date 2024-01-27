@@ -1,6 +1,7 @@
 import axios from 'axios';
 import router from '@/router/index.js';
 import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js';
+import { responseStatusesHandler } from '@/api/responseStatusesHandler.js'
 
 const mechanicApiClient = axios.create({
   validateStatus: (status) => status < 500,
@@ -53,20 +54,7 @@ mechanicApiClient.interceptors.response.use(
         }
       });
     }
-    if (response.status === 409) {
-      alert(response.data);
-    }
-    if (response.status !== 200) {
-      console.log(response);
-    }
-    if (
-      response.status >= 400 &&
-      response.status <= 499 &&
-      response.status !== 409 &&
-      response.status !== 401
-    ) {
-      alert(`Произошла ошибка на сервере, код ошибки ${response.status}`);
-    }
+    responseStatusesHandler();
     return response;
   },
   (error) => {

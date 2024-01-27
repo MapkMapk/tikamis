@@ -3,15 +3,15 @@
 </template>
 <script setup>
 import AuthPanel from '@/components/AuthPanel.vue';
-import { directorApiClient } from '@/api/directorApiClient.js'
 import { useDirectorUserStore } from '@/stores/director/directorUser.js'
+import directorApiLogin from '@/api/director/directorApiLogin.js'
 import { ref } from 'vue'
 
 const directorUserStore = useDirectorUserStore()
 let isErrorVisible = ref(false)
 
 async function authenticate(login, password) {
-  let {data} = await directorApiClient.post('/login', {login, password})
+  let data = directorApiLogin(login, password)
   if (data.accessToken && data.refreshToken) {
     directorUserStore.accessToken = data.accessToken;
     directorUserStore.refreshToken = data.refreshToken

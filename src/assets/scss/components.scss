@@ -2,6 +2,6 @@
 
 @layer components {
   .input-regular {
-    @apply h-[60px] border border-gray-a1a4ad pl-5 pr-5;
+    @apply h-[60px] flex border border-gray-a1a4ad pl-5 pr-5;
   }
 }
