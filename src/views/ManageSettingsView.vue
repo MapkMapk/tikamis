@@ -12,7 +12,7 @@
         :class="{ 'pl-[300px]': mainStore.isHeaderMenuOpen }"
         class="pt-[20px] pl-[122px] flex flex-1 mr-[30px]"
       >
-        <div class="flex flex-col w-full max-w-[540px]">
+        <form class="flex flex-col w-full max-w-[540px]">
           <h1 class="text-4xl leading-normal font-medium">
             Технические настройки<br />Сургут, Аэрофлотская ул., 5/2
           </h1>
@@ -21,15 +21,16 @@
               <div class="flex flex-col mr-5 w-full">
                 <span class="text-lg font-semibold">Логин директора</span>
                 <input
-                  class="base-input w-full mt-3"
+                  class="base-input text-2xl w-full mt-3"
                   type="text"
                 />
               </div>
               <div class="flex flex-col w-full">
                 <span class="text-lg font-semibold">Пароль директора</span>
                 <input
-                  class="base-input w-full mt-3"
+                  class="base-input text-2xl w-full mt-3"
                   type="password"
+                  autocomplete="false"
                 />
               </div>
             </div>
@@ -64,7 +65,7 @@
               <span class="text-lg font-semibold">Время начала работы</span>
               <input
                 v-model="jobStartTime"
-                class="base-input w-full mt-3"
+                class="base-input text-2xl w-full mt-3"
                 type="text"
               />
             </div>
@@ -72,7 +73,7 @@
               <span class="text-lg font-semibold">Время окончания работы</span>
               <input
                 v-model="jobEndTime"
-                class="base-input w-full mt-3"
+                class="base-input text-2xl w-full mt-3"
                 type="text"
               />
             </div>
@@ -82,14 +83,14 @@
             class="flex flex-col mt-10"
           >
             <span class="text-2xl font-medium">Часовой пояс</span>
-            <BaseSelectTimezone class="mt-3" />
+            <SelectTimezone class="mt-3" />
           </div>
           <div class="flex flex-col mt-10">
             <span class="text-2xl font-medium">Техническая оснащённость постами</span>
             <input
               v-model="postsEquipment"
               type="number"
-              class="base-input w-36 mt-3"
+              class="base-input text-2xl w-40 mt-3"
             />
           </div>
           <div v-if="getViewEnv() === 'sadmin'" class="flex flex-col mt-10">
@@ -101,7 +102,7 @@
             <input
               v-model="productionBacklash"
               type="number"
-              class="base-input w-36 mt-3"
+              class="base-input text-2xl w-40 mt-3"
             />
           </div>
           <div v-if="getViewEnv() === 'sadmin'" class="flex flex-col mt-10">
@@ -109,27 +110,27 @@
             <input
               v-model="recordingDepth"
               type="number"
-              class="base-input w-36 mt-3"
+              class="base-input text-2xl w-40 mt-3"
             />
           </div>
           <div class="w-full flex mt-10 mb-5">
-            <BaseButtonFilledGreen class="flex flex-1 mr-5">Сохранить</BaseButtonFilledGreen>
-            <BaseButtonFilledLight @click="go" class="flex flex-1">Закрыть</BaseButtonFilledLight>
+            <BaseButtonFilledGreen @click.prevent="console.log('Сохранить')" class="flex flex-1 mr-5">Сохранить</BaseButtonFilledGreen>
+            <BaseButtonFilledLight v-if="getViewEnv() === 'sadmin'" @click.prevent="console.log('Закрыть')" class="flex flex-1">Закрыть</BaseButtonFilledLight>
           </div>
-        </div>
+        </form>
       </section>
     </div>
   </div>
 </template>
 <script setup>
-import TheDirectorHeader from '@/components/TheDirectorHeader.vue';
+import TheDirectorHeader from '@/components/Header.vue';
 import BaseRadioButton from '@/components/BaseRadioButton.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
-import BaseSelectTimezone from '@/components/SelectTimezone.vue';
+import SelectTimezone from '@/components/SelectTimezone.vue';
 import { useMainStore } from '@/stores/shared/main.js';
-import { ref } from 'vue';
 import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
 import { getViewEnv } from '@/utils/getViewEnv.js'
+import { ref } from 'vue';
 
 const mainStore = useMainStore();
 let isLiveQueue = ref(false);

@@ -10,13 +10,7 @@
         class="relative flex bg- h-full pl-[30px] pr-[30px] justify-center items-center border-r border-b border-gray-dcdcdc cursor-pointer"
       >
         <BaseSvgIcon
-          v-if="!mainStore.isHeaderMenuOpen"
-          name="burger-menu"
-          class="w-[30px] h-[30px]"
-        />
-        <BaseSvgIcon
-          v-if="mainStore.isHeaderMenuOpen"
-          name="cross"
+          :name="!mainStore.isHeaderMenuOpen ? 'burger-menu' : 'cross'"
           class="w-[30px] h-[30px]"
         />
       </div>
@@ -32,14 +26,14 @@
         <div class="pr-[30px]">Когалым, Проспект Нефтяников, 1а/4</div>
       </div>
     </div>
-    <TheDirectorMenu/>
+    <HeaderMenu />
   </header>
 </template>
 
 <script setup>
-import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
-import { useMainStore } from '@/stores/shared/main.js';
-import TheDirectorMenu from '@/components/TheDirectorMenu.vue'
+import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
+import { useMainStore } from '@/stores/shared/main.js'
+import HeaderMenu from '@/components/HeaderMenu.vue'
 
 const mainStore = useMainStore();
 </script>

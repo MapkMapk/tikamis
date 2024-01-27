@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import TheDirectorHeader from '@/components/TheDirectorHeader.vue';
+import TheDirectorHeader from '@/components/Header.vue';
 import ReportPrimeTitle from '@/components/ReportPrimeTitle.vue';
 import HeaderGap from '@/components/HeaderGap.vue';
 import ReportInputDate from '@/components/ReportInputDate.vue';

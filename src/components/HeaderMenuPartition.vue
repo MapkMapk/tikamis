@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col border-b-gray-53565b border-b pl-[30px] pr-[20px]">
     <div
-      @click="emit('toggle', props.index)"
+      @click="emit('isOpenSwitch', index)"
       class="flex justify-between items-center cursor-pointer py-[30px]"
       :class="{'pb-[10px]': props.isOpen}"
     >
@@ -27,7 +27,7 @@
 <script setup>
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 
-let emit = defineEmits(['toggle']);
+let emit = defineEmits(['isOpenSwitch'])
 let props = defineProps({
   partition: {
     type: String,
