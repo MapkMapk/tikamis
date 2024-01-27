@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 // Shared
-import Index from '@/views/index.vue';
+import Index from '@/views/Index.vue';
+import AuthView from '@/views/AuthView.vue'
+import ManageSettingsView from '@/views/ManageSettingsView.vue'
+import ReportPostsDowntimeView from '@/views/ReportPostsDowntimeView.vue'
 // Mechanic
 import MechanicAuthView from '@/views/Mechanic/MechanicAuth/MechanicAuthView.vue';
 import MechanicHumanSelectView from '@/views/Mechanic/MechanicHumanSelect/MechanicHumanSelectView.vue';
@@ -10,14 +13,9 @@ import MechanicPaymentQrView from '@/views/Mechanic/MechanicPaymentQr/MechanicPa
 import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js';
 import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
 // Director
-import DirectorAuthView from '@/views/Director/DirectorAuth/DirectorAuthView.vue'
-import DirectorManageSettingsView from '@/views/Director/DirectorManageSettings/DirectorManageSettingsView.vue'
 import { useDirectorUserStore } from '@/stores/director/directorUser.js'
 // Sadmin
-import SadminAuthView from '@/views/Sadmin/SadminAuth/SadminAuthView.vue'
-import SadminManageSettingsView from '@/views/Sadmin/SadminManageSettings/SadminManageSettingsView.vue'
 import { useSadminUserStore } from '@/stores/sadmin/sadminUser.js'
-import ReportPostsDowntimeView from '@/views/ReportPostsDowntimeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,7 +26,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'root',
-      component: Index
+      component: Index,
     },
 
     // Sadmin routes
@@ -36,12 +34,13 @@ const router = createRouter({
     {
       path: '/sadmin/auth',
       name: 'sadmin.auth',
-      component: SadminAuthView
+      component: AuthView,
+      props: {title: 'Панель админа'},
     },
     {
-      path: '/sadmin/technical-settings',
-      name: 'sadmin.technicalSettings',
-      component: SadminManageSettingsView
+      path: '/sadmin/manage/settings',
+      name: 'sadmin.manage.settings',
+      component: ManageSettingsView,
     },
 
     // Director routes
@@ -49,17 +48,18 @@ const router = createRouter({
     {
       path: '/director/auth',
       name: 'director.auth',
-      component: DirectorAuthView
+      component: AuthView,
+      props: {title: 'Панель директора'},
     },
     {
-      path: '/director/technical-settings',
-      name: 'director.technicalSettings',
-      component: DirectorManageSettingsView
+      path: '/director/manage/settings',
+      name: 'director.manage.settings',
+      component: ManageSettingsView,
     },
     {
       path: '/director/report/posts-downtime',
       name: 'director.report.postsDowntime',
-      component: ReportPostsDowntimeView
+      component: ReportPostsDowntimeView,
     },
 
     // Mechanic routes
@@ -67,27 +67,27 @@ const router = createRouter({
     {
       path: '/mechanic/auth',
       name: 'mechanic.auth',
-      component: MechanicAuthView
+      component: MechanicAuthView,
     },
     {
       path: '/mechanic/human-select',
       name: 'mechanic.humanSelect',
-      component: MechanicHumanSelectView
+      component: MechanicHumanSelectView,
     },
     {
       path: '/mechanic/order',
       name: 'mechanic.order',
-      component: MechanicOrderView
+      component: MechanicOrderView,
     },
     {
       path: '/mechanic/order/work-add',
       name: 'mechanic.order.workAdd',
-      component: MechanicOrderWorkAddView
+      component: MechanicOrderWorkAddView,
     },
     {
       path: '/mechanic/payment-qr',
       name: 'mechanic.paymentQr',
-      component: MechanicPaymentQrView
+      component: MechanicPaymentQrView,
     },
 
     // 404 page
@@ -95,7 +95,7 @@ const router = createRouter({
     {
       path: '/:pathMatch(.*)*',
       name: '404',
-      component: Index
+      component: Index,
     }
   ]
 });

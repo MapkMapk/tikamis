@@ -32,12 +32,12 @@
             ></BaseSvgIcon>
           </div>
           <BaseButtonFilledGreen
-            @click.prevent="emit('authenticate', login, password)"
+            @click.prevent="authenticate"
             class="w-full bg-green text-white mt-[30px]"
           >Войти
           </BaseButtonFilledGreen>
           <div
-            v-if="props.isErrorVisible"
+            v-if="isErrorVisible"
             class="text-red mt-4"
           >
             {{ errorText }}
@@ -50,25 +50,57 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-// import router from '@/router/index.js';
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
+import { useDirectorUserStore } from '@/stores/director/directorUser.js'
+import directorApiLogin from '@/api/director/directorApiLogin.js'
+import { useSadminUserStore } from '@/stores/sadmin/sadminUser.js'
+import sadminApiLogin from '@/api/sadmin/sadminApiLogin.js'
+import { getViewEnv } from '@/utils/getViewEnv.js'
 
-let emit = defineEmits(['authenticate']);
+const directorUserStore = useDirectorUserStore();
+const sadminUserStore = useSadminUserStore();
+
 let props = defineProps({
+  env: {
+    Type: String,
+    required: true
+  },
   title: {
-    type: String,
+    Type: String,
     required: true,
   },
-  isErrorVisible: {
-    type: Boolean,
-    required: true,
-  }
 })
 
 let login = ref('');
 let password = ref('');
-let errorText = ref('wefwefwfe');
+let errorText = ref('');
+let isErrorVisible = ref(false)
 let isPasswordVisible = ref(false);
 let passwordInputType = computed(() => (isPasswordVisible.value ? 'text' : 'password'));
+
+async function authenticate() {
+  if (getViewEnv() === 'director') {
+    console.log('director route')
+    let data = await directorApiLogin(login.value, password.value)
+    if (data.accessToken && data.refreshToken) {
+      directorUserStore.accessToken = data.accessToken;
+      directorUserStore.refreshToken = data.refreshToken
+      isErrorVisible.value = false
+    } else {
+      isErrorVisible.value = true
+    }
+  }
+  if (getViewEnv() === 'sadmin') {
+    console.log('sadmin route')
+    let data = await sadminApiLogin(login.value, password.value)
+    if (data.accessToken && data.refreshToken) {
+      sadminUserStore.accessToken = data.accessToken;
+      sadminUserStore.refreshToken = data.refreshToken
+      isErrorVisible.value = false
+    } else {
+      isErrorVisible.value = true
+    }
+  }
+}
 </script>

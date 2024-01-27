@@ -62,20 +62,23 @@
       </div>
     </div>
   </section>
-  <BaseButtonFilledGreen
-    @click="addWorksToOrder"
-    v-if="amountOfSelectedWorks > 0"
-    class="fixed w-[300px] bottom-5 left-[calc(50%-(theme(width.52))/2)]"
-    >Добавить
-    {{
-      `${amountOfSelectedWorks} ${getQuantitativeDeclination(
-        amountOfSelectedWorks,
-        'услугу',
-        'услуги',
-        'услуг'
-      )}`
-    }}
-  </BaseButtonFilledGreen>
+  <div :class="{'!left-[calc(50%-320px)]': amountOfSelectedWorks > 0}" class="fixed flex justify-center bottom-5 left-[calc(50%-160px)]">
+    <BaseButtonFilledLight @click="router.push('/mechanic/order')" class="w-[300px] mr-5">Вернуться к заказу</BaseButtonFilledLight>
+    <BaseButtonFilledGreen
+      @click="addWorksToOrder"
+      v-if="amountOfSelectedWorks > 0"
+      class="w-[300px] ml-5"
+      >Добавить
+      {{
+        `${amountOfSelectedWorks} ${getQuantitativeDeclination(
+          amountOfSelectedWorks,
+          'услугу',
+          'услуги',
+          'услуг'
+        )}`
+      }}
+    </BaseButtonFilledGreen>
+  </div>
 </template>
 <script setup>
 import TheHeader from '@/components/TheMechanicHeader.vue';
@@ -87,6 +90,7 @@ import MechanicOrderWorkAddCracker from '@/views/Mechanic/MechanicOrderWorkAdd/M
 import getQuantitativeDeclination from '@/utils/getQuantitativeDeclination.js';
 import { onMounted, ref, computed } from 'vue';
 import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
+import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
 
 const mechanicOrderStore = useMechanicOrderStore();
 let searchInputText = ref('');

@@ -1,9 +1,6 @@
 // Здесь прописывать только стили для компонентного слоя Tailwind
 
 @layer components {
-  .input-regular {
-    @apply h-[60px] flex border border-gray-a1a4ad pl-5 pr-5;
-  }
   .report-section {
     @apply pt-[40px] px-[30px];
   }

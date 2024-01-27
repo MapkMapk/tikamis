@@ -16,19 +16,19 @@
           <h1 class="text-4xl leading-normal font-medium">
             Технические настройки<br />Сургут, Аэрофлотская ул., 5/2
           </h1>
-          <div class="flex flex-col mt-10 w-full max-w-full">
+          <div v-if="getViewEnv() === 'sadmin'" class="flex flex-col mt-10 w-full max-w-full">
             <div class="flex w-full">
               <div class="flex flex-col mr-5 w-full">
                 <span class="text-lg font-semibold">Логин директора</span>
                 <input
-                  class="w-full input-regular mt-3"
+                  class="base-input w-full mt-3"
                   type="text"
                 />
               </div>
               <div class="flex flex-col w-full">
                 <span class="text-lg font-semibold">Пароль директора</span>
                 <input
-                  class="w-full input-regular mt-3"
+                  class="base-input w-full mt-3"
                   type="password"
                 />
               </div>
@@ -64,15 +64,15 @@
               <span class="text-lg font-semibold">Время начала работы</span>
               <input
                 v-model="jobStartTime"
-                class="w-full input-regular mt-3"
+                class="base-input w-full mt-3"
                 type="text"
               />
             </div>
             <div class="flex flex-col ml-8">
-              <span class="text-lg font-semibold">Время окончания</span>
+              <span class="text-lg font-semibold">Время окончания работы</span>
               <input
                 v-model="jobEndTime"
-                class="w-full input-regular mt-3"
+                class="base-input w-full mt-3"
                 type="text"
               />
             </div>
@@ -89,10 +89,10 @@
             <input
               v-model="postsEquipment"
               type="number"
-              class="input-regular w-36 mt-3"
+              class="base-input w-36 mt-3"
             />
           </div>
-          <div class="flex flex-col mt-10">
+          <div v-if="getViewEnv() === 'sadmin'" class="flex flex-col mt-10">
             <span class="text-2xl font-medium">Производственный люфт</span>
             <span class="text-lg mt-3 mb-3"
               >Установка значения перерыва между обслуживанием автомобилей на посту, в
@@ -101,20 +101,20 @@
             <input
               v-model="productionBacklash"
               type="number"
-              class="input-regular w-36 mt-3"
+              class="base-input w-36 mt-3"
             />
           </div>
-          <div class="flex flex-col mt-10">
+          <div v-if="getViewEnv() === 'sadmin'" class="flex flex-col mt-10">
             <span class="text-2xl font-medium">Установка глубины записи в днях</span>
             <input
               v-model="recordingDepth"
               type="number"
-              class="input-regular w-36 mt-3"
+              class="base-input w-36 mt-3"
             />
           </div>
-          <div class="w-full flex mt-14 mb-5">
+          <div class="w-full flex mt-10 mb-5">
             <BaseButtonFilledGreen class="flex flex-1 mr-5">Сохранить</BaseButtonFilledGreen>
-            <BaseButtonFilledLight class="flex flex-1">Закрыть</BaseButtonFilledLight>
+            <BaseButtonFilledLight @click="go" class="flex flex-1">Закрыть</BaseButtonFilledLight>
           </div>
         </div>
       </section>
@@ -127,9 +127,9 @@ import BaseRadioButton from '@/components/BaseRadioButton.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseSelectTimezone from '@/components/SelectTimezone.vue';
 import { useMainStore } from '@/stores/shared/main.js';
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue';
 import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
-import sadminApiManageSettings from '@/api/sadmin/sadminApiManageSettings.js'
+import { getViewEnv } from '@/utils/getViewEnv.js'
 
 const mainStore = useMainStore();
 let isLiveQueue = ref(false);
@@ -140,9 +140,4 @@ let jobEndTime = ref('');
 let postsEquipment = ref('');
 let productionBacklash = ref('');
 let recordingDepth = ref('');
-
-onMounted(async () => {
-  let data = await sadminApiManageSettings()
-  console.log(data)
-})
 </script>
