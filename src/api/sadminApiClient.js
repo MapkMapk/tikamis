@@ -34,8 +34,8 @@ sadminApiClient.interceptors.response.use(
         )
         .catch(async (error) => {
           if (error.response.status === 401) {
-            localStorage.clear();
-            await router.push('/mechanic/auth');
+            localStorage.removeItem('sadminUser');
+            await router.push('/sadmin/auth');
           }
         });
       // console.log('ЧЕКПОИНТ - 3');
@@ -55,7 +55,8 @@ sadminApiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.log(error);
+    console.log(error)
+    alert('Произошла ошибка на сервере, код ошибки 500+')
     return Promise.reject(error);
   }
 );

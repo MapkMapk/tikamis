@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-// Базовая страница
+// Shared
 import Index from '@/views/index.vue';
-// Страницы и сторы механика
+// Mechanic
 import MechanicAuthView from '@/views/Mechanic/MechanicAuth/MechanicAuthView.vue';
 import MechanicHumanSelectView from '@/views/Mechanic/MechanicHumanSelect/MechanicHumanSelectView.vue';
 import MechanicOrderView from '@/views/Mechanic/MechanicOrder/MechanicOrderView.vue';
@@ -9,20 +9,57 @@ import MechanicOrderWorkAddView from '@/views/Mechanic/MechanicOrderWorkAdd/Mech
 import MechanicPaymentQrView from '@/views/Mechanic/MechanicPaymentQr/MechanicPaymentQrView.vue';
 import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js';
 import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
-// Страницы и сторы директора
+// Director
 import DirectorAuthView from '@/views/Director/DirectorAuth/DirectorAuthView.vue'
-import DirectorTechnicalSettingsView from '@/views/Director/DirectorTechnicalSettings/DirectorTechnicalSettingsView.vue'
+import DirectorManageSettingsView from '@/views/Director/DirectorManageSettings/DirectorManageSettingsView.vue'
+import { useDirectorUserStore } from '@/stores/director/directorUser.js'
+// Sadmin
 import SadminAuthView from '@/views/Sadmin/SadminAuth/SadminAuthView.vue'
-import SadminTechnicalSettingsView from '@/views/Sadmin/SadminTechnicalSettings/SadminTechnicalSettingsView.vue'
+import SadminManageSettingsView from '@/views/Sadmin/SadminManageSettings/SadminManageSettingsView.vue'
+import { useSadminUserStore } from '@/stores/sadmin/sadminUser.js'
+import ReportPostsDowntimeView from '@/views/ReportPostsDowntimeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+
     // Base routes
+
     {
       path: '/',
       name: 'root',
       component: Index
+    },
+
+    // Sadmin routes
+
+    {
+      path: '/sadmin/auth',
+      name: 'sadmin.auth',
+      component: SadminAuthView
+    },
+    {
+      path: '/sadmin/technical-settings',
+      name: 'sadmin.technicalSettings',
+      component: SadminManageSettingsView
+    },
+
+    // Director routes
+
+    {
+      path: '/director/auth',
+      name: 'director.auth',
+      component: DirectorAuthView
+    },
+    {
+      path: '/director/technical-settings',
+      name: 'director.technicalSettings',
+      component: DirectorManageSettingsView
+    },
+    {
+      path: '/director/report/posts-downtime',
+      name: 'director.report.postsDowntime',
+      component: ReportPostsDowntimeView
     },
 
     // Mechanic routes
@@ -53,32 +90,6 @@ const router = createRouter({
       component: MechanicPaymentQrView
     },
 
-    // Director routes
-
-    {
-      path: '/director/auth',
-      name: 'director.auth',
-      component: DirectorAuthView
-    },
-    {
-      path: '/director/technical-settings',
-      name: 'director.technicalSettings',
-      component: DirectorTechnicalSettingsView
-    },
-
-    // Sadmin routes
-
-    {
-      path: '/sadmin/auth',
-      name: 'sadmin.auth',
-      component: SadminAuthView
-    },
-    {
-      path: '/sadmin/technical-settings',
-      name: 'sadmin.technicalSettings',
-      component: SadminTechnicalSettingsView
-    },
-
     // 404 page
 
     {
@@ -91,12 +102,45 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
 
-  // Сюда попадание при попытке перехода на одну из страниц раздела директора
-  if (to.fullPath.split('/')[1] === 'director') {
-    console.log('director route chapter')
+  //Сюда попадание при попытке перехода на одну из страниц раздела SADMIN
+  if (to.fullPath.split('/')[1] === 'sadmin') {
+    const sadminUserStore = useSadminUserStore();
+
+    if (!sadminUserStore.accessToken) {
+      if (to.name === 'sadmin.auth') {
+        return next();
+      } else {
+        return next({
+          name: 'sadmin.auth'
+        })
+      }
+    }
+
+    if (sadminUserStore.accessToken) {
+      //
+    }
   }
 
-  // Сюда попадание при попытке перехода на одну из страниц раздела механика
+  // Сюда попадание при попытке перехода на одну из страниц раздела DIRECTOR
+  if (to.fullPath.split('/')[1] === 'director') {
+    const directorUserStore = useDirectorUserStore()
+
+    if (!directorUserStore.accessToken) {
+      if (to.name === 'director.auth') {
+        return next();
+      } else {
+        return next({
+          name: 'director.auth'
+        })
+      }
+    }
+
+    if (directorUserStore.accessToken) {
+    //
+    }
+  }
+
+  // Сюда попадание при попытке перехода на одну из страниц раздела MECHANIC
   if (to.fullPath.split('/')[1] === 'mechanic') {
     const mechanicUserStore = useMechanicUserStore();
     const mechanicOrderStore = useMechanicOrderStore();

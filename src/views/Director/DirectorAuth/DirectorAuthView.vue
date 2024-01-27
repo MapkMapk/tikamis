@@ -11,7 +11,7 @@ const directorUserStore = useDirectorUserStore()
 let isErrorVisible = ref(false)
 
 async function authenticate(login, password) {
-  let data = directorApiLogin(login, password)
+  let data = await directorApiLogin(login, password)
   if (data.accessToken && data.refreshToken) {
     directorUserStore.accessToken = data.accessToken;
     directorUserStore.refreshToken = data.refreshToken

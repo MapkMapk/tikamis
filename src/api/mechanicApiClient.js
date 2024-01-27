@@ -37,7 +37,8 @@ mechanicApiClient.interceptors.response.use(
         )
         .catch(async (error) => {
           if (error.response.status === 401) {
-            localStorage.clear();
+           localStorage.removeItem('mechanicUser');
+            localStorage.removeItem('mechanicOrder')
             await router.push('/mechanic/auth');
           }
         });
@@ -54,7 +55,7 @@ mechanicApiClient.interceptors.response.use(
         }
       });
     }
-    responseStatusesHandler();
+    responseStatusesHandler(response);
     return response;
   },
   (error) => {

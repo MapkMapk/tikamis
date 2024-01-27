@@ -3,6 +3,7 @@
   <div class="w-full flex overflow-x-hidden pt-[60px]">
     <div class="flex flex-col w-full">
       <div
+        :class="{'pl-[300px]': mainStore.isHeaderMenuOpen}"
         class="w-full flex justify-center items-center bg-red text-2xl text-white font-medium h-[50px]"
       >
         Изменения вступят в силу начиная с 25 июня 2023 г.
@@ -126,8 +127,9 @@ import BaseRadioButton from '@/components/BaseRadioButton.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseSelectTimezone from '@/components/SelectTimezone.vue';
 import { useMainStore } from '@/stores/shared/main.js';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue'
 import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
+import sadminApiManageSettings from '@/api/sadmin/sadminApiManageSettings.js'
 
 const mainStore = useMainStore();
 let isLiveQueue = ref(false);
@@ -139,5 +141,8 @@ let postsEquipment = ref('');
 let productionBacklash = ref('');
 let recordingDepth = ref('');
 
-
+onMounted(async () => {
+  let data = await sadminApiManageSettings()
+  console.log(data)
+})
 </script>
