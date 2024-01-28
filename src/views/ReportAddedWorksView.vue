@@ -2,7 +2,7 @@
   <Header />
   <HeaderGap />
   <ReportSection>
-    <ReportPrimeTitle>Простои постов</ReportPrimeTitle>
+    <ReportPrimeTitle>Дополнительные работы</ReportPrimeTitle>
     <ReportFiltersWrapper>
       <ReportFilterPeriod />
       <ReportFilterDate />
@@ -22,39 +22,39 @@
         <ReportTableCell>Рычагов Невернти</ReportTableCell>
         <ReportTableCell>Анатолий Басурман Крехтехович</ReportTableCell>
         <ReportTableCell>Серпиголовый Каруман</ReportTableCell>
-        <ReportTableCellBottom>Итого простоя:</ReportTableCellBottom>
+        <ReportTableCellBottom>Итого потерь:</ReportTableCellBottom>
       </ReportTableColumn>
       <ReportTableColumn
         class="w-1/4"
         id="#columnDowntime"
       >
-        <ReportTableCellTop>Время простоя, мин</ReportTableCellTop>
-        <ReportTableCell>10</ReportTableCell>
-        <ReportTableCell>71</ReportTableCell>
-        <ReportTableCell>1</ReportTableCell>
-        <ReportTableCell>4</ReportTableCell>
-        <ReportTableCell>32</ReportTableCell>
-        <ReportTableCell>16</ReportTableCell>
-        <ReportTableCellBottom>135 минут</ReportTableCellBottom>
+        <ReportTableCellTop>Работы</ReportTableCellTop>
+        <ReportTableCell>Все работы</ReportTableCell>
+        <ReportTableCell>Все работы</ReportTableCell>
+        <ReportTableCell>Все работы</ReportTableCell>
+        <ReportTableCell>Все работы</ReportTableCell>
+        <ReportTableCell>Все работы</ReportTableCell>
+        <ReportTableCell>Все работы</ReportTableCell>
+        <ReportTableCellBottom />
       </ReportTableColumn>
       <ReportTableColumn
         class="w-1/4"
         id="columnDate"
       >
-        <ReportTableCellTop>Дата</ReportTableCellTop>
-        <ReportTableCell>22.06.2022 09:35</ReportTableCell>
-        <ReportTableCell>22.06.2022 09:35</ReportTableCell>
-        <ReportTableCell>22.06.2022 09:35</ReportTableCell>
-        <ReportTableCell>22.06.2022 09:35</ReportTableCell>
-        <ReportTableCell>22.06.2022 09:35</ReportTableCell>
-        <ReportTableCell>22.06.2022 09:35</ReportTableCell>
-        <ReportTableCellBottom />
+        <ReportTableCellTop>Потери</ReportTableCellTop>
+        <ReportTableCell>14500 Р</ReportTableCell>
+        <ReportTableCell>14500 Р</ReportTableCell>
+        <ReportTableCell>14500 Р</ReportTableCell>
+        <ReportTableCell>14500 Р</ReportTableCell>
+        <ReportTableCell>14500 Р</ReportTableCell>
+        <ReportTableCell>14500 Р</ReportTableCell>
+        <ReportTableCellBottom>46 400 Р</ReportTableCellBottom>
       </ReportTableColumn>
     </ReportTable>
-    <ReportButtonsWrapper>
-      <ReportButtonSave class="mr-[15px]" />
-      <ReportButtonSend class="ml-[15px]" />
-    </ReportButtonsWrapper>
+<!--    <ReportButtonsWrapper>-->
+<!--      <ReportButtonSave class="mr-[15px]" />-->
+<!--      <ReportButtonSend class="ml-[15px]" />-->
+<!--    </ReportButtonsWrapper>-->
   </ReportSection>
 </template>
 

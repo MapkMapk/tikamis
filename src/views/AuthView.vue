@@ -57,6 +57,7 @@ import directorApiLogin from '@/api/director/directorApiLogin.js'
 import { useSadminUserStore } from '@/stores/sadmin/sadminUser.js'
 import sadminApiLogin from '@/api/sadmin/sadminApiLogin.js'
 import { env } from '@/utils/env.js'
+import router from '@/router/index.js'
 
 const directorUserStore = useDirectorUserStore();
 const sadminUserStore = useSadminUserStore();
@@ -80,8 +81,8 @@ async function authenticate() {
     let data = await directorApiLogin(login.value, password.value)
     if (data.accessToken && data.refreshToken) {
       directorUserStore.accessToken = data.accessToken;
-      directorUserStore.refreshToken = data.refreshToken
-      isErrorVisible.value = false
+      directorUserStore.refreshToken = data.refreshToken;
+      await router.push('/director/manage/settings');
     } else {
       isErrorVisible.value = true
     }
@@ -90,8 +91,8 @@ async function authenticate() {
     let data = await sadminApiLogin(login.value, password.value)
     if (data.accessToken && data.refreshToken) {
       sadminUserStore.accessToken = data.accessToken;
-      sadminUserStore.refreshToken = data.refreshToken
-      isErrorVisible.value = false
+      sadminUserStore.refreshToken = data.refreshToken;
+      await router.push('/sadmin/manage/settings');
     } else {
       isErrorVisible.value = true
     }

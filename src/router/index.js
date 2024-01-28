@@ -16,6 +16,9 @@ import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
 import { useDirectorUserStore } from '@/stores/director/directorUser.js'
 // Sadmin
 import { useSadminUserStore } from '@/stores/sadmin/sadminUser.js'
+import ReportCanceledWorksView from '@/views/ReportCanceledWorksView.vue'
+import ReportAddedWorksView from '@/views/ReportAddedWorksView.vue'
+import ReportCustomerSkipsView from '@/views/ReportCustomerSkipsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -63,9 +66,41 @@ const router = createRouter({
     },
     {
       path: '/director/report/posts-downtime',
-      name: 'director.report.postsDowntime',
+      name: 'director.report.posts-downtime',
       component: ReportPostsDowntimeView,
       meta: {title: 'Простои постов | Директор | Tikamis'},
+    },
+    {
+      path: '/director/report/canceled-works',
+      name: 'director.report.canceled-works',
+      component: ReportCanceledWorksView,
+      meta: {title: 'Заказанные, но не выполненные работы | Директор | Tikamis'},
+    },
+    {
+      path: '/director/report/added-works',
+      name: 'director.report.added-works',
+      component: ReportAddedWorksView
+    },
+    {
+      path: '/director/report/customer-skips',
+      name: 'director.report.customer-skips',
+      component: ReportCustomerSkipsView
+    },
+    {
+      path: '/director/analytics/posts-kpd',
+      name: 'director.analytics.posts-kpd,'
+    },
+    {
+      path: '/director/analytics/order-history',
+      name: 'director.analytics.order-history,'
+    },
+    {
+      path: '/director/report/plate-fakes',
+      name: 'director.report.plate-fakes',
+    },
+    {
+      path: '/director/report/suspicious',
+      name: 'director.report.suspicious'
     },
 
     // Mechanic routes
@@ -78,7 +113,7 @@ const router = createRouter({
     },
     {
       path: '/mechanic/human-select',
-      name: 'mechanic.humanSelect',
+      name: 'mechanic.human-select',
       component: MechanicHumanSelectView,
       meta: {title: 'Выбор механика | Механик | Tikamis'},
     },
@@ -90,13 +125,13 @@ const router = createRouter({
     },
     {
       path: '/mechanic/order/work-add',
-      name: 'mechanic.order.workAdd',
+      name: 'mechanic.order.work-add',
       component: MechanicOrderWorkAddView,
       meta: {title: 'Добавление работы в заказ | Механик | Tikamis'}
     },
     {
       path: '/mechanic/payment-qr',
-      name: 'mechanic.paymentQr',
+      name: 'mechanic.payment-qr',
       component: MechanicPaymentQrView,
       meta: {title: 'QR Код | Механик | Tikamis'}
     },
@@ -105,7 +140,6 @@ const router = createRouter({
 
     {
       path: '/:pathMatch(.*)*',
-      name: '404',
       component: Index,
       meta: {title: 'Выбор раздела | Tikamis'}
     }
@@ -176,7 +210,7 @@ router.beforeEach((to, from, next) => {
     if (mechanicUserStore.accessToken) {
       // Если переход на страницу выбора механика, но механик уже выбран
       // то редиректнуть на страницу заказа
-      if (to.name === 'mechanic.humanSelect' && mechanicUserStore.activeMechanicId) {
+      if (to.name === 'mechanic.human-select' && mechanicUserStore.activeMechanicId) {
         return next({
           name: 'mechanic.order'
         });
@@ -185,21 +219,21 @@ router.beforeEach((to, from, next) => {
       // то редиректнуть на страницу выбора механика
       if (to.name === 'mechanic.order' && mechanicUserStore.activeMechanicId === '') {
         return next({
-          name: 'mechanic.humanSelect'
+          name: 'mechanic.human-select'
         });
       }
       // Если переход на страницу авторизации, но человек уже авторизован
       // то переход на страницу выбора механика
       if (to.name === 'mechanic.auth' && localStorage.getItem('accessToken')) {
         return next({
-          name: 'mechanic.humanSelect'
+          name: 'mechanic.human-select'
         });
       }
       // Если переход на страницу добавления работ в заказ, но механик ещё не выбран
       // то редиректнуть на страницу выбора механика
-      if (to.name === 'mechanic.order.workAdd' && !mechanicUserStore.activeMechanicId) {
+      if (to.name === 'mechanic.order.work-add' && !mechanicUserStore.activeMechanicId) {
         return next({
-          name: 'mechanic.humanSelect'
+          name: 'mechanic.human-select'
         });
       }
       // Если переход на страницу с QR кодом, но QR код о завершении заказа ещё не получен

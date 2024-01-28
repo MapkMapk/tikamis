@@ -1,11 +1,11 @@
 <template>
-  <div class="report-input justify-between">
+  <div class="report-filter justify-between min-w-min flex-1">
     <div class="flex-col">
       <div class="report-input-header-text-gray">Начало отсчета</div>
       <div class="report-input-body-text">01.05.2023</div>
     </div>
     <BaseSvgIcon
-      class="w-[18px] h-[18px]"
+      class="max-w-[18px] max-h-[18px]"
       name="calendar-gray"
     />
   </div>

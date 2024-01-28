@@ -1,5 +1,5 @@
 <template>
-  <div class="report-input justify-between">
+  <div class="report-filter justify-between min-w-min flex-1">
     <div class="flex-col">
       <div class="report-input-header-text-gray">Период</div>
       <div class="report-input-body-text">Месяц</div>

@@ -43,28 +43,28 @@
           <div class="text-2xl font-medium mt-5">Режим работы</div>
           <div class="flex flex-col mt-4">
             <div
-              @click="isLiveQueue = true"
+              @click="bookingAvailable = true"
               class="flex items-center cursor-pointer"
             >
-              <BaseRadioButton :is-active="!isLiveQueue" />
+              <BaseRadioButton :is-active="!bookingAvailable" />
               <span class="text-lg ml-2">Без записи, только живая очередь</span>
             </div>
             <div
-              @click="isLiveQueue = false"
+              @click="bookingAvailable = false"
               class="flex items-center cursor-pointer mt-3"
             >
-              <BaseRadioButton :is-active="isLiveQueue" />
+              <BaseRadioButton :is-active="bookingAvailable" />
               <span class="text-lg ml-2">Режим записи</span>
             </div>
           </div>
           <div
-            v-if="!isLiveQueue"
+            v-if="!bookingAvailable"
             class="flex mt-6"
           >
             <div class="flex flex-col">
               <span class="text-lg font-semibold">Время начала работы</span>
               <input
-                v-model="jobStartTime"
+                v-model="shiftsStart"
                 class="base-input text-2xl w-full mt-3"
                 type="text"
               />
@@ -72,14 +72,14 @@
             <div class="flex flex-col ml-8">
               <span class="text-lg font-semibold">Время окончания работы</span>
               <input
-                v-model="jobEndTime"
+                v-model="shiftsFinish"
                 class="base-input text-2xl w-full mt-3"
                 type="text"
               />
             </div>
           </div>
           <div
-            v-if="!isLiveQueue"
+            v-if="!bookingAvailable"
             class="flex flex-col mt-10"
           >
             <span class="text-2xl font-medium">Часовой пояс</span>
@@ -100,7 +100,6 @@
               минутах.</span
             >
             <input
-              v-model="productionBacklash"
               type="number"
               class="base-input text-2xl w-40 mt-3"
             />
@@ -108,7 +107,6 @@
           <div v-if="env('sadmin')" class="flex flex-col mt-10">
             <span class="text-2xl font-medium">Установка глубины записи в днях</span>
             <input
-              v-model="recordingDepth"
               type="number"
               class="base-input text-2xl w-40 mt-3"
             />
@@ -130,15 +128,20 @@ import SelectTimezone from '@/components/SelectTimezone.vue';
 import { useMainStore } from '@/stores/shared/main.js';
 import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
 import { env } from '@/utils/env.js'
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue'
+import directorApiManageSettings from '@/api/director/directorApiManageSettings.js'
 
 const mainStore = useMainStore();
-let isLiveQueue = ref(false);
 
-let jobStartTime = ref('');
-let jobEndTime = ref('');
-// let timeZone = ref('');
-let postsEquipment = ref('');
-let productionBacklash = ref('');
-let recordingDepth = ref('');
+let bookingAvailable = ref(false);
+let changesSince = ref();
+let postsEquipment = ref();
+let shiftsFinish = ref();
+let shiftsStart = ref();
+let timeZoneOffsetHours = ref();
+
+onMounted(async () => {
+  const data = await directorApiManageSettings();
+  console.log(data)
+})
 </script>
