@@ -1,12 +1,12 @@
 <template>
-  <TheDirectorHeader />
+  <Header />
   <HeaderGap />
   <section class="report-section">
-    <ReportPrimeTitle>Записи клиентов 22 июня 2023</ReportPrimeTitle>
+    <ReportPrimeTitle></ReportPrimeTitle>
     <div class="flex">
       <ReportInputPeriod class="flex-1" />
       <ReportInputDate class="border-l-0 flex-[2]" />
-      <ReportInputShow class="flex-[1]" />
+      <ReportInputShow class="flex-1" />
       <ReportButtonCross />
       <ReportButtonApplyFilters class="flex-[0.5]" />
     </div>
@@ -21,7 +21,7 @@
 </template>
 
 <script setup>
-import TheDirectorHeader from '@/components/Header.vue';
+import Header from '@/components/Header.vue';
 import ReportPrimeTitle from '@/components/ReportPrimeTitle.vue';
 import HeaderGap from '@/components/HeaderGap.vue';
 import ReportInputDate from '@/components/ReportInputDate.vue';

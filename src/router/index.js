@@ -27,6 +27,7 @@ const router = createRouter({
       path: '/',
       name: 'root',
       component: Index,
+      meta: {title: 'Выбор раздела | Tikamis'},
     },
 
     // Sadmin routes
@@ -35,12 +36,14 @@ const router = createRouter({
       path: '/sadmin/auth',
       name: 'sadmin.auth',
       component: AuthView,
+      meta: {title: 'Аутентификация | Суперадмин | Tikamis'},
       props: {title: 'Панель админа'},
     },
     {
       path: '/sadmin/manage/settings',
       name: 'sadmin.manage.settings',
       component: ManageSettingsView,
+      meta: {title: 'Настройки | Суперадмин | Tikamis'},
     },
 
     // Director routes
@@ -49,17 +52,20 @@ const router = createRouter({
       path: '/director/auth',
       name: 'director.auth',
       component: AuthView,
+      meta: {title: 'Аутентификация | Директор | Tikamis'},
       props: {title: 'Панель директора'},
     },
     {
       path: '/director/manage/settings',
       name: 'director.manage.settings',
       component: ManageSettingsView,
+      meta: {title: 'Настройки | Директор'},
     },
     {
       path: '/director/report/posts-downtime',
       name: 'director.report.postsDowntime',
       component: ReportPostsDowntimeView,
+      meta: {title: 'Простои постов | Директор | Tikamis'},
     },
 
     // Mechanic routes
@@ -68,26 +74,31 @@ const router = createRouter({
       path: '/mechanic/auth',
       name: 'mechanic.auth',
       component: MechanicAuthView,
+      meta: {title: 'Аутентификация | Механик | Tikamis'},
     },
     {
       path: '/mechanic/human-select',
       name: 'mechanic.humanSelect',
       component: MechanicHumanSelectView,
+      meta: {title: 'Выбор механика | Механик | Tikamis'},
     },
     {
       path: '/mechanic/order',
       name: 'mechanic.order',
       component: MechanicOrderView,
+      meta: {title: 'Заказ | Механик | Tikamis'},
     },
     {
       path: '/mechanic/order/work-add',
       name: 'mechanic.order.workAdd',
       component: MechanicOrderWorkAddView,
+      meta: {title: 'Добавление работы в заказ | Механик | Tikamis'}
     },
     {
       path: '/mechanic/payment-qr',
       name: 'mechanic.paymentQr',
       component: MechanicPaymentQrView,
+      meta: {title: 'QR Код | Механик | Tikamis'}
     },
 
     // 404 page
@@ -96,11 +107,15 @@ const router = createRouter({
       path: '/:pathMatch(.*)*',
       name: '404',
       component: Index,
+      meta: {title: 'Выбор раздела | Tikamis'}
     }
   ]
 });
 
 router.beforeEach((to, from, next) => {
+
+  // Именование страницы (meta)
+  document.title = to.meta.title ? to.meta.title : 'Tikamis';
 
   //Сюда попадание при попытке перехода на одну из страниц раздела SADMIN
   if (to.fullPath.split('/')[1] === 'sadmin') {

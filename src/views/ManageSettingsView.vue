@@ -1,5 +1,5 @@
 <template>
-  <TheDirectorHeader />
+  <Header />
   <div class="w-full flex overflow-x-hidden pt-[60px]">
     <div class="flex flex-col w-full">
       <div
@@ -16,7 +16,7 @@
           <h1 class="text-4xl leading-normal font-medium">
             Технические настройки<br />Сургут, Аэрофлотская ул., 5/2
           </h1>
-          <div v-if="getViewEnv() === 'sadmin'" class="flex flex-col mt-10 w-full max-w-full">
+          <div v-if="env('sadmin')" class="flex flex-col mt-10 w-full max-w-full">
             <div class="flex w-full">
               <div class="flex flex-col mr-5 w-full">
                 <span class="text-lg font-semibold">Логин директора</span>
@@ -93,7 +93,7 @@
               class="base-input text-2xl w-40 mt-3"
             />
           </div>
-          <div v-if="getViewEnv() === 'sadmin'" class="flex flex-col mt-10">
+          <div v-if="env('sadmin')" class="flex flex-col mt-10">
             <span class="text-2xl font-medium">Производственный люфт</span>
             <span class="text-lg mt-3 mb-3"
               >Установка значения перерыва между обслуживанием автомобилей на посту, в
@@ -105,7 +105,7 @@
               class="base-input text-2xl w-40 mt-3"
             />
           </div>
-          <div v-if="getViewEnv() === 'sadmin'" class="flex flex-col mt-10">
+          <div v-if="env('sadmin')" class="flex flex-col mt-10">
             <span class="text-2xl font-medium">Установка глубины записи в днях</span>
             <input
               v-model="recordingDepth"
@@ -115,7 +115,7 @@
           </div>
           <div class="w-full flex mt-10 mb-5">
             <BaseButtonFilledGreen @click.prevent="console.log('Сохранить')" class="flex flex-1 mr-5">Сохранить</BaseButtonFilledGreen>
-            <BaseButtonFilledLight v-if="getViewEnv() === 'sadmin'" @click.prevent="console.log('Закрыть')" class="flex flex-1">Закрыть</BaseButtonFilledLight>
+            <BaseButtonFilledLight v-if="env('sadmin')" @click.prevent="console.log('Закрыть')" class="flex flex-1">Закрыть</BaseButtonFilledLight>
           </div>
         </form>
       </section>
@@ -123,13 +123,13 @@
   </div>
 </template>
 <script setup>
-import TheDirectorHeader from '@/components/Header.vue';
+import Header from '@/components/Header.vue';
 import BaseRadioButton from '@/components/BaseRadioButton.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import SelectTimezone from '@/components/SelectTimezone.vue';
 import { useMainStore } from '@/stores/shared/main.js';
 import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
-import { getViewEnv } from '@/utils/getViewEnv.js'
+import { env } from '@/utils/env.js'
 import { ref } from 'vue';
 
 const mainStore = useMainStore();

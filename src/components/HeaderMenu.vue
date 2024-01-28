@@ -15,6 +15,7 @@
       />
     </div>
     <div
+      @click="logout"
       class="mt-auto flex flex-col py-[20px] border-t-gray-53565b border-t text-2xl text-white justify-center pl-[30px] pr-[20px] cursor-pointer"
     >
       Выход
@@ -25,9 +26,21 @@
 import TheHeaderMenuPartition from '@/components/HeaderMenuPartition.vue';
 import { useMainStore } from '@/stores/shared/main.js'
 import { ref } from 'vue'
-import { getViewEnv } from '@/utils/getViewEnv.js'
+import { env } from '@/utils/env.js'
+import directorApiLogout from '@/api/director/directorApiLogout.js'
+import sadminApiLogout from '@/api/sadmin/sadminApiLogout.js'
 
 const mainStore = useMainStore();
+
+function logout() {
+  if (env('director')) {
+    directorApiLogout()
+    return;
+  }
+  if (env('sadmin')) {
+    sadminApiLogout()
+  }
+}
 
 function isOpenSwitch(index) {
   navigation.value.forEach((nav) => {
@@ -38,7 +51,7 @@ function isOpenSwitch(index) {
 
 let navigation = ref([])
 
-if (getViewEnv() === 'director') {
+if (env('director')) {
   navigation.value = [
     {
       isOpen: false,
@@ -76,7 +89,7 @@ if (getViewEnv() === 'director') {
   ]
 }
 
-if (getViewEnv() === 'sadmin') {
+if (env('sadmin')) {
   navigation.value = [
     {
       isOpen: false,

@@ -56,16 +56,12 @@ import { useDirectorUserStore } from '@/stores/director/directorUser.js'
 import directorApiLogin from '@/api/director/directorApiLogin.js'
 import { useSadminUserStore } from '@/stores/sadmin/sadminUser.js'
 import sadminApiLogin from '@/api/sadmin/sadminApiLogin.js'
-import { getViewEnv } from '@/utils/getViewEnv.js'
+import { env } from '@/utils/env.js'
 
 const directorUserStore = useDirectorUserStore();
 const sadminUserStore = useSadminUserStore();
 
 let props = defineProps({
-  env: {
-    Type: String,
-    required: true
-  },
   title: {
     Type: String,
     required: true,
@@ -80,8 +76,7 @@ let isPasswordVisible = ref(false);
 let passwordInputType = computed(() => (isPasswordVisible.value ? 'text' : 'password'));
 
 async function authenticate() {
-  if (getViewEnv() === 'director') {
-    console.log('director route')
+  if (env('director')) {
     let data = await directorApiLogin(login.value, password.value)
     if (data.accessToken && data.refreshToken) {
       directorUserStore.accessToken = data.accessToken;
@@ -91,8 +86,7 @@ async function authenticate() {
       isErrorVisible.value = true
     }
   }
-  if (getViewEnv() === 'sadmin') {
-    console.log('sadmin route')
+  if (env('sadmin')) {
     let data = await sadminApiLogin(login.value, password.value)
     if (data.accessToken && data.refreshToken) {
       sadminUserStore.accessToken = data.accessToken;
