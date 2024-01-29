@@ -1,9 +1,9 @@
-import AuthView from '@/views/AuthView.vue';
-import ManageSettingsView from '@/views/ManageSettingsView.vue';
-import ReportPostsDowntimeView from '@/views/ReportPostsDowntimeView.vue';
-import ReportCanceledWorksView from '@/views/ReportCanceledWorksView.vue';
-import ReportAddedWorksView from '@/views/ReportAddedWorksView.vue';
-import ReportCustomerSkipsView from '@/views/ReportCustomerSkipsView.vue';
+import AuthView from '@/views/Shared/SharedAuth/SharedAuthView.vue';
+import ManageSettingsView from '@/views/Shared/SharedManageSerttings/SharedManageSettingsView.vue';
+import ReportPostsDowntimeView from '@/views/Shared/_Tabular/TabularReportPostsDowntime/TabularReportPostsDowntimeView.vue';
+import ReportCanceledWorksView from '@/views/Shared/_Tabular/TabularReportCanceledWorks/TabularReportCanceledWorksView.vue';
+import ReportAddedWorksView from '@/views/Shared/_Tabular/TabularReportAddedWorks/TabularReportAddedWorksView.vue';
+import ReportCustomerSkipsView from '@/views/Shared/_Tabular/TabularReportCustomerSkipsView/TabularReportCustomerSkipsView.vue';
 import { useDirectorUserStore } from '@/stores/director/directorUser.js';
 
 const directorRoutes = {

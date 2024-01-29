@@ -1,5 +1,5 @@
-import AuthView from '@/views/AuthView.vue';
-import ManageSettingsView from '@/views/ManageSettingsView.vue';
+import AuthView from '@/views/Shared/SharedAuth/SharedAuthView.vue';
+import ManageSettingsView from '@/views/Shared/SharedManageSerttings/SharedManageSettingsView.vue';
 import { useSadminUserStore } from '@/stores/sadmin/sadminUser.js';
 import Index from '@/views/Index.vue';
 

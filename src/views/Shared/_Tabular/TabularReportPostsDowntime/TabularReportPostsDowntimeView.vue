@@ -60,21 +60,21 @@
 
 <script setup>
 import Header from '@/components/Header.vue';
-import ReportPrimeTitle from '@/components/ReportPrimeTitle.vue';
+import ReportPrimeTitle from '@/views/Shared/_Tabular/TabularPrimeTitle.vue';
 import HeaderGap from '@/components/HeaderGap.vue';
-import ReportFilterDate from '@/components/ReportFilterDate.vue';
-import ReportFilterPeriod from '@/components/ReportFilterPeriod.vue';
-import ReportFilterEntity from '@/components/ReportFilterEntity.vue';
-import ReportButtonCross from '@/components/ReportButtonCross.vue';
-import ReportButtonApplyFilters from '@/components/ReportButtonApplyFilters.vue';
-import ReportButtonSend from '@/components/ReportButtonSend.vue';
-import ReportButtonSave from '@/components/ReportButtonSave.vue';
-import ReportTableColumn from '@/components/ReportTableColumn.vue';
-import ReportTableCellTop from '@/components/ReportTableCellTop.vue';
-import ReportTableCell from '@/components/ReportTableCell.vue';
-import ReportTableCellBottom from '@/components/ReportTableCellBottom.vue';
-import ReportTable from '@/components/ReportTable.vue';
-import ReportFiltersWrapper from '@/components/ReportFiltersWrapper.vue';
-import ReportSection from '@/components/ReportSection.vue';
-import ReportButtonsWrapper from '@/components/ReportButtonsWrapper.vue';
+import ReportFilterDate from '@/views/Shared/_Tabular/TabularFilterDate.vue';
+import ReportFilterPeriod from '@/views/Shared/_Tabular/TabularFilterPeriod.vue';
+import ReportFilterEntity from '@/views/Shared/_Tabular/TabularFilterEntity.vue';
+import ReportButtonCross from '@/views/Shared/_Tabular/TabularButtonCross.vue';
+import ReportButtonApplyFilters from '@/views/Shared/_Tabular/TabularButtonApplyFilters.vue';
+import ReportButtonSend from '@/views/Shared/_Tabular/TabularButtonSend.vue';
+import ReportButtonSave from '@/views/Shared/_Tabular/TabularButtonSave.vue';
+import ReportTableColumn from '@/views/Shared/_Tabular/TabularTableColumn.vue';
+import ReportTableCellTop from '@/views/Shared/_Tabular/TabularTableCellTop.vue';
+import ReportTableCell from '@/views/Shared/_Tabular/TabularTableCell.vue';
+import ReportTableCellBottom from '@/views/Shared/_Tabular/TabularTableCellBottom.vue';
+import ReportTable from '@/views/Shared/_Tabular/TabularTable.vue';
+import ReportFiltersWrapper from '@/views/Shared/_Tabular/TabularFiltersWrapper.vue';
+import ReportSection from '@/views/Shared/_Tabular/TabularSection.vue';
+import ReportButtonsWrapper from '@/views/Shared/_Tabular/TabularButtonsWrapper.vue';
 </script>

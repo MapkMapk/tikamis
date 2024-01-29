@@ -81,7 +81,7 @@
   </div>
 </template>
 <script setup>
-import TheHeader from '@/components/TheMechanicHeader.vue';
+import TheHeader from '@/views/Mechanic/TheMechanicHeader.vue';
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import router from '@/router/index.js';
