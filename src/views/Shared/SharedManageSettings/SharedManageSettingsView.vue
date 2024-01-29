@@ -121,7 +121,7 @@
   </div>
 </template>
 <script setup>
-import Header from '@/components/Header.vue';
+import Header from '@/components/MainHeader.vue';
 import BaseRadioButton from '@/components/BaseRadioButton.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import SelectTimezone from '@/components/SelectTimezone.vue';

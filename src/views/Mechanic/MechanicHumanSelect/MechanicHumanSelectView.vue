@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-import TheHeader from '@/views/Mechanic/TheMechanicHeader.vue';
+import TheHeader from '@/components/TheMechanicHeader.vue';
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 import { computed, onMounted, ref } from 'vue';
 import MechanicHumanSelectItem from '@/views/Mechanic/MechanicHumanSelect/MechanicHumanSelectItem.vue';

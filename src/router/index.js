@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 // Shared
-import Index from '@/views/Index.vue';
+import index from '@/views/index.vue';
 import { mechanicBeforeEach, mechanicRoutes } from '@/router/mechanic.js';
 import { sadminBeforeEach, sadminRoutes } from '@/router/sadmin.js';
 import { directorBeforeEach, directorRoutes } from '@/router/director.js';
@@ -11,7 +11,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'root',
-      component: Index,
+      component: index,
       meta: { title: 'Выбор раздела | Tikamis' }
     },
     sadminRoutes,
@@ -19,13 +19,12 @@ const router = createRouter({
     mechanicRoutes,
     {
       path: '/:pathMatch(.*)*',
-      redirect: '/',
+      redirect: '/'
     }
   ]
 });
 
 router.beforeEach((to) => {
-
   // Именование страницы (meta)
   document.title = to?.meta.title ? to.meta.title : 'Tikamis';
 

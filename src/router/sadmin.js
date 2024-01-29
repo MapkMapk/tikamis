@@ -1,7 +1,19 @@
-import AuthView from '@/views/Shared/SharedAuth/SharedAuthView.vue';
-import ManageSettingsView from '@/views/Shared/SharedManageSerttings/SharedManageSettingsView.vue';
 import { useSadminUserStore } from '@/stores/sadmin/sadminUser.js';
-import Index from '@/views/Index.vue';
+import SharedAuthView from '@/views/Shared/SharedAuth/SharedAuthView.vue';
+import SharedManageSettingsView from '@/views/Shared/SharedManageSettings/SharedManageSettingsView.vue';
+import SharedManageCalendarView from '@/views/Shared/SharedManageCalendar/SharedManageCalendarView.vue';
+import SharedManageCustomerRecordsView from '@/views/Shared/SharedManageCustomerRecords/SharedManageCustomerRecordsView.vue';
+import SharedAnalyticsPostsKpdView from '@/views/Shared/SharedAnalyticsPostsKpd/SharedAnalyticsPostsKpdView.vue';
+import SharedAnalyticsReviewsView from '@/views/Shared/SharedAnalyticsReviews/SharedAnalyticsReviewsView.vue';
+import SharedAnalyticsServiceKpd from '@/views/Shared/SharedAnalyticsServiceKpd/SharedAnalyticsServiceKpd.vue';
+import SharedAnalyticsServiceWorkloadView from '@/views/Shared/SharedAnalyticsServiceWorkload/SharedAnalyticsServiceWorkloadView.vue';
+import SharedReportPostsDowntimeView from '@/views/Shared/SharedReportPostsDowntime/SharedReportPostsDowntimeView.vue';
+import SharedReportCanceledWorksView from '@/views/Shared/SharedReportCanceledWorks/SharedReportCanceledWorksView.vue';
+import SharedReportAddedWorksView from '@/views/Shared/SharedReportAddedWorks/SharedReportAddedWorksView.vue';
+import SharedReportCustomerSkipsView from '@/views/Shared/SharedReportCustomerSkipsView/SharedReportCustomerSkipsView.vue';
+import SharedReportPlateFakesView from '@/views/Shared/SharedReportPlateFakes/SharedReportPlateFakesView.vue';
+import SharedAnalyticsServiceHistoryView from '@/views/Shared/SharedAnalyticsServiceHistory/SharedAnalyticsServiceHistoryView.vue';
+import SharedReportSuspiciousPhonesView from '@/views/Shared/SharedReportSuspiciousPhones/SharedReportSuspiciousPhonesView.vue';
 
 const sadminRoutes = {
   path: '/sadmin',
@@ -9,20 +21,113 @@ const sadminRoutes = {
     {
       path: 'auth',
       name: 'sadmin.auth',
-      component: AuthView,
-      meta: { title: 'Аутентификация | Суперадмин | Tikamis' },
+      component: SharedAuthView,
+      meta: { title: 'Аутентификация' },
       props: { title: 'Панель админа' }
     },
     {
-      path: 'manage/settings',
-      name: 'sadmin.manage.settings',
-      component: ManageSettingsView,
-      meta: { title: 'Настройки | Суперадмин | Tikamis' }
+      path: 'manage',
+      children: [
+        {
+          path: 'settings',
+          name: 'sadmin.manage.settings',
+          component: SharedManageSettingsView,
+          meta: { title: 'Настройки' }
+        },
+        {
+          path: 'calendar',
+          name: 'sadmin.manage.calendar',
+          component: SharedManageCalendarView,
+          meta: { title: 'Календарь рабочих смен' }
+        },
+        {
+          path: 'customer-records',
+          name: 'sadmin.manage.customer-records',
+          component: SharedManageCustomerRecordsView,
+          meta: { title: 'Записи клиентов' }
+        }
+      ]
     },
-    // 404 LAST
+    {
+      path: 'analytics',
+      children: [
+        {
+          path: 'posts-kpd',
+          name: 'sadmin.analytics.posts-kpd',
+          component: SharedAnalyticsPostsKpdView,
+          meta: { title: 'КПД постов' }
+        },
+        {
+          path: 'reviews',
+          name: 'sadmin.analytics.reviews',
+          component: SharedAnalyticsReviewsView,
+          meta: { title: 'Отзывы' }
+        },
+        {
+          path: 'service-kpd',
+          name: 'sadmin.analytics.service-kpd',
+          component: SharedAnalyticsServiceKpd,
+          meta: { title: 'КПД сервиса' }
+        },
+        {
+          path: 'service-workload',
+          name: 'sadmin.service.workload',
+          component: SharedAnalyticsServiceWorkloadView,
+          meta: { title: 'Загруженность сервиса' }
+        },
+        {
+          path: 'service-history',
+          name: 'sadmin.analytics.service-history',
+          component: SharedAnalyticsServiceHistoryView,
+          meta: { title: 'Сервисная история' }
+        }
+      ]
+    },
+    {
+      path: 'report',
+      children: [
+        {
+          path: 'posts-downtime',
+          name: 'sadmin.report.posts-downtime',
+          component: SharedReportPostsDowntimeView,
+          meta: { title: 'Простои постов' }
+        },
+        {
+          path: 'canceled-works',
+          name: 'sadmin.report.canceled-works',
+          component: SharedReportCanceledWorksView,
+          meta: { title: 'Заказанные, но не выполненные работы' }
+        },
+        {
+          path: 'added-works',
+          name: 'sadmin.report.added-works',
+          component: SharedReportAddedWorksView,
+          meta: { title: 'Дополнительные работы' }
+        },
+        {
+          path: 'customer-skips',
+          name: 'sadmin.report.customer-skips',
+          component: SharedReportCustomerSkipsView,
+          meta: { title: 'Не приехавшие клиенты' }
+        },
+        {
+          path: 'plate-fakes',
+          name: 'sadmin.report.plate-fakes',
+          component: SharedReportPlateFakesView,
+          meta: { title: 'Фалишовые гос. номера' }
+        },
+        {
+          path: 'suspicious-phones',
+          name: 'director.report.suspicious-phones',
+          component: SharedReportSuspiciousPhonesView,
+          meta: { title: 'Подозрительная привязка телефонов' }
+        }
+      ]
+    },
+    // >>> 404 REDIRECT <<<
     {
       path: ':pathMatch(.*)*',
-      redirect: 'sadmin/auth',
+      redirect: '/sadmin/auth',
     }
   ]
 };

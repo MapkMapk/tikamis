@@ -138,7 +138,7 @@
   </section>
 </template>
 <script setup>
-import TheHeader from '@/views/Mechanic/TheMechanicHeader.vue';
+import TheHeader from '@/components/TheMechanicHeader.vue';
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 
 import MechanicOrderWork from '@/views/Mechanic/MechanicOrder/MechanicOrderWork.vue';

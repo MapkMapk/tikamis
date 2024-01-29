@@ -33,7 +33,7 @@
 <script setup>
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
 import { useMainStore } from '@/stores/shared/main.js'
-import HeaderMenu from '@/components/HeaderMenu.vue'
+import HeaderMenu from '@/components/MainHeaderMenu.vue'
 
 const mainStore = useMainStore();
 </script>

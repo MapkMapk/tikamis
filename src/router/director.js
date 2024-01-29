@@ -1,10 +1,19 @@
-import AuthView from '@/views/Shared/SharedAuth/SharedAuthView.vue';
-import ManageSettingsView from '@/views/Shared/SharedManageSerttings/SharedManageSettingsView.vue';
-import ReportPostsDowntimeView from '@/views/Shared/_Tabular/TabularReportPostsDowntime/TabularReportPostsDowntimeView.vue';
-import ReportCanceledWorksView from '@/views/Shared/_Tabular/TabularReportCanceledWorks/TabularReportCanceledWorksView.vue';
-import ReportAddedWorksView from '@/views/Shared/_Tabular/TabularReportAddedWorks/TabularReportAddedWorksView.vue';
-import ReportCustomerSkipsView from '@/views/Shared/_Tabular/TabularReportCustomerSkipsView/TabularReportCustomerSkipsView.vue';
+import SharedAuthView from '@/views/Shared/SharedAuth/SharedAuthView.vue';
+import SharedManageSettingsView from '@/views/Shared/SharedManageSettings/SharedManageSettingsView.vue';
+import SharedReportPostsDowntimeView from '@/views/Shared/SharedReportPostsDowntime/SharedReportPostsDowntimeView.vue';
+import SharedReportAddedWorksView from '@/views/Shared/SharedReportAddedWorks/SharedReportAddedWorksView.vue';
+import SharedReportCustomerSkipsView from '@/views/Shared/SharedReportCustomerSkipsView/SharedReportCustomerSkipsView.vue';
 import { useDirectorUserStore } from '@/stores/director/directorUser.js';
+import SharedReportCanceledWorksView from '@/views/Shared/SharedReportCanceledWorks/SharedReportCanceledWorksView.vue';
+import SharedManageCalendarView from '@/views/Shared/SharedManageCalendar/SharedManageCalendarView.vue';
+import SharedManageCustomerRecordsView from '@/views/Shared/SharedManageCustomerRecords/SharedManageCustomerRecordsView.vue';
+import SharedAnalyticsPostsKpdView from '@/views/Shared/SharedAnalyticsPostsKpd/SharedAnalyticsPostsKpdView.vue';
+import SharedAnalyticsReviewsView from '@/views/Shared/SharedAnalyticsReviews/SharedAnalyticsReviewsView.vue';
+import SharedAnalyticsServiceKpd from '@/views/Shared/SharedAnalyticsServiceKpd/SharedAnalyticsServiceKpd.vue';
+import SharedAnalyticsServiceWorkloadView from '@/views/Shared/SharedAnalyticsServiceWorkload/SharedAnalyticsServiceWorkloadView.vue';
+import SharedReportPlateFakesView from '@/views/Shared/SharedReportPlateFakes/SharedReportPlateFakesView.vue';
+import SharedAnalyticsServiceHistoryView from '@/views/Shared/SharedAnalyticsServiceHistory/SharedAnalyticsServiceHistoryView.vue';
+import SharedReportSuspiciousPhonesView from '@/views/Shared/SharedReportSuspiciousPhones/SharedReportSuspiciousPhonesView.vue';
 
 const directorRoutes = {
   path: '/director',
@@ -12,60 +21,115 @@ const directorRoutes = {
     {
       path: 'auth',
       name: 'director.auth',
-      component: AuthView,
-      meta: { title: 'Аутентификация | Директор | Tikamis' },
+      component: SharedAuthView,
+      meta: { title: 'Аутентификация' },
       props: { title: 'Панель директора' }
     },
     {
-      path: 'manage/settings',
-      name: 'director.manage.settings',
-      component: ManageSettingsView,
-      meta: { title: 'Настройки | Директор' }
+      path: 'manage',
+      children: [
+        {
+          path: 'settings',
+          name: 'director.manage.settings',
+          component: SharedManageSettingsView,
+          meta: { title: 'Настройки' }
+        },
+        {
+          path: 'calendar',
+          name: 'manage.calendar',
+          component: SharedManageCalendarView,
+          meta: { title: 'Календарь рабочих смен' }
+        },
+        {
+          path: 'customer-records',
+          name: 'manage.customer-records',
+          component: SharedManageCustomerRecordsView,
+          meta: { title: 'Записи клиентов' }
+        }
+      ]
     },
     {
-      path: 'report/posts-downtime',
-      name: 'director.report.posts-downtime',
-      component: ReportPostsDowntimeView,
-      meta: { title: 'Простои постов | Директор | Tikamis' }
+      path: 'analytics',
+      children: [
+        {
+          path: 'posts-kpd',
+          name: 'director.analytics.posts-kpd',
+          component: SharedAnalyticsPostsKpdView,
+          meta: { title: 'КПД постов' }
+        },
+        {
+          path: 'reviews',
+          name: 'analytics.reviews',
+          component: SharedAnalyticsReviewsView,
+          meta: { title: 'Отзывы' }
+        },
+        {
+          path: 'service-kpd',
+          name: 'director.analytics.service-kpd',
+          component: SharedAnalyticsServiceKpd,
+          meta: { title: 'КПД сервиса' }
+        },
+        {
+          path: 'service-workload',
+          name: 'director.analytics.service.workload',
+          component: SharedAnalyticsServiceWorkloadView,
+          meta: { title: 'Загруженность сервиса' }
+        },
+        {
+          path: 'service-history',
+          name: 'director.analytics.service-history',
+          component: SharedAnalyticsServiceHistoryView,
+          meta: { title: 'Сервисная история' }
+        }
+      ]
     },
     {
-      path: 'report/canceled-works',
-      name: 'director.report.canceled-works',
-      component: ReportCanceledWorksView,
-      meta: { title: 'Заказанные, но не выполненные работы | Директор | Tikamis' }
+      path: 'report',
+      children: [
+        {
+          path: 'posts-downtime',
+          name: 'director.report.posts-downtime',
+          component: SharedReportPostsDowntimeView,
+          meta: { title: 'Простои постов' }
+        },
+        {
+          path: 'canceled-works',
+          name: 'director.report.canceled-works',
+          component: SharedReportCanceledWorksView,
+          meta: { title: 'Заказанные, но не выполненные работы' }
+        },
+        {
+          path: 'added-works',
+          name: 'director.report.added-works',
+          component: SharedReportAddedWorksView,
+          meta: { title: 'Дополнительные работы' }
+        },
+        {
+          path: 'customer-skips',
+          name: 'director.report.customer-skips',
+          component: SharedReportCustomerSkipsView,
+          meta: { title: 'Не приехавшие клиенты' }
+        },
+        {
+          path: 'plate-fakes',
+          name: 'director.report.plate-fakes',
+          component: SharedReportPlateFakesView,
+          meta: { title: 'Фалишовые гос. номера' }
+        },
+        {
+          path: 'suspicious-phones',
+          name: 'director.report.suspicious-phones',
+          component: SharedReportSuspiciousPhonesView,
+          meta: { title: 'Подозрительная привязка телефонов' }
+        }
+      ]
     },
-    {
-      path: 'report/added-works',
-      name: 'director.report.added-works',
-      component: ReportAddedWorksView
-    },
-    {
-      path: 'report/customer-skips',
-      name: 'director.report.customer-skips',
-      component: ReportCustomerSkipsView
-    },
-    {
-      path: 'analytics/posts-kpd',
-      name: 'director.analytics.posts-kpd,'
-    },
-    {
-      path: 'analytics/order-history',
-      name: 'director.analytics.order-history,'
-    },
-    {
-      path: 'report/plate-fakes',
-      name: 'director.report.plate-fakes'
-    },
-    {
-      path: 'report/suspicious',
-      name: 'director.report.suspicious'
-    },
-    // 404 LAST
+    // >>> 404 REDIRECT <<<
     {
       path: ':pathMatch(.*)*',
-      redirect: 'director/auth',
+      redirect: '/director/auth',
     }
-  ]
+  ],
 };
 
 function directorBeforeEach(to) {
@@ -81,7 +145,7 @@ function directorBeforeEach(to) {
 
   if (directorUserStore.accessToken) {
     if (to.path === '/director/auth' && directorUserStore.accessToken) {
-      return '/director/manage/settings';
+      return '/director/manage/settings'
     } else {
       return true;
     }

@@ -22,7 +22,7 @@
   </section>
 </template>
 <script setup>
-import TheHeader from '@/views/Mechanic/TheMechanicHeader.vue';
+import TheHeader from '@/components/TheMechanicHeader.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
 import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
 import QrcodeVue from 'qrcode.vue';

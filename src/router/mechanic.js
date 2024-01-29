@@ -39,10 +39,10 @@ const mechanicRoutes = {
       component: MechanicPaymentQrView,
       meta: { title: 'QR Код | Механик | Tikamis' }
     },
-    // 404 LAST
+    // >>> 404 REDIRECT <<<
     {
       path: ':pathMatch(.*)*',
-      redirect: 'mechanic/auth',
+      redirect: '/mechanic/auth',
     }
   ]
 };
@@ -66,31 +66,31 @@ function mechanicBeforeEach(to) {
     // Если переход на страницу выбора механика, но механик уже выбран
     // то редиректнуть на страницу заказа
     if (to.path === '/mechanic/human-select' && mechanicUserStore.activeMechanicId) {
-      return '/mechanic/order';
+      return '/mechanic/order'
     }
     // Если переход на страницу заказа, но механик ещё не выбран
     // то редиректнуть на страницу выбора механика
     if (to.path === '/mechanic/order' && mechanicUserStore.activeMechanicId === '') {
-      return '/mechanic/human-select';
+      return '/mechanic/human-select'
     }
     // Если переход на страницу авторизации, но человек уже авторизован
     // то переход на страницу выбора механика
     if (to.path === '/mechanic/auth' && mechanicUserStore.accessToken) {
-      return '/mechanic/human-select';
+      return '/mechanic/human-select'
     }
     // Если переход на страницу добавления работ в заказ, но механик ещё не выбран
     // то редиректнуть на страницу выбора механика
     if (to.path === '/mechanic/order/work-add' && !mechanicUserStore.activeMechanicId) {
-      return 'mechanic/human-select';
+      return '/mechanic/human-select'
     }
     // Если переход на страницу с QR кодом, но QR код о завершении заказа ещё не получен
     // то редиректнуть на страницу заказа
     if (to.path === '/mechanic/payment-qr' && !mechanicOrderStore.qrcode) {
-      return '/mechanic/order';
+      return '/mechanic/order'
     }
   }
 
-  return true
+  return true;
 }
 
 export { mechanicRoutes, mechanicBeforeEach };
