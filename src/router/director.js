@@ -60,6 +60,11 @@ const directorRoutes = {
       path: 'report/suspicious',
       name: 'director.report.suspicious'
     },
+    // 404 LAST
+    {
+      path: ':pathMatch(.*)*',
+      redirect: 'director/auth',
+    }
   ]
 };
 

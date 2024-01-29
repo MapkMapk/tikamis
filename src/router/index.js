@@ -19,8 +19,7 @@ const router = createRouter({
     mechanicRoutes,
     {
       path: '/:pathMatch(.*)*',
-      component: Index,
-      meta: { title: 'Выбор раздела | Tikamis' }
+      redirect: '/',
     }
   ]
 });

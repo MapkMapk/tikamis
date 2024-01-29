@@ -38,6 +38,11 @@ const mechanicRoutes = {
       name: 'mechanic.payment-qr',
       component: MechanicPaymentQrView,
       meta: { title: 'QR Код | Механик | Tikamis' }
+    },
+    // 404 LAST
+    {
+      path: ':pathMatch(.*)*',
+      redirect: 'mechanic/auth',
     }
   ]
 };
