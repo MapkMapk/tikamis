@@ -1,10 +1,10 @@
 <template>
   <section class="h-screen flex flex-col justify-center items-center">
     <router-link
-      to="/mechanic/auth"
+      to="/sadmin/auth"
       class="bg-green font-semibold text-white w-[300px] flex justify-center items-center rounded mb-4 py-5"
     >
-      Mechanic
+      Sadmin
     </router-link>
     <router-link
       to="/director/auth"
@@ -13,10 +13,10 @@
       Director
     </router-link>
     <router-link
-      to="/sadmin/auth"
+      to="/mechanic/auth"
       class="bg-green font-semibold text-white w-[300px] flex justify-center items-center rounded mb-4 py-5"
     >
-      Sadmin
+      Mechanic
     </router-link>
   </section>
 </template>
