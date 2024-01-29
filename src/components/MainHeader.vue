@@ -26,14 +26,14 @@
         <div class="pr-[30px]">Когалым, Проспект Нефтяников, 1а/4</div>
       </div>
     </div>
-    <HeaderMenu />
+    <MainHeaderMenu />
   </header>
 </template>
 
 <script setup>
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
 import { useMainStore } from '@/stores/shared/main.js'
-import HeaderMenu from '@/components/MainHeaderMenu.vue'
+import MainHeaderMenu from '@/components/MainHeaderMenu.vue'
 
 const mainStore = useMainStore();
 </script>
