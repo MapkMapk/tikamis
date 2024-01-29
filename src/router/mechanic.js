@@ -13,31 +13,31 @@ const mechanicRoutes = {
       path: 'auth',
       name: 'mechanic.auth',
       component: MechanicAuthView,
-      meta: { title: 'Аутентификация | Механик | Tikamis' }
+      meta: { title: 'Аутентификация' }
     },
     {
       path: 'human-select',
       name: 'mechanic.human-select',
       component: MechanicHumanSelectView,
-      meta: { title: 'Выбор механика | Механик | Tikamis' }
+      meta: { title: 'Выбор механика' }
     },
     {
       path: 'order',
       name: 'mechanic.order',
       component: MechanicOrderView,
-      meta: { title: 'Заказ | Механик | Tikamis' }
+      meta: { title: 'Заказ' }
     },
     {
       path: 'order/work-add',
       name: 'mechanic.order.work-add',
       component: MechanicOrderWorkAddView,
-      meta: { title: 'Добавление работы в заказ | Механик | Tikamis' }
+      meta: { title: 'Добавление работы в заказ' }
     },
     {
       path: 'payment-qr',
       name: 'mechanic.payment-qr',
       component: MechanicPaymentQrView,
-      meta: { title: 'QR Код | Механик | Tikamis' }
+      meta: { title: 'QR Код' }
     },
     // >>> 404 REDIRECT <<<
     {

@@ -5,6 +5,10 @@ import { mechanicBeforeEach, mechanicRoutes } from '@/router/mechanic.js';
 import { sadminBeforeEach, sadminRoutes } from '@/router/sadmin.js';
 import { directorBeforeEach, directorRoutes } from '@/router/director.js';
 
+// ПРИ ИЗМЕНЕНИИ КАКИХ-ЛИБО РОУТОВ ЗДЕСЬ (ПУТЕЙ) НЕОБХОДИМО
+// ТАКЖЕ НЕ ЗАБЫТЬ ИЗМЕНИТЬ ИХ В КОМПОНЕНТЕ "MainHeaderMenu"
+// (В КОМПОНЕНТЕ ОСНОВНОГО МЕНЮ)
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [

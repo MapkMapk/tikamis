@@ -25,24 +25,19 @@
 <script setup>
 import TheHeaderMenuPartition from '@/components/MainHeaderMenuPartition.vue';
 import { useMainStore } from '@/stores/shared/main.js'
-import { onMounted, ref } from 'vue'
-import { env } from '@/utils/env.js'
+import { ref } from 'vue'
+import { isEnv } from '@/utils/isEnv.js'
 import directorApiLogout from '@/api/director/directorApiLogout.js'
 import sadminApiLogout from '@/api/sadmin/sadminApiLogout.js'
-import router from '@/router/index.js'
 
 const mainStore = useMainStore();
 
-onMounted(() => {
-  console.log(router.getRoutes())
-})
-
 function logout() {
-  if (env('director')) {
+  if (isEnv('director')) {
     directorApiLogout()
     return;
   }
-  if (env('sadmin')) {
+  if (isEnv('sadmin')) {
     sadminApiLogout()
   }
 }
@@ -56,7 +51,7 @@ function isOpenSwitch(index) {
 
 let navigation = ref([])
 
-if (env('sadmin')) {
+if (isEnv('sadmin')) {
   navigation.value = [
     {
       isOpen: false,
@@ -94,7 +89,7 @@ if (env('sadmin')) {
   ]
 }
 
-if (env('director')) {
+if (isEnv('director')) {
   navigation.value = [
     {
       isOpen: false,
@@ -131,4 +126,6 @@ if (env('director')) {
     }
   ]
 }
+
+
 </script>
