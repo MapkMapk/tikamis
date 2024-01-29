@@ -70,7 +70,7 @@ function mechanicBeforeEach(to) {
     }
     // Если переход на страницу авторизации, но человек уже авторизован
     // то переход на страницу выбора механика
-    if (to.path === 'mechanic/auth' && localStorage.getItem('accessToken')) {
+    if (to.path === '/mechanic/auth' && mechanicUserStore.accessToken) {
       return '/mechanic/human-select';
     }
     // Если переход на страницу добавления работ в заказ, но механик ещё не выбран
@@ -80,7 +80,7 @@ function mechanicBeforeEach(to) {
     }
     // Если переход на страницу с QR кодом, но QR код о завершении заказа ещё не получен
     // то редиректнуть на страницу заказа
-    if (to.path === 'mechanic/payment-qr' && !mechanicOrderStore.qrcode) {
+    if (to.path === '/mechanic/payment-qr' && !mechanicOrderStore.qrcode) {
       return '/mechanic/order';
     }
   }
