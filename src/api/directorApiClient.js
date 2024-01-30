@@ -1,12 +1,37 @@
 import axios from 'axios';
-import router from '@/router/index.js'
-import { useDirectorUserStore } from '@/stores/director/directorUser.js'
-import { responseStatusesHandler } from '@/api/responseStatusesHandler.js'
+import router from '@/router/index.js';
+import { useDirectorUserStore } from '@/stores/director/directorUser.js';
+import { responseStatusesHandler } from '@/api/responseStatusesHandler.js';
+
+let refreshTokenRequest = null;
+
+async function authRefresh() {
+  let directorUserStore = useDirectorUserStore();
+  try {
+    const { data } = await axios.post(
+      import.meta.env.VITE_AXIOS_BASE_URL + '/director-api/refresh',
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${directorUserStore.refreshToken}`
+        }
+      }
+    );
+    directorUserStore.accessToken = data.accessToken;
+    directorUserStore.refreshToken = data.refreshToken;
+    return true;
+  } catch (error) {
+    localStorage.removeItem('directorUser');
+    localStorage.removeItem('directorBase');
+    await router.push('/director/auth');
+    return false;
+  }
+}
 
 const directorApiClient = axios.create({
   validateStatus: (status) => status < 500,
   baseURL: import.meta.env.VITE_AXIOS_BASE_URL + '/director-api'
-})
+});
 
 directorApiClient.interceptors.request.use((config) => {
   const directorUserStore = useDirectorUserStore();
@@ -19,40 +44,28 @@ directorApiClient.interceptors.request.use((config) => {
 directorApiClient.interceptors.response.use(
   async (response) => {
     const directorUserStore = useDirectorUserStore();
-    // console.log('ЧЕКПОИНТ - 1');
-    if (response.status === 401 && directorUserStore.accessToken) {
-      // console.log('ЧЕКПОИНТ - 2');
-      let { data } = await axios
-        .post(
-          import.meta.env.VITE_AXIOS_BASE_URL + '/director-api/refresh',
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${directorUserStore.refreshToken}`
+
+    if (response.status === 401 && directorUserStore.refreshToken) {
+      if (refreshTokenRequest === null) {
+        refreshTokenRequest = authRefresh;
+      }
+
+      let refreshResult = await refreshTokenRequest();
+      refreshTokenRequest = null;
+
+      if (refreshResult) {
+        return await directorApiClient({
+          ...response.config,
+          headers: {
+            common: {
+              ['Authorization']: `Bearer ${directorUserStore.accessToken}`,
+              ['Content-Type']: 'application/json'
             }
           }
-        )
-        .catch(async (error) => {
-          if (error.response.status === 401) {
-            localStorage.removeItem('directorUser');
-            localStorage.removeItem('directorBase');
-            await router.push('/director/auth');
-          }
         });
-      // console.log('ЧЕКПОИНТ - 3');
-      directorUserStore.accessToken = data.accessToken;
-      directorUserStore.refreshToken = data.refreshToken
-      return await directorApiClient({
-        ...response.config,
-        headers: {
-          common: {
-            ['Authorization']: `Bearer ${data.accessToken}`,
-            ['Content-Type']: 'application/json'
-          }
-        }
-      });
+      }
     }
-    responseStatusesHandler(response)
+    responseStatusesHandler(response);
     return response;
   },
   (error) => {

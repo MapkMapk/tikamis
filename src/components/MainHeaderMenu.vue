@@ -26,7 +26,7 @@
 import TheHeaderMenuPartition from '@/components/MainHeaderMenuPartition.vue';
 import { useMainStore } from '@/stores/shared/main.js'
 import { ref } from 'vue'
-import { isEnv } from '@/utils/isEnv.js'
+import isEnv from '@/utils/isEnv.js'
 import directorApiLogout from '@/api/director/directorApiLogout.js'
 import sadminApiLogout from '@/api/sadmin/sadminApiLogout.js'
 

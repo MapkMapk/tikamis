@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router';
-// Shared
 import index from '@/views/index.vue';
 import { mechanicBeforeEach, mechanicRoutes } from '@/router/mechanic.js';
 import { sadminBeforeEach, sadminRoutes } from '@/router/sadmin.js';

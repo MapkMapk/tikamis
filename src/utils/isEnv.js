@@ -1,5 +1,5 @@
 import router from '@/router/index.js'
-export function isEnv(env) {
+export default function isEnv(env) {
   if (env) {
     return String(router.currentRoute.value.fullPath.split('/')[1]) === env.toLowerCase()
   }

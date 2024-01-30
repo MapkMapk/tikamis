@@ -32,25 +32,41 @@
         <span class="pl-[10px] font-semibold text-lg">Механик</span>
         <span class="pl-[30px] text-lg">{{ mechanicUserStore.activeMechanicName }}</span>
       </div>
-      <div class="pr-[30px]">Когалым, Проспект Нефтяников, 1а/4</div>
+      <div class="pr-[30px]">{{ formattedFullAddress}}</div>
     </div>
   </header>
 </template>
 
 <script setup>
-import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
-import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js';
-import { ref } from 'vue';
-import mechanicApiMechanicLogout from '@/api/mechanic/mechanicApiMechanicLogout.js';
-import router from '@/router/index.js';
+import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
+import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js'
+import { computed, onMounted, ref } from 'vue'
+import mechanicApiMechanicLogout from '@/api/mechanic/mechanicApiMechanicLogout.js'
+import mechanicApiCenterInfo from '@/api/mechanic/mechanicApiCenterInfo.js'
+import router from '@/router/index.js'
 
-let mechanicUserStore = useMechanicUserStore();
-let isMenuActive = ref(false);
+let mechanicUserStore = useMechanicUserStore()
+let isMenuActive = ref(false)
+let city = ref('')
+let address = ref('')
+let formattedFullAddress = computed(() => city.value + ', ' + address.value)
+
+onMounted(async () => {
+  if (mechanicUserStore.accessToken) {
+    await getCenterInfo()
+  }
+})
+
+async function getCenterInfo() {
+  const data = await mechanicApiCenterInfo()
+  city.value = data.city
+  address.value = data.addressName
+}
 
 async function mechanicLogout() {
-  mechanicUserStore.activeMechanicId = '';
-  mechanicUserStore.activeMechanicName = '';
-  await mechanicApiMechanicLogout();
-  await router.push('/mechanic/human-select');
+  mechanicUserStore.activeMechanicId = ''
+  mechanicUserStore.activeMechanicName = ''
+  await mechanicApiMechanicLogout()
+  await router.push('/mechanic/human-select')
 }
 </script>

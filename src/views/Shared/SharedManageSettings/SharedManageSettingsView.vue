@@ -47,14 +47,14 @@
           <div class="text-2xl font-medium mt-5">Режим работы</div>
           <div class="flex flex-col mt-4">
             <div
-              @click="bookingAvailable = true"
+              @click="bookingAvailable = false"
               class="flex items-center cursor-pointer"
             >
               <BaseRadioButton :is-active="!bookingAvailable" />
               <span class="text-lg ml-2">Без записи, только живая очередь</span>
             </div>
             <div
-              @click="bookingAvailable = false"
+              @click="bookingAvailable = true"
               class="flex items-center cursor-pointer mt-3"
             >
               <BaseRadioButton :is-active="bookingAvailable" />
@@ -62,7 +62,7 @@
             </div>
           </div>
           <div
-            v-if="!bookingAvailable"
+            v-if="bookingAvailable"
             class="flex mt-6"
           >
             <div class="flex flex-col">
@@ -83,7 +83,7 @@
             </div>
           </div>
           <div
-            v-if="!bookingAvailable"
+            v-if="bookingAvailable"
             class="flex flex-col mt-10"
           >
             <span class="text-2xl font-medium">Часовой пояс</span>
@@ -146,15 +146,15 @@ import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import SelectTimezone from '@/components/SelectTimezone.vue';
 import { useMainStore } from '@/stores/shared/main.js';
 import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
-import { isEnv } from '@/utils/isEnv.js';
+import isEnv from '@/utils/isEnv.js';
 import { onMounted, ref } from 'vue';
 import directorApiManageSettings from '@/api/director/directorApiManageSettings.js';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
 
 const mainStore = useMainStore();
 
-let bookingAvailable = ref(false);
 let changesSince = ref();
+let bookingAvailable = ref();
 let postsEquipment = ref();
 let shiftsFinish = ref();
 let shiftsStart = ref();
@@ -163,5 +163,8 @@ let timeZoneOffsetHours = ref();
 onMounted(async () => {
   const data = await directorApiManageSettings();
   console.log(data);
+  if (isEnv('director')) {
+    bookingAvailable.value = data.bookingAvailable;
+  }
 });
 </script>

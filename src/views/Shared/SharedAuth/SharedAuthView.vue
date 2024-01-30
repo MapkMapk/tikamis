@@ -56,7 +56,7 @@ import { useDirectorUserStore } from '@/stores/director/directorUser.js'
 import directorApiLogin from '@/api/director/directorApiLogin.js'
 import { useSadminUserStore } from '@/stores/sadmin/sadminUser.js'
 import sadminApiLogin from '@/api/sadmin/sadminApiLogin.js'
-import { isEnv } from '@/utils/isEnv.js'
+import isEnv from '@/utils/isEnv.js'
 import router from '@/router/index.js'
 
 const directorUserStore = useDirectorUserStore();

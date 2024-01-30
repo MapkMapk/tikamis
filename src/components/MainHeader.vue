@@ -23,7 +23,12 @@
           <span class="pl-[10px] font-semibold text-lg">Директор</span>
           <span class="pl-[30px] text-lg"></span>
         </div>
-        <div class="pr-[30px]">Когалым, Проспект Нефтяников, 1а/4</div>
+        <div
+          v-if="isEnv('director')"
+          class="pr-[30px]"
+        >
+          {{ formattedFullAddress }}
+        </div>
       </div>
     </div>
     <MainHeaderMenu />
@@ -31,9 +36,29 @@
 </template>
 
 <script setup>
-import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
-import { useMainStore } from '@/stores/shared/main.js'
-import MainHeaderMenu from '@/components/MainHeaderMenu.vue'
+import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
+import { useMainStore } from '@/stores/shared/main.js';
+import MainHeaderMenu from '@/components/MainHeaderMenu.vue';
+import { computed, onMounted, ref } from 'vue';
+import directorApiCenterInfo from '@/api/director/directorApiCenterInfo.js'
+import isEnv from '@/utils/isEnv.js';
 
 const mainStore = useMainStore();
+
+let city = ref('');
+let address = ref('');
+let formattedFullAddress = computed(() => city.value + ', ' + address.value);
+
+onMounted(async () => {
+  if (isEnv('director')) {
+    await getCenterInfo();
+  }
+});
+
+async function getCenterInfo() {
+  const data = await directorApiCenterInfo();
+  console.log(data)
+  city.value = data.city;
+  address.value = data.addressName;
+}
 </script>
