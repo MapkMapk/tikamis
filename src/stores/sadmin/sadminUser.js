@@ -7,7 +7,12 @@ export const useSadminUserStore = defineStore(
     let accessToken = ref('');
     let refreshToken = ref('');
 
-    return { accessToken, refreshToken };
+    function $reset() {
+      accessToken.value = '';
+      refreshToken.value = '';
+    }
+
+    return { accessToken, refreshToken, $reset };
   },
   {
     persist: true

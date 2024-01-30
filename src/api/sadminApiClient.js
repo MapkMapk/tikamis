@@ -1,7 +1,30 @@
 import axios from 'axios';
 import router from '@/router/index.js';
-import { useSadminUserStore } from '@/stores/sadmin/sadminUser.js'
-import { responseStatusesHandler } from '@/api/responseStatusesHandler.js'
+import { useSadminUserStore } from '@/stores/sadmin/sadminUser.js';
+import { responseStatusesHandler } from '@/api/responseStatusesHandler.js';
+
+let refreshTokenRequest = null;
+
+async function authRefresh() {
+  let sadminUserStore = useSadminUserStore();
+  try {
+    const { data } = await axios.post(
+      import.meta.env.VITE_AXIOS_BASE_URL + '/sadmin-api/refresh',
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${sadminUserStore.refreshToken}`
+        }
+      }
+    );
+    sadminUserStore.accessToken = data.accessToken;
+    sadminUserStore.refreshToken = data.refreshToken;
+    return true;
+  } catch (error) {
+    sadminUserStore.$reset()
+    return false;
+  }
+}
 
 const sadminApiClient = axios.create({
   validateStatus: (status) => status < 500,
@@ -16,49 +39,32 @@ sadminApiClient.interceptors.request.use((config) => {
   return config;
 });
 
-sadminApiClient.interceptors.response.use(
-  async (response) => {
-    const sadminUserStore = useSadminUserStore();
-    // console.log('ЧЕКПОИНТ - 1');
-    if (response.status === 401 && sadminUserStore.accessToken) {
-      // console.log('ЧЕКПОИНТ - 2');
-      let { data } = await axios
-        .post(
-          import.meta.env.VITE_AXIOS_BASE_URL + '/sadmin-api/refresh',
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${sadminUserStore.refreshToken}`
-            }
-          }
-        )
-        .catch(async (error) => {
-          if (error.response.status === 401) {
-            localStorage.removeItem('sadminUser');
-            await router.push('/sadmin/auth');
-          }
-        });
-      // console.log('ЧЕКПОИНТ - 3');
-      sadminUserStore.accessToken = data.accessToken;
-      sadminUserStore.refreshToken = data.refreshToken;
+sadminApiClient.interceptors.response.use(async (response) => {
+  const sadminUserStore = useSadminUserStore();
+
+  if (response.status === 401 && sadminUserStore.refreshToken) {
+    if (refreshTokenRequest === null) {
+      refreshTokenRequest = authRefresh();
+    }
+
+    let refreshResponse = await refreshTokenRequest;
+    refreshTokenRequest = null;
+    if (refreshResponse) {
       return await sadminApiClient({
         ...response.config,
         headers: {
           common: {
-            ['Authorization']: `Bearer ${data.accessToken}`,
+            ['Authorization']: `Bearer ${sadminUserStore.accessToken}`,
             ['Content-Type']: 'application/json'
           }
         }
       });
+    } else {
+      await router.push('/sadmin/auth');
     }
-    responseStatusesHandler(response)
-    return response;
-  },
-  (error) => {
-    console.log(error)
-    alert('Произошла ошибка на сервере, код ошибки 500+')
-    return Promise.reject(error);
   }
-);
+  responseStatusesHandler(response);
+  return response;
+});
 
 export { sadminApiClient };

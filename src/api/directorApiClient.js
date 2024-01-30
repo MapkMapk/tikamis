@@ -21,9 +21,7 @@ async function authRefresh() {
     directorUserStore.refreshToken = data.refreshToken;
     return true;
   } catch (error) {
-    localStorage.removeItem('directorUser');
-    localStorage.removeItem('directorBase');
-    await router.push('/director/auth');
+    directorUserStore.$reset();
     return false;
   }
 }
@@ -41,37 +39,32 @@ directorApiClient.interceptors.request.use((config) => {
   return config;
 });
 
-directorApiClient.interceptors.response.use(
-  async (response) => {
-    const directorUserStore = useDirectorUserStore();
+directorApiClient.interceptors.response.use(async (response) => {
+  const directorUserStore = useDirectorUserStore();
 
-    if (response.status === 401 && directorUserStore.refreshToken) {
-      if (refreshTokenRequest === null) {
-        refreshTokenRequest = authRefresh;
-      }
-
-      let refreshResult = await refreshTokenRequest();
-      refreshTokenRequest = null;
-
-      if (refreshResult) {
-        return await directorApiClient({
-          ...response.config,
-          headers: {
-            common: {
-              ['Authorization']: `Bearer ${directorUserStore.accessToken}`,
-              ['Content-Type']: 'application/json'
-            }
-          }
-        });
-      }
+  if (response.status === 401 && directorUserStore.refreshToken) {
+    if (refreshTokenRequest === null) {
+      refreshTokenRequest = authRefresh();
     }
-    responseStatusesHandler(response);
-    return response;
-  },
-  (error) => {
-    console.log(error);
-    return Promise.reject(error);
+
+    let refreshResponse = await refreshTokenRequest;
+    refreshTokenRequest = null;
+    if (refreshResponse) {
+      return await directorApiClient({
+        ...response.config,
+        headers: {
+          common: {
+            ['Authorization']: `Bearer ${directorUserStore.accessToken}`,
+            ['Content-Type']: 'application/json'
+          }
+        }
+      });
+    } else {
+      await router.push('/director/auth');
+    }
   }
-);
+  responseStatusesHandler(response);
+  return response;
+});
 
 export { directorApiClient };

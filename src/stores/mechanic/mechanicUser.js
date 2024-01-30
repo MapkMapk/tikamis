@@ -9,7 +9,14 @@ export const useMechanicUserStore = defineStore(
     let accessToken = ref('');
     let refreshToken = ref('');
 
-    return { activeMechanicId, activeMechanicName, accessToken, refreshToken };
+    function $reset() {
+      activeMechanicId.value = '';
+      activeMechanicName.value = '';
+      accessToken.value = '';
+      refreshToken.value = '';
+    }
+
+    return { activeMechanicId, activeMechanicName, accessToken, refreshToken, $reset };
   },
   {
     persist: true

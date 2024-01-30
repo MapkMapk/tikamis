@@ -1,7 +1,31 @@
 import axios from 'axios';
 import router from '@/router/index.js';
 import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js';
-import { responseStatusesHandler } from '@/api/responseStatusesHandler.js'
+import { responseStatusesHandler } from '@/api/responseStatusesHandler.js';
+import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js'
+
+let refreshTokenRequest = null;
+
+async function authRefresh() {
+  const mechanicUserStore = useMechanicUserStore();
+  try {
+    const { data } = await axios.post(
+      import.meta.env.VITE_AXIOS_BASE_URL + '/mechanic-api/refresh',
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${mechanicUserStore.refreshToken}`
+        }
+      }
+    );
+    mechanicUserStore.accessToken = data.accessToken;
+    mechanicUserStore.refreshToken = data.refreshToken;
+    return true;
+  } catch (error) {
+    mechanicUserStore.$reset()
+    return false;
+  }
+}
 
 const mechanicApiClient = axios.create({
   validateStatus: (status) => status < 500,
@@ -19,48 +43,28 @@ mechanicApiClient.interceptors.request.use((config) => {
 mechanicApiClient.interceptors.response.use(
   async (response) => {
     const mechanicUserStore = useMechanicUserStore();
-    // console.log('ЧЕКПОИНТ - 1');
-    if (response.request.responseURL === '/get-posts') {
-      return response;
-    }
-    if (response.status === 401 && mechanicUserStore.accessToken) {
-      // console.log('ЧЕКПОИНТ - 2');
-      let { data } = await axios
-        .post(
-          import.meta.env.VITE_AXIOS_BASE_URL + '/mechanic-api/refresh',
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${mechanicUserStore.refreshToken}`
+    if (response.status === 401 && mechanicUserStore.refreshToken) {
+      if (refreshTokenRequest === null) {
+        refreshTokenRequest = authRefresh();
+      }
+      let refreshResponse = await refreshTokenRequest;
+      refreshTokenRequest = null;
+      if (refreshResponse) {
+        return await mechanicApiClient({
+          ...response.config,
+          headers: {
+            common: {
+              ['Authorization']: `Bearer ${mechanicUserStore.accessToken}`,
+              ['Content-Type']: 'application/json'
             }
           }
-        )
-        .catch(async (error) => {
-          if (error.response.status === 401) {
-           localStorage.removeItem('mechanicUser');
-            localStorage.removeItem('mechanicOrder')
-            await router.push('/mechanic/auth');
-          }
         });
-      // console.log('ЧЕКПОИНТ - 3');
-      mechanicUserStore.accessToken = data.accessToken;
-      mechanicUserStore.refreshToken = data.refreshToken;
-      return await mechanicApiClient({
-        ...response.config,
-        headers: {
-          common: {
-            ['Authorization']: `Bearer ${data.accessToken}`,
-            ['Content-Type']: 'application/json'
-          }
-        }
-      });
+      } else {
+        await router.push('/mechanic/auth')
+      }
     }
     responseStatusesHandler(response);
     return response;
-  },
-  (error) => {
-    console.log(error);
-    return Promise.reject(error);
   }
 );
 

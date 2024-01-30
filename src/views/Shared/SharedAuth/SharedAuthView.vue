@@ -40,7 +40,7 @@
             v-if="isErrorVisible"
             class="text-red mt-4"
           >
-            {{ errorText }}
+            Не верный логин или пароль
           </div>
         </form>
       </div>
@@ -71,7 +71,6 @@ let props = defineProps({
 
 let login = ref('');
 let password = ref('');
-let errorText = ref('');
 let isErrorVisible = ref(false)
 let isPasswordVisible = ref(false);
 let passwordInputType = computed(() => (isPasswordVisible.value ? 'text' : 'password'));
