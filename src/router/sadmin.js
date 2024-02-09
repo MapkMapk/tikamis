@@ -14,6 +14,7 @@ import SharedReportCustomerSkipsView from '@/views/Shared/SharedReportCustomerSk
 import SharedReportPlateFakesView from '@/views/Shared/SharedReportPlateFakes/SharedReportPlateFakesView.vue';
 import SharedAnalyticsServiceHistoryView from '@/views/Shared/SharedAnalyticsServiceHistory/SharedAnalyticsServiceHistoryView.vue';
 import SharedReportSuspiciousPhonesView from '@/views/Shared/SharedReportSuspiciousPhones/SharedReportSuspiciousPhonesView.vue';
+import SadminManageCarCentersView from '@/views/Sadmin/SadminManageCarCenters/SadminManageCarCentersView.vue'
 
 const sadminRoutes = {
   path: '/sadmin',
@@ -45,6 +46,11 @@ const sadminRoutes = {
           name: 'sadmin.manage.customer-records',
           component: SharedManageCustomerRecordsView,
           meta: { title: 'Записи клиентов' }
+        },
+        {
+          path: 'car-centers',
+          name: 'sadmin.manage.car-centers',
+          component: SadminManageCarCentersView
         }
       ]
     },

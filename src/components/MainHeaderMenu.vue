@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="mainStore.isHeaderMenuOpen"
-    class="absolute top-[60px] flex flex-col min-w-[276px] max-w-[276px] overflow-y-auto h-[calc(100vh-60px)] bg-gray-2c2d2f mr-[30px]"
+    class="absolute top-[60px] flex flex-col min-w-[276px] max-w-[276px] overflow-y-auto h-[calc(100vh-60px)] bg-gray-2c2d2f"
   >
     <div class="w-full flex flex-col pt-[10px]">
       <TheHeaderMenuPartition
@@ -57,7 +57,7 @@ if (isEnv('sadmin')) {
       isOpen: false,
       partition: 'Управление',
       routes: [
-        { name: 'Аккаунты директоров', url: '/sadmin' },
+        { name: 'Аккаунты директоров', url: '/sadmin/manage/car-centers' },
         { name: 'Записи клиентов', url: '/sadmin/manage/customer-records' },
         { name: 'Календарь рабочих смен', url: '/sadmin/manage/calendar' }
       ]
@@ -66,24 +66,24 @@ if (isEnv('sadmin')) {
       isOpen: false,
       partition: 'Аналитика',
       routes: [
-        { name: 'Загруженность сервиса', url: '/sadmin/service-workload' },
-        { name: 'Видеоархив', url: '/sadmin' },
-        { name: 'КПД постов', url: '/sadmin/posts-kpd' },
-        { name: 'КПД сервиса', url: '/sadmin/service-kpd' },
-        { name: 'Сервисная история', url: '/sadmin/service-history' },
-        { name: 'Отзывы', url: '/sadmin/reviews' }
+        { name: 'Загруженность сервиса', url: '/sadmin/analytics/service-workload' },
+        { name: 'Видеоархив', url: '/sadmin/analytics' },
+        { name: 'КПД постов', url: '/sadmin/analytics/posts-kpd' },
+        { name: 'КПД сервиса', url: '/sadmin/analytics/service-kpd' },
+        { name: 'Сервисная история', url: '/sadmin/analytics/service-history' },
+        { name: 'Отзывы', url: '/sadmin/analytics/reviews' }
       ]
     },
     {
       isOpen: false,
       partition: 'Отчеты',
       routes: [
-        { name: 'Простои постов', url: '/sadmin/posts-downtime' },
-        { name: 'Не приехавшие клиенты', url: '/sadmin/customer-skips' },
-        { name: 'Заказанные, но не выполненные работы', url: '/sadmin/canceled-works' },
-        { name: 'Дополнительные работы', url: '/sadmin/added-works' },
-        { name: 'Фальшивые гос.номера', url: '/sadmin/plate-fakes' },
-        { name: 'Подозрительная привязка телефонов', url: '/sadmin/suspicious-phones' }
+        { name: 'Простои постов', url: '/sadmin/report/posts-downtime' },
+        { name: 'Не приехавшие клиенты', url: '/sadmin/report/customer-skips' },
+        { name: 'Заказанные, но не выполненные работы', url: '/sadmin/report/canceled-works' },
+        { name: 'Дополнительные работы', url: '/sadmin/report/added-works' },
+        { name: 'Фальшивые гос.номера', url: '/sadmin//report/plate-fakes' },
+        { name: 'Подозрительная привязка телефонов', url: '/sadmin/report/suspicious-phones' }
       ]
     }
   ]
@@ -104,24 +104,24 @@ if (isEnv('director')) {
       isOpen: false,
       partition: 'Аналитика',
       routes: [
-        { name: 'Загруженность сервиса', url: '/director/service-workload' },
+        { name: 'Загруженность сервиса', url: '/director/analytics/service-workload' },
         { name: 'Видеоархив', url: '/director' },
-        { name: 'КПД постов', url: '/director/posts-kpd' },
-        { name: 'КПД сервиса', url: '/director/service-kpd' },
-        { name: 'Сервисная история', url: '/director/service-history' },
-        { name: 'Отзывы', url: '/director/reviews' }
+        { name: 'КПД постов', url: '/director/analytics/posts-kpd' },
+        { name: 'КПД сервиса', url: '/director/analytics/service-kpd' },
+        { name: 'Сервисная история', url: '/director/analytics/service-history' },
+        { name: 'Отзывы', url: '/director/analytics/reviews' }
       ]
     },
     {
       isOpen: false,
       partition: 'Отчеты',
       routes: [
-        { name: 'Простои постов', url: '/director/posts-downtime' },
-        { name: 'Не приехавшие клиенты', url: '/director/customer-skips' },
-        { name: 'Заказанные, но не выполненные работы', url: '/director/canceled-works' },
-        { name: 'Дополнительные работы', url: '/director/added-works' },
-        { name: 'Фальшивые гос.номера', url: '/director/plate-fakes' },
-        { name: 'Подозрительная привязка телефонов', url: '/director/suspicious-phones' }
+        { name: 'Простои постов', url: '/director/report/posts-downtime' },
+        { name: 'Не приехавшие клиенты', url: '/director/report/customer-skips' },
+        { name: 'Заказанные, но не выполненные работы', url: '/director/report/canceled-works' },
+        { name: 'Дополнительные работы', url: '/director/report/added-works' },
+        { name: 'Фальшивые гос.номера', url: '/director/report/plate-fakes' },
+        { name: 'Подозрительная привязка телефонов', url: '/director/report/suspicious-phones' }
       ]
     }
   ]

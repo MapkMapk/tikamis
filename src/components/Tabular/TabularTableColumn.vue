@@ -6,4 +6,7 @@
   .report-table-column:first-child > div {
     padding-left: 20px;
   }
+  .report-table-column:last-child > div {
+    padding-right: 20px;
+  }
 </style>

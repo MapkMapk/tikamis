@@ -33,7 +33,8 @@ export default {
         'f5f5f5': '#F5F5F5',
         'dcdcdc': '#DCDCDC',
         'c8c8c8': '#C8C8C8',
-        '53565b': '#53565B'
+        '53565b': '#53565B',
+        'd9d9d9': '#d9d9d9',
       },
       'white': '#FFFFFF',
       'black': {

@@ -1,3 +1,3 @@
 <template>
-  <div>SharedManageCalendarView</div>
+  <div>SharedManageCaledarView</div>
 </template>

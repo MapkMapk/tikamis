@@ -3,7 +3,7 @@ export function responseStatusesHandler(response) {
     alert(response.data);
   }
   if (
-    response.status >= 400 &&
+    response.status > 400 &&
     response.status !== 409 &&
     response.status !== 401
   ) {

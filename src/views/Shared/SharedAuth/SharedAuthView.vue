@@ -6,7 +6,7 @@
           name="logo"
           class="w-[86px] h-[84px]"
         />
-        <h1 class="text-4xl font-medium pt-6">{{props.title}}</h1>
+        <h1 class="text-4xl font-medium pt-6">{{ props.title }}</h1>
         <form class="w-full flex flex-col items-center pt-4">
           <input
             type="text"
@@ -34,13 +34,13 @@
           <BaseButtonFilledGreen
             @click.prevent="authenticate"
             class="w-full bg-green text-white mt-[30px]"
-          >Войти
+            >Войти
           </BaseButtonFilledGreen>
           <div
-            v-if="isErrorVisible"
+            v-if="errorText"
             class="text-red mt-4"
           >
-            Не верный логин или пароль
+            {{ errorText }}
           </div>
         </form>
       </div>
@@ -49,15 +49,15 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref } from 'vue';
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
-import { useDirectorUserStore } from '@/stores/director/directorUser.js'
-import directorApiLogin from '@/api/director/directorApiLogin.js'
-import { useSadminUserStore } from '@/stores/sadmin/sadminUser.js'
-import sadminApiLogin from '@/api/sadmin/sadminApiLogin.js'
-import isEnv from '@/utils/isEnv.js'
-import router from '@/router/index.js'
+import { useDirectorUserStore } from '@/stores/director/directorUser.js';
+import directorApiLogin from '@/api/director/directorApiLogin.js';
+import { useSadminUserStore } from '@/stores/sadmin/sadminUser.js';
+import sadminApiLogin from '@/api/sadmin/sadminApiLogin.js';
+import isEnv from '@/utils/isEnv.js';
+import router from '@/router/index.js';
 
 const directorUserStore = useDirectorUserStore();
 const sadminUserStore = useSadminUserStore();
@@ -65,35 +65,35 @@ const sadminUserStore = useSadminUserStore();
 let props = defineProps({
   title: {
     Type: String,
-    required: true,
-  },
-})
+    required: true
+  }
+});
 
 let login = ref('');
 let password = ref('');
-let isErrorVisible = ref(false)
+let errorText = ref('');
 let isPasswordVisible = ref(false);
 let passwordInputType = computed(() => (isPasswordVisible.value ? 'text' : 'password'));
 
 async function authenticate() {
   if (isEnv('director')) {
-    let data = await directorApiLogin(login.value, password.value)
+    let data = await directorApiLogin(login.value, password.value);
     if (data.accessToken && data.refreshToken) {
       directorUserStore.accessToken = data.accessToken;
       directorUserStore.refreshToken = data.refreshToken;
       await router.push('/director/manage/settings');
     } else {
-      isErrorVisible.value = true
+      errorText.value = 'Не верный логин или пароль'
     }
   }
   if (isEnv('sadmin')) {
-    let data = await sadminApiLogin(login.value, password.value)
+    let data = await sadminApiLogin(login.value, password.value);
     if (data.accessToken && data.refreshToken) {
       sadminUserStore.accessToken = data.accessToken;
       sadminUserStore.refreshToken = data.refreshToken;
       await router.push('/sadmin/manage/settings');
     } else {
-      isErrorVisible.value = true
+      errorText.value = 'Не верный логин или пароль'
     }
   }
 }

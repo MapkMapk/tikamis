@@ -1,5 +1,6 @@
 <template>
   <section
+    v-if="props.isVisible"
     class="z-50 flex justify-center items-center fixed w-full h-screen left-0 top-0 bg-gray-848484"
   >
     <div class="flex flex-col items-center bg-white w-[520px]">
@@ -29,6 +30,7 @@ import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
 
 let emit = defineEmits(['callback']);
 let props = defineProps({
+  isVisible: Boolean,
   mainTitle: String,
   mainText: String,
   primaryButtonComponent: Object,

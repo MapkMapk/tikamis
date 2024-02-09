@@ -1,13 +1,22 @@
 <template>
+  <ModalBoolean
+    @callback="modal.callback"
+    :is-visible="modal.isVisible"
+    :primary-button-component="BaseButtonFilledDark"
+    :main-title="modal.mainTitle"
+    :primary-button-text="modal.primaryButtonText"
+    :secondary-button-text="modal.secondaryButtonText"
+  />
   <MainHeader />
   <MainHeaderGap />
   <div class="w-full flex overflow-x-hidden">
     <div class="flex flex-col w-full">
       <div
+        v-if="changesSince"
         :class="{ 'pl-[300px]': mainStore.isHeaderMenuOpen }"
         class="w-full flex justify-center items-center bg-red text-2xl text-white font-medium h-[50px]"
       >
-        Изменения вступят в силу начиная с 25 июня 2023 г.
+        Изменения вступят в силу начиная с {{ changesSince }}
       </div>
       <section
         :class="{ 'pl-[300px]': mainStore.isHeaderMenuOpen }"
@@ -15,7 +24,8 @@
       >
         <form class="flex flex-col w-full max-w-[540px]">
           <h1 class="text-4xl leading-normal font-medium">
-            Технические настройки<br />Сургут, Аэрофлотская ул., 5/2
+            Технические настройки<br />
+            {{ formattedFullAddress}}
           </h1>
           <div
             v-if="isEnv('sadmin')"
@@ -25,6 +35,7 @@
               <div class="flex flex-col mr-5 w-full">
                 <span class="text-lg font-semibold">Логин директора</span>
                 <input
+                  v-model="login"
                   class="base-input text-2xl w-full mt-3"
                   type="text"
                 />
@@ -32,6 +43,7 @@
               <div class="flex flex-col w-full">
                 <span class="text-lg font-semibold">Пароль директора</span>
                 <input
+                  v-model="password"
                   class="base-input text-2xl w-full mt-3"
                   type="password"
                   autocomplete="false"
@@ -69,6 +81,7 @@
               <span class="text-lg font-semibold">Время начала работы</span>
               <input
                 v-model="shiftsStart"
+                v-mask="'##:##'"
                 class="base-input text-2xl w-full mt-3"
                 type="text"
               />
@@ -77,6 +90,7 @@
               <span class="text-lg font-semibold">Время окончания работы</span>
               <input
                 v-model="shiftsFinish"
+                v-mask="'##:##'"
                 class="base-input text-2xl w-full mt-3"
                 type="text"
               />
@@ -87,7 +101,11 @@
             class="flex flex-col mt-10"
           >
             <span class="text-2xl font-medium">Часовой пояс</span>
-            <SelectTimezone class="mt-3" />
+            <SelectTimezone
+              @set-time-zone="emitSetTimezone"
+              :timezone-offset-hours="timezoneOffsetHours"
+              class="mt-3"
+            />
           </div>
           <div class="flex flex-col mt-10">
             <span class="text-2xl font-medium">Техническая оснащённость постами</span>
@@ -107,6 +125,7 @@
               минутах.</span
             >
             <input
+              v-model="clearanceMinutes"
               type="number"
               class="base-input text-2xl w-40 mt-3"
             />
@@ -117,21 +136,30 @@
           >
             <span class="text-2xl font-medium">Установка глубины записи в днях</span>
             <input
+              v-model="orderDepthDays"
               type="number"
               class="base-input text-2xl w-40 mt-3"
             />
           </div>
-          <div class="w-full flex mt-10 mb-5">
-            <BaseButtonFilledGreen
-              @click.prevent="console.log('Сохранить')"
-              class="flex flex-1 mr-5"
-              >Сохранить</BaseButtonFilledGreen
+          <div class="flex flex-col items-center">
+            <div class="w-full flex mt-10 mb-3">
+              <BaseButtonFilledGreen
+                @click.prevent="saveModal"
+                class="flex flex-1 mr-5"
+                >Сохранить</BaseButtonFilledGreen
+              >
+              <BaseButtonFilledLight
+                v-if="isEnv('sadmin')"
+                @click.prevent="closeModal"
+                class="flex flex-1"
+                >Закрыть</BaseButtonFilledLight
+              >
+            </div>
+            <BaseErrorText v-if="isRequestSuccess !== undefined && !isRequestSuccess"
+              >Ошибка! Один или несколько полей заполнены не верно</BaseErrorText
             >
-            <BaseButtonFilledLight
-              v-if="isEnv('sadmin')"
-              @click.prevent="console.log('Закрыть')"
-              class="flex flex-1"
-              >Закрыть</BaseButtonFilledLight
+            <BaseSuccessText v-if="isRequestSuccess !== undefined && isRequestSuccess"
+              >Успех! Запрос отправлен</BaseSuccessText
             >
           </div>
         </form>
@@ -147,24 +175,136 @@ import SelectTimezone from '@/components/SelectTimezone.vue';
 import { useMainStore } from '@/stores/shared/main.js';
 import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
 import isEnv from '@/utils/isEnv.js';
-import { onMounted, ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue'
 import directorApiManageSettings from '@/api/director/directorApiManageSettings.js';
+import directorApiManageSettingsPost from '@/api/director/directorApiManageSettingsPost.js';
+import sadminApiManageSettings from '@/api/sadmin/sadminApiManageSettings.js';
+import sadminApiManageSettingsPost from '@/api/sadmin/sadminApiManageSettingsPost.js';
+
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
+import BaseSuccessText from '@/components/BaseSuccessText.vue';
+import BaseErrorText from '@/components/BaseErrorText.vue';
+import ModalBoolean from '@/components/ModalBoolean.vue';
+import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
+import router from '@/router/index.js';
+import minutesToHHMM from '@/utils/time/minutesToHHMM.js';
+import HHMMtoMinutes from '@/utils/time/HHMMtoMinutes.js';
+import directorApiCenterInfo from '@/api/director/directorApiCenterInfo.js'
 
 const mainStore = useMainStore();
 
+let login = ref();
+let password = ref();
 let changesSince = ref();
-let bookingAvailable = ref();
+let bookingAvailable = ref(false);
 let postsEquipment = ref();
 let shiftsFinish = ref();
 let shiftsStart = ref();
-let timeZoneOffsetHours = ref();
+let timezoneOffsetHours = ref();
+let orderDepthDays = ref();
+let clearanceMinutes = ref();
+let isRequestSuccess = ref();
+let formattedFullAddress = ref()
 
-onMounted(async () => {
-  const data = await directorApiManageSettings();
-  console.log(data);
+let modal = ref({});
+
+function saveModal() {
+  modal.value.callback = save;
+  modal.value.isVisible = true;
+  modal.value.mainTitle = 'Настройки будут применены 25 июня. Продолжить?';
+  modal.value.primaryButtonText = 'Продолжить';
+  modal.value.secondaryButtonText = 'Отмена';
+
+  async function save() {
+    // Sadmin
+    if (isEnv('sadmin')) {
+      console.log(shiftsStart.value)
+      console.log(shiftsFinish.value)
+      const response = await sadminApiManageSettingsPost(
+        router.currentRoute.value.query.id,
+        login.value,
+        password.value,
+        bookingAvailable.value,
+        postsEquipment.value,
+        shiftsStart.value,
+        shiftsFinish.value,
+        timezoneOffsetHours.value,
+        clearanceMinutes.value,
+        orderDepthDays.value
+      );
+      if (response.status === 200) {
+        isRequestSuccess.value = true
+      }
+      if (response.status === 400) {
+        isRequestSuccess.value = false;
+        console.log(response)
+      }
+      modal.value.isVisible = false;
+    }
+    // Director
+    if (isEnv('director')) {
+      const response = await directorApiManageSettingsPost(
+        bookingAvailable.value,
+        postsEquipment.value,
+        HHMMtoMinutes(shiftsStart.value),
+        HHMMtoMinutes(shiftsFinish.value),
+        timezoneOffsetHours.value
+      );
+      if (response.status === 200) {
+        console.log(response)
+        isRequestSuccess.value = true;
+      }
+      if (response.status === 400) {
+        isRequestSuccess.value = false;
+      }
+      modal.value.isVisible = false;
+    }
+  }
+}
+
+function closeModal() {
+  modal.value.callback = close;
+  modal.value.isVisible = true;
+  modal.value.mainTitle = 'Закрыть без сохранения?';
+  modal.value.mainText = 'Настройки не будут применены';
+  modal.value.primaryButtonText = 'Сохранить изменения';
+  modal.value.secondaryButtonText = 'Закрыть без сохранения';
+
+  function close() {
+    router.push('/');
+  }
+}
+
+function emitSetTimezone(value) {
+  timezoneOffsetHours.value = value;
+}
+
+onBeforeMount(async () => {
+  const data = await directorApiCenterInfo();
+  formattedFullAddress.value = data.city + ', ' + data.addressName
+
   if (isEnv('director')) {
+    const data = await directorApiManageSettings();
     bookingAvailable.value = data.bookingAvailable;
+    postsEquipment.value = data.postsEquipment;
+    shiftsStart.value = minutesToHHMM(data.shiftsStart);
+    shiftsFinish.value = minutesToHHMM(data.shiftsFinish);
+    changesSince.value = data.changesSince;
+    timezoneOffsetHours.value = data.timeZoneOffsetHours;
+  }
+
+  if (isEnv('sadmin')) {
+    const data = await sadminApiManageSettings(router.currentRoute.value.query.id);
+    login.value = data.login;
+    password.value = data.password;
+    bookingAvailable.value = data.bookingAvailable;
+    postsEquipment.value = data.postsEquipment;
+    shiftsStart.value = minutesToHHMM(data.shiftsStart);
+    shiftsFinish.value = minutesToHHMM(data.shiftsFinish);
+    changesSince.value = data.changesSince;
+    timezoneOffsetHours.value = data.timeZoneOffsetHours;
+    clearanceMinutes.value = data.clearanceMinutes;
+    orderDepthDays.value = data.orderDepthDays;
   }
 });
 </script>
