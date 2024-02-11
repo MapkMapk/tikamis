@@ -1,14 +1,22 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref } from 'vue'
 
 export const useSadminBaseStore = defineStore(
   'sadminBase',
   () => {
-    let amountOfSelectedServices = ref();
+    let serviceStations = ref([]);
+
+    function getAmountOfSelectedServiceStations() {
+      let counter = 0;
+      serviceStations.value.forEach((station) => {
+        if (station.isSelected) {counter++}
+      })
+      return counter
+    }
 
     function $reset() {}
 
-    return { amountOfSelectedServices };
+    return { serviceStations, getAmountOfSelectedServiceStations };
   },
   {
     persist: true

@@ -1,4 +1,5 @@
 <template>
+  <ModalSelectServiceStations @callback="isVisibleModalSelectServiceStations = false" :is-visible="isVisibleModalSelectServiceStations" />
   <header class="fixed z-10 bg-white flex w-full h-the-header">
     <div class="flex w-full">
       <div
@@ -20,7 +21,7 @@
             name="logo"
             class="w-[32px] h-[32px]"
           />
-          <span class="pl-[10px] font-semibold text-lg">Директор</span>
+          <span class="pl-[10px] font-semibold text-lg">{{ isEnv('director') ? 'Директор' : 'Суперадмин'}}</span>
           <span class="pl-[30px] text-lg"></span>
         </div>
         <div
@@ -30,15 +31,19 @@
           {{ formattedFullAddress }}
         </div>
         <div
+          @click="isVisibleModalSelectServiceStations = true"
           v-if="isEnv('sadmin')"
           class="flex pr-[30px] border-l border-l-gray-dcdcdc h-full"
         >
           <div class="flex items-center pl-[20px] cursor-pointer">
             <div class="flex flex-col justify-center">
               <div class="text-gray-a1a4ad text-sm">Сервисы</div>
-              <div class="text-2xl">Выбранные (2)</div>
+              <div class="text-2xl">Выбранные ({{sadminBaseStore.getAmountOfSelectedServiceStations()}})</div>
             </div>
-            <BaseSvgIcon name="arrow-down-gray" class="w-[14px] h-[8px] -rotate-90 ml-[50px]" />
+            <BaseSvgIcon
+              name="arrow-down-gray"
+              class="w-[14px] h-[8px] -rotate-90 ml-[50px]"
+            />
           </div>
         </div>
       </div>
@@ -54,9 +59,14 @@ import MainHeaderMenu from '@/components/MainHeaderMenu.vue';
 import { computed, onMounted, ref } from 'vue';
 import directorApiCenterInfo from '@/api/director/directorApiCenterInfo.js';
 import isEnv from '@/utils/isEnv.js';
+import ModalSelectServiceStations from '@/components/ModalSelectServiceStations.vue';
+import sadminApiAllCarCenters from '@/api/sadmin/sadminApiAllCarCenters.js'
+import { useSadminBaseStore } from '@/stores/sadmin/sadminBase.js'
 
 const mainStore = useMainStore();
+const sadminBaseStore = useSadminBaseStore();
 
+let isVisibleModalSelectServiceStations = ref(false);
 let city = ref('');
 let address = ref('');
 let formattedFullAddress = computed(() => city.value + ', ' + address.value);
@@ -64,6 +74,13 @@ let formattedFullAddress = computed(() => city.value + ', ' + address.value);
 onMounted(async () => {
   if (isEnv('director')) {
     await getCenterInfo();
+  }
+  if (isEnv('sadmin')) {
+    const { carCenters } = await sadminApiAllCarCenters();
+    carCenters.forEach((station) => {
+      station.isSelected = true;
+    });
+    sadminBaseStore.serviceStations = carCenters;
   }
 });
 

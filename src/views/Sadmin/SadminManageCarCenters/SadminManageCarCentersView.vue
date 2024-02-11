@@ -48,7 +48,6 @@ let carCenters = ref({});
 onBeforeMount(async () => {
   const data = await sadminApiManageCarCenters();
   carCenters.value = data.carCenters
-  console.log(carCenters.value)
 })
 
 function getQueuingModeText(mode) {

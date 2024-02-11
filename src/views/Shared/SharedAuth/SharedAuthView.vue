@@ -76,22 +76,22 @@ let isPasswordVisible = ref(false);
 let passwordInputType = computed(() => (isPasswordVisible.value ? 'text' : 'password'));
 
 async function authenticate() {
+  if (isEnv('sadmin')) {
+    let data = await sadminApiLogin(login.value, password.value);
+    if (data.accessToken && data.refreshToken) {
+      sadminUserStore.accessToken = data.accessToken;
+      sadminUserStore.refreshToken = data.refreshToken;
+      await router.push('/sadmin/manage/car-centers');
+    } else {
+      errorText.value = 'Не верный логин или пароль'
+    }
+  }
   if (isEnv('director')) {
     let data = await directorApiLogin(login.value, password.value);
     if (data.accessToken && data.refreshToken) {
       directorUserStore.accessToken = data.accessToken;
       directorUserStore.refreshToken = data.refreshToken;
       await router.push('/director/manage/settings');
-    } else {
-      errorText.value = 'Не верный логин или пароль'
-    }
-  }
-  if (isEnv('sadmin')) {
-    let data = await sadminApiLogin(login.value, password.value);
-    if (data.accessToken && data.refreshToken) {
-      sadminUserStore.accessToken = data.accessToken;
-      sadminUserStore.refreshToken = data.refreshToken;
-      await router.push('/sadmin/manage/settings');
     } else {
       errorText.value = 'Не верный логин или пароль'
     }

@@ -16,7 +16,7 @@
         :class="{ 'pl-[300px]': mainStore.isHeaderMenuOpen }"
         class="w-full flex justify-center items-center bg-red text-2xl text-white font-medium h-[50px]"
       >
-        Изменения вступят в силу начиная с {{ changesSince }}
+        Изменения вступят в силу начиная с {{ changesSinceFormatted }}
       </div>
       <section
         :class="{ 'pl-[300px]': mainStore.isHeaderMenuOpen }"
@@ -196,6 +196,7 @@ const mainStore = useMainStore();
 let login = ref();
 let password = ref();
 let changesSince = ref();
+let changesSinceFormatted = computed(() => new Date(changesSince.value * 1000).getDate() + ' февраля')
 let bookingAvailable = ref(false);
 let postsEquipment = ref();
 let shiftsFinish = ref();
@@ -216,49 +217,40 @@ function saveModal() {
   modal.value.secondaryButtonText = 'Отмена';
 
   async function save() {
+    let response;
     // Sadmin
     if (isEnv('sadmin')) {
-      console.log(shiftsStart.value)
-      console.log(shiftsFinish.value)
-      const response = await sadminApiManageSettingsPost(
+      response = await sadminApiManageSettingsPost(
         router.currentRoute.value.query.id,
         login.value,
         password.value,
         bookingAvailable.value,
         postsEquipment.value,
-        shiftsStart.value,
+        HHMMtoMinutes(shiftsStart.value),
+        HHMMtoMinutes(shiftsFinish.value),
         shiftsFinish.value,
         timezoneOffsetHours.value,
         clearanceMinutes.value,
         orderDepthDays.value
       );
-      if (response.status === 200) {
-        isRequestSuccess.value = true
-      }
-      if (response.status === 400) {
-        isRequestSuccess.value = false;
-        console.log(response)
-      }
-      modal.value.isVisible = false;
     }
     // Director
     if (isEnv('director')) {
-      const response = await directorApiManageSettingsPost(
+      response = await directorApiManageSettingsPost(
         bookingAvailable.value,
         postsEquipment.value,
         HHMMtoMinutes(shiftsStart.value),
         HHMMtoMinutes(shiftsFinish.value),
         timezoneOffsetHours.value
       );
-      if (response.status === 200) {
-        console.log(response)
-        isRequestSuccess.value = true;
-      }
-      if (response.status === 400) {
-        isRequestSuccess.value = false;
-      }
-      modal.value.isVisible = false;
     }
+    if (response.status === 200) {
+      isRequestSuccess.value = true;
+    }
+    if (response.status === 400) {
+      isRequestSuccess.value = false;
+    }
+    modal.value.isVisible = false;
   }
 }
 

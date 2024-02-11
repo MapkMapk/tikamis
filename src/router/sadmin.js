@@ -131,10 +131,10 @@ const sadminRoutes = {
       ]
     },
     // >>> 404 REDIRECT <<<
-    {
-      path: ':pathMatch(.*)*',
-      redirect: '/sadmin/auth',
-    }
+    // {
+    //   path: ':pathMatch(.*)*',
+    //   redirect: '/sadmin/manage/car-services',
+    // }
   ]
 };
 

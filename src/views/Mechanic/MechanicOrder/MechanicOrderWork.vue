@@ -1,8 +1,8 @@
 <template>
   <teleport to="body">
-    <BaseModalBoolean
-      v-if="isModalVisible"
+    <ModalBoolean
       @callback="removeWork"
+      :is-visible="isModalVisible"
       :primary-button-component="BaseButtonFilledRed"
       main-title="Удалить услугу из заказа?"
       main-text="Вы сможете её снова включить в заказ"
@@ -31,7 +31,7 @@ import { ref } from 'vue';
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
 import BaseButtonFilledRed from '@/components/BaseButtonFilledRed.vue';
-import BaseModalBoolean from '@/components/ModalBoolean.vue';
+import ModalBoolean from '@/components/ModalBoolean.vue';
 
 const mechanicOrderStore = useMechanicOrderStore();
 let isModalVisible = ref(false);
