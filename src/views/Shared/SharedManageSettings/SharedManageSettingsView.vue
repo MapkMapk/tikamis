@@ -25,7 +25,7 @@
         <form class="flex flex-col w-full max-w-[540px]">
           <h1 class="text-4xl leading-normal font-medium">
             Технические настройки<br />
-            {{ formattedFullAddress}}
+            {{ formattedFullAddress }}
           </h1>
           <div
             v-if="isEnv('sadmin')"
@@ -175,12 +175,12 @@ import SelectTimezone from '@/components/SelectTimezone.vue';
 import { useMainStore } from '@/stores/shared/main.js';
 import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
 import isEnv from '@/utils/isEnv.js';
-import { computed, onBeforeMount, ref } from 'vue'
+import { computed, onBeforeMount, ref } from 'vue';
 import directorApiManageSettings from '@/api/director/directorApiManageSettings.js';
 import directorApiManageSettingsPost from '@/api/director/directorApiManageSettingsPost.js';
 import sadminApiManageSettings from '@/api/sadmin/sadminApiManageSettings.js';
 import sadminApiManageSettingsPost from '@/api/sadmin/sadminApiManageSettingsPost.js';
-
+import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
 import BaseSuccessText from '@/components/BaseSuccessText.vue';
 import BaseErrorText from '@/components/BaseErrorText.vue';
@@ -189,14 +189,16 @@ import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
 import router from '@/router/index.js';
 import minutesToHHMM from '@/utils/time/minutesToHHMM.js';
 import HHMMtoMinutes from '@/utils/time/HHMMtoMinutes.js';
-import directorApiCenterInfo from '@/api/director/directorApiCenterInfo.js'
+import directorApiCenterInfo from '@/api/director/directorApiCenterInfo.js';
 
 const mainStore = useMainStore();
 
 let login = ref();
 let password = ref();
 let changesSince = ref();
-let changesSinceFormatted = computed(() => new Date(changesSince.value * 1000).getDate() + ' февраля')
+let changesSinceFormatted = computed(
+  () => new Date(changesSince.value * 1000).getDate() + ' февраля'
+);
 let bookingAvailable = ref(false);
 let postsEquipment = ref();
 let shiftsFinish = ref();
@@ -205,7 +207,7 @@ let timezoneOffsetHours = ref();
 let orderDepthDays = ref();
 let clearanceMinutes = ref();
 let isRequestSuccess = ref();
-let formattedFullAddress = ref()
+let formattedFullAddress = ref();
 
 let modal = ref({});
 
@@ -271,10 +273,10 @@ function emitSetTimezone(value) {
 }
 
 onBeforeMount(async () => {
-  const data = await directorApiCenterInfo();
-  formattedFullAddress.value = data.city + ', ' + data.addressName
-
   if (isEnv('director')) {
+    const centerInfo = await directorApiCenterInfo();
+    formattedFullAddress.value = centerInfo.city + ', ' + centerInfo.addressName;
+
     const data = await directorApiManageSettings();
     bookingAvailable.value = data.bookingAvailable;
     postsEquipment.value = data.postsEquipment;
@@ -285,6 +287,12 @@ onBeforeMount(async () => {
   }
 
   if (isEnv('sadmin')) {
+    const sadminServiceStationsStore = useSadminServiceStationsStore();
+    formattedFullAddress.value =
+      sadminServiceStationsStore.getSelectedServiceStation().city +
+      ', ' +
+      sadminServiceStationsStore.getSelectedServiceStation().addressName;
+
     const data = await sadminApiManageSettings(router.currentRoute.value.query.id);
     login.value = data.login;
     password.value = data.password;

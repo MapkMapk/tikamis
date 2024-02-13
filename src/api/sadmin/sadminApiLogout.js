@@ -11,9 +11,9 @@ export default async function () {
 
   const response = await sadminApiClient.post('/logout');
   if (response.status === 200) {
-    mainStore.$reset();
     sadminUserStore.$reset();
-    sadminServiceStationsStore.$reset();
+    mainStore.$reset();
     await router.push('/sadmin/auth');
+    sadminServiceStationsStore.$reset();
   }
 }
