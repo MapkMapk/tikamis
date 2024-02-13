@@ -17,10 +17,7 @@
   >
     <span class="text-black text-2xl">{{ work.name }}</span>
     <BaseSvgIcon
-      @click="
-        workId = work.id;
-        isModalVisible = true;
-      "
+      @click="localHandler(work)"
       name="trash-bin"
       class="w-[22px] h-[25px] cursor-pointer"
     ></BaseSvgIcon>
@@ -33,9 +30,24 @@ import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
 import BaseButtonFilledRed from '@/components/BaseButtonFilledRed.vue';
 import ModalBoolean from '@/components/ModalBoolean.vue';
 
+let props = defineProps({
+  odometer: {
+    required: true
+  }
+})
+
 const mechanicOrderStore = useMechanicOrderStore();
 let isModalVisible = ref(false);
 let workId = ref();
+
+function localHandler(work) {
+  if (props.odometer === '') {
+    alert('Для удаления работы из заказа необходимо указать пробег автомобиля');
+    return;
+  }
+  workId.value = work.id;
+  isModalVisible.value = true;
+}
 
 async function removeWork(isConfirmed) {
   if (isConfirmed) {

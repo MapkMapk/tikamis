@@ -20,7 +20,7 @@
       </div>
       <section
         :class="{ 'pl-[300px]': mainStore.isHeaderMenuOpen }"
-        class="pt-[20px] pl-[122px] flex flex-1 mr-[30px]"
+        class="pt-[20px] pl-[122px] flex flex-1 mr-[30px] mb-10"
       >
         <form class="flex flex-col w-full max-w-[540px]">
           <h1 class="text-4xl leading-normal font-medium">
@@ -228,7 +228,6 @@ function saveModal() {
         postsEquipment.value,
         HHMMtoMinutes(shiftsStart.value),
         HHMMtoMinutes(shiftsFinish.value),
-        shiftsFinish.value,
         timezoneOffsetHours.value,
         clearanceMinutes.value,
         orderDepthDays.value

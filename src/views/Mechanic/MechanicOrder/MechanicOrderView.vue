@@ -1,6 +1,6 @@
 <template>
   <ModalBoolean
-    v-if="isModalVisible"
+    :is-visible="isModalVisible"
     @callback="orderCancel"
     :primary-button-component="BaseButtonFilledDark"
     main-title="Начать следующий заказ?"
@@ -70,11 +70,11 @@
         <div class="bg-gray-f5f5f5">
           <div class="text-gray-a1a4ad px-[30px] py-4">Список услуг в заказе</div>
         </div>
-        <MechanicOrderWork />
+        <MechanicOrderWork :odometer="odometer" />
       </div>
       <div class="flex mt-auto pt-10 pb-6">
-        <router-link
-          to="/mechanic/order/work-add"
+        <div
+          @click="navigateToOrderWorKAddView"
           class="flex flex-1 justify-center items-center border border-green cursor-pointer py-5"
         >
           <BaseSvgIcon
@@ -84,7 +84,7 @@
           <span class="font-semibold text-[21px] ml-4 text-green lg:!text-base lg:ml-3"
             >Добавить услугу</span
           >
-        </router-link>
+        </div>
         <BaseButtonFilledGreen
           v-if="!mechanicOrderStore.isOrderAccepted"
           @click="mechanicOrderStore.orderStart"
@@ -147,6 +147,7 @@ import { ref, computed, onBeforeMount, onBeforeUnmount } from 'vue';
 import ModalBoolean from '@/components/ModalBoolean.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
+import router from '@/router/index.js'
 
 const mechanicOrderStore = useMechanicOrderStore();
 let updateOrderInfoInterval = '';
@@ -169,6 +170,14 @@ async function orderComplete() {
   } else {
     alert('Необходимо указать корректный пробег автомобиля!');
   }
+}
+
+function navigateToOrderWorKAddView() {
+  if (odometer.value === '') {
+    alert('Для добавления работ в заказ необходимо указать пробег автомобиля');
+    return;
+  }
+  router.push('/mechanic/order/work-add');
 }
 
 // Интервал необходим, чтобы поддерживать данные заказа в актуальном состоянии

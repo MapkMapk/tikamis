@@ -14,7 +14,9 @@ import SharedReportCustomerSkipsView from '@/views/Shared/SharedReportCustomerSk
 import SharedReportPlateFakesView from '@/views/Shared/SharedReportPlateFakes/SharedReportPlateFakesView.vue';
 import SharedAnalyticsServiceHistoryView from '@/views/Shared/SharedAnalyticsServiceHistory/SharedAnalyticsServiceHistoryView.vue';
 import SharedReportSuspiciousPhonesView from '@/views/Shared/SharedReportSuspiciousPhones/SharedReportSuspiciousPhonesView.vue';
-import SadminManageCarCentersView from '@/views/Sadmin/SadminManageCarCenters/SadminManageCarCentersView.vue'
+import SadminManageCarCentersView from '@/views/Sadmin/SadminManageCarCenters/SadminManageCarCentersView.vue';
+import sadminApiAllCarCenters from '@/api/sadmin/sadminApiAllCarCenters.js';
+import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 
 const sadminRoutes = {
   path: '/sadmin',
@@ -129,7 +131,7 @@ const sadminRoutes = {
           meta: { title: 'Подозрительная привязка телефонов' }
         }
       ]
-    },
+    }
     // >>> 404 REDIRECT <<<
     // {
     //   path: ':pathMatch(.*)*',
@@ -138,7 +140,7 @@ const sadminRoutes = {
   ]
 };
 
-function sadminBeforeEach(to) {
+async function sadminBeforeEach(to) {
   const sadminUserStore = useSadminUserStore();
 
   if (!sadminUserStore.accessToken) {
@@ -150,14 +152,38 @@ function sadminBeforeEach(to) {
   }
 
   if (sadminUserStore.accessToken) {
-    if (to.path === '/sadmin/auth' && sadminUserStore.accessToken) {
-      return '/sadmin/manage/settings';
-    } else {
-      return true;
+    console.log('ny u')
+    await sadminServiceStationsHandler();
+
+    if (to.path === '/sadmin/auth') {
+      return '/sadmin/manage/car-centers';
     }
+
+    if (to.path === '/sadmin/manage/settings') {
+      if (to.query.id) {
+        return true;
+      } else {
+        return '/sadmin/manage/car-centers'
+      }
+    }
+
+    return true;
+
   }
 
   return true;
+}
+
+async function sadminServiceStationsHandler() {
+  const sadminServiceStationsStore = useSadminServiceStationsStore();
+  if (sadminServiceStationsStore.serviceStations.length === 0) {
+    const { carCenters } = await sadminApiAllCarCenters();
+    carCenters.forEach((carCenter) => {
+      carCenter.isSelected = false;
+    })
+    carCenters[0].isSelected = true;
+    sadminServiceStationsStore.serviceStations = carCenters;
+  }
 }
 
 export { sadminRoutes, sadminBeforeEach };

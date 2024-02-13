@@ -32,13 +32,13 @@ import sadminApiLogout from '@/api/sadmin/sadminApiLogout.js'
 
 const mainStore = useMainStore();
 
-function logout() {
+async function logout() {
   if (isEnv('director')) {
-    directorApiLogout()
+    await directorApiLogout()
     return;
   }
   if (isEnv('sadmin')) {
-    sadminApiLogout()
+    await sadminApiLogout()
   }
 }
 
