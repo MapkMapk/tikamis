@@ -1,3 +1,197 @@
 <template>
-  <div>SharedManageCustomerRecordsView</div>
+  <div>
+    <ModalBoolean
+      v-if="modal && modal.callback"
+      @callback="modal.callback"
+      :is-visible="modal.isVisible"
+      :primary-button-component="BaseButtonFilledDark"
+      :main-title="modal.mainTitle"
+      :primary-button-text="modal.primaryButtonText"
+      :secondary-button-text="modal.secondaryButtonText"
+    />
+    <MainHeader />
+    <MainHeaderGap />
+
+    <TabularSection>
+      <TabularPrimeTitle class="mb-2">22 сентября 2023, 11:25</TabularPrimeTitle>
+      <TabularPrimeDescription class="mb-5">Свободно для записи 7 постов 10 ч 50 мин</TabularPrimeDescription>
+      <TabularFiltersWrapper>
+      <TabularFilterPeriod :option-selected="handleOptionSelected" style="flex: 184;"/>
+<TabularFilterDate @selected="handleSelectedDate" style="flex: 614;"/>
+
+      <TabularButtonCross style="flex: 60; cursor: pointer;" @click="console.log('cancel')" />
+      <TabularButtonApplyFilters style="flex: 217;" @click="applyFilters" />
+    </TabularFiltersWrapper>
+    </TabularSection>
+
+    <TabularTable style="display: block; padding: 30px;">
+      <TabularTableRow style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">
+        <TabularTableCellTop style="padding-left: 10px;">Работы</TabularTableCellTop>
+        <TabularTableCellTop style="padding-left: 10px;">Время записи</TabularTableCellTop>
+        <TabularTableCellTop style="padding-left: 10px;">Телефон</TabularTableCellTop>
+        <TabularTableCellTop style="padding-left: 10px;">Автомобиль</TabularTableCellTop>
+        <TabularTableCellTop></TabularTableCellTop>
+      </TabularTableRow>
+  <TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">
+    <TabularTableRowCell :style="{ height: cellHeight, width: '2fr' }" style="padding-left: 10px;">
+      {{ item.works.length === 1 ? item.works[0].name : '' }}
+      <details v-if="item.works.length > 1" class="custom-details" :style="{ width: cellWidth }">
+        <summary class="flex" style="justify-content: space-between;">
+          {{ item.works[0].name }} <strong>ещё {{ item.works.length - 1 }}</strong>
+        </summary>
+        <ul>
+          <li v-for="work in item.works.slice(1)" :key="work.id">{{ work.name }}</li>
+        </ul>
+      </details>
+    </TabularTableRowCell>
+    <TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px;">{{ unixToData(item.bookingTime) }}</TabularTableRowCell>
+    <TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px;">{{ item.phone }}</TabularTableRowCell>
+    <TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px;">{{ item.plate }}</TabularTableRowCell>
+    <TabularTableRowCell :style="{ height: cellHeight, width: '.2fr' }" >
+      <!-- Кликабельное изображение крестика -->
+      <svg @click="deleteItem(item)" style="cursor: pointer;" class="delete-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 16 16">
+      <path d="M14.2929 0.292893C14.6834 -0.0976311 15.3166 -0.0976311 15.7071 0.292893C16.0976 0.683417 16.0976 1.31658 15.7071 1.70711L9.41421 8L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L8 9.41421L1.70711 15.7071C1.31658 16.0976 0.683418 16.0976 0.292894 15.7071C-0.0976312 15.3166 -0.0976312 14.6834 0.292894 14.2929L6.58579 8L0.292894 1.70711C-0.0976306 1.31658 -0.0976306 0.683417 0.292894 0.292893C0.683418 -0.0976311 1.31658 -0.0976311 1.70711 0.292893L8 6.58579L14.2929 0.292893Z" fill="#A1A4AD"/>
+      </svg>
+    </TabularTableRowCell>
+  </TabularTableRow>
+</TabularTable>
+
+  </div>
 </template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import MainHeader from '@/components/MainHeader.vue';
+import ModalBoolean from '@/components/ModalBoolean.vue';
+import MainHeaderGap from '@/components/MainHeaderGap.vue';
+import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
+import directorApiGetCustomerRecords from '@/api/director/directorApiGetCustomerRecords.js';
+import unixToData from '@/utils/time/unixToData.js';
+
+import TabularSection from '@/components/Tabular/TabularSection.vue';
+import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
+import TabularPrimeDescription from '@/components/Tabular/TabularPrimeDescription.vue';
+import TabularFiltersWrapper from '@/components/Tabular/TabularFiltersWrapper.vue';
+import TabularFilterPeriod from '@/components/Tabular/TabularFilterPeriod.vue';
+import TabularFilterDate from '@/components/Tabular/TabularFilterDate.vue';
+//import TabularFilterPosts from '@/components/Tabular/TabularFilterPosts.vue';
+
+import TabularTableCellTop from '@/components/Tabular/TabularTableCellTop.vue';
+import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
+//import TabularTableCellBottom from '@/components/Tabular/TabularTableCellBottom.vue';
+import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
+import TabularTable from '@/components/Tabular/TabularTable.vue';
+
+import TabularButtonCross from '@/components/Tabular/TabularButtonCross.vue';
+import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFilters.vue';
+
+
+
+let cellHeight,cellWidth = '100%';
+
+
+
+
+// Функция для удаления элемента из списка
+// function deleteItem(item) {
+//   // Реализация удаления элемента
+// }
+
+onMounted(fetchData);
+
+
+
+</script>
+
+<script>
+
+
+let filterDateStart = ref(1672544807);
+let filterDatePeriod = ref('year');
+
+function handleSelectedDate(date) {
+  filterDateStart.value = (Math.floor(date.getTime() / 1000)+86400);
+}
+
+const items = ref([]);
+const filters = ref({
+  interval: filterDatePeriod,
+  dateStart: filterDateStart,
+  works: ['11111', '22222', '33333', '44444', '55555'],
+  carCenters: ['C-1111'],
+  page: 1
+});
+
+async function applyFilters() {
+  try {
+    const response = await directorApiGetCustomerRecords(filters.value);
+    items.value = response.items;
+  } catch (error) {
+    console.error('Error applying filters:', error);
+  }
+}
+
+async function fetchData() {
+  try {
+    const response = await directorApiGetCustomerRecords(filters.value);
+    items.value = response.items;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+}
+
+
+
+export default {
+  components: {
+    MainHeader,
+    ModalBoolean,
+    MainHeaderGap,
+    TabularTableRow,
+    TabularTable,
+    TabularFilterPeriod
+  },
+  methods:{
+    handleOptionSelected(option){
+      filterDatePeriod.value = option.value;
+      console.log('Значение опции:', filterDatePeriod.value);
+    }
+  },
+  setup() {
+    // Добавьте функцию для обработки выбора даты
+    function handleDateSelected(selectedDate) {
+      // Обновите фильтры, передав выбранную дату
+      filters.value.dateStart = selectedDate;
+    }
+
+    return {
+      items,
+      applyFilters,
+      handleDateSelected
+    };
+  }
+};
+
+
+</script>
+
+<style scoped>
+.custom-details summary {
+  list-style: none;
+}
+
+.custom-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.custom-details  {
+  margin-right: 50px;
+}
+
+.custom-details[open] summary:after {
+  transform: rotate(-90deg);
+}
+.report-table-row:nth-child(odd) {
+  background-color: #f5f5f5;
+}
+</style>

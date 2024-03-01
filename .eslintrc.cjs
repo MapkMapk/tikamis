@@ -18,4 +18,10 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest',
   }
+  ,
+  ignorePatterns: [
+    'src/components/Datepicker/',
+    'src/components/Tabular/',
+    'src/views/Shared/SharedManageCustomerRecords/SharedManageCustomerRecordsView.vue'
+  ]
 }
