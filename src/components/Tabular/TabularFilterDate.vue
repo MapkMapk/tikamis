@@ -2,7 +2,7 @@
   <div class="report-filter justify-between min-w-min flex-1">
     <div class="flex-col">
       <div class="report-input-header-text-gray">Начало отсчета</div>
-      <DatePickerComponent value="5.1.23" minimum-view="day" @selected="handleSelectedDate"/> <!-- Вставляем компонент DatePickerComponent.vue здесь -->
+      <DatePickerComponent value="5.1.23" minimum-view="day" @selected="handleSelectedDate"/> 
     </div>
     <BaseSvgIcon
       class="max-w-[18px] max-h-[18px]"
@@ -20,13 +20,13 @@ const props = defineProps({
   initialDate: Date,
 });
 
-const emits = defineEmits(['selected']); // Define the emits property correctly
+const emits = defineEmits(['selected']); 
 
 const selectedDate = ref(props.initialDate);
 
 function handleSelectedDate(date) {
   selectedDate.value = date;
-  emits('selected', selectedDate.value); // Use the emits function correctly
+  emits('selected', selectedDate.value); 
 }
 </script>
 
@@ -38,11 +38,11 @@ export default {
     DatePickerComponent,
   },
   setup() {
-    const selectedDate = ref(null); // Инициализируйте реактивную переменную для хранения выбранной даты
+    const selectedDate = ref(null); // Инициализирует реактивную переменную для хранения выбранной даты
 
     // Обработчик события 'selected'
     function handleSelectedDate(date) {
-      selectedDate.value = date; // Установите выбранную дату в реактивную переменную
+      selectedDate.value = date; // Установливает выбранную дату в реактивную переменную
     }
 
     return {

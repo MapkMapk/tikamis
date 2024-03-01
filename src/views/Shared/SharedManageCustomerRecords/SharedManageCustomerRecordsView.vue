@@ -13,13 +13,12 @@
     <MainHeaderGap />
 
     <TabularSection>
-      <TabularPrimeTitle class="mb-2">22 сентября 2023, 11:25</TabularPrimeTitle>
-      <TabularPrimeDescription class="mb-5">Свободно для записи 7 постов 10 ч 50 мин</TabularPrimeDescription>
+      <TabularPrimeTitle class="mb-2">22 сентября 2023</TabularPrimeTitle>
       <TabularFiltersWrapper>
       <TabularFilterPeriod :option-selected="handleOptionSelected" style="flex: 184;"/>
 <TabularFilterDate @selected="handleSelectedDate" style="flex: 614;"/>
 
-      <TabularButtonCross style="flex: 60; cursor: pointer;" @click="console.log('cancel')" />
+      <TabularButtonCross style="flex: 60; cursor: pointer;" @click="defaultFilters" />
       <TabularButtonApplyFilters style="flex: 217;" @click="applyFilters" />
     </TabularFiltersWrapper>
     </TabularSection>
@@ -115,16 +114,28 @@ function handleSelectedDate(date) {
 
 const items = ref([]);
 const filters = ref({
-  interval: filterDatePeriod,
+  interval: filterDatePeriod.value === 'null' ? `'${filterDatePeriod.value}'` : filterDatePeriod.value,
   dateStart: filterDateStart,
   works: ['11111', '22222', '33333', '44444', '55555'],
   carCenters: ['C-1111'],
   page: 1
 });
+async function defaultFilters() {
+  try {
+    // Устанавливаем значения по умолчанию для filterDateStart и filterDatePeriod
+    filterDateStart.value = 1672544807; // Значение по умолчанию для даты
+    filterDatePeriod.value = null; // Значение по умолчанию для периода
 
+    // Применяем фильтры
+    await applyFilters();
+  } catch (error) {
+    console.error('Error applying default filters:', error);
+  }
+}
 async function applyFilters() {
   try {
     const response = await directorApiGetCustomerRecords(filters.value);
+    
     items.value = response.items;
   } catch (error) {
     console.error('Error applying filters:', error);
@@ -167,6 +178,7 @@ export default {
     return {
       items,
       applyFilters,
+      defaultFilters,
       handleDateSelected
     };
   }
