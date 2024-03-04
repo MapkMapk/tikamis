@@ -16,7 +16,7 @@
       <TabularPrimeTitle class="mb-2">22 сентября 2023</TabularPrimeTitle>
       <TabularFiltersWrapper>
       <TabularFilterPeriod :option-selected="handleOptionSelected" style="flex: 184;"/>
-<TabularFilterDate @selected="handleSelectedDate" style="flex: 614;"/>
+      <TabularFilterDate @update:date="handleSelectedDate" style="flex: 614;"/>
 
       <TabularButtonCross style="flex: 60; cursor: pointer;" @click="defaultFilters" />
       <TabularButtonApplyFilters style="flex: 217;" @click="applyFilters" />
@@ -69,15 +69,15 @@ import unixToData from '@/utils/time/unixToData.js';
 
 import TabularSection from '@/components/Tabular/TabularSection.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
-import TabularPrimeDescription from '@/components/Tabular/TabularPrimeDescription.vue';
 import TabularFiltersWrapper from '@/components/Tabular/TabularFiltersWrapper.vue';
 import TabularFilterPeriod from '@/components/Tabular/TabularFilterPeriod.vue';
 import TabularFilterDate from '@/components/Tabular/TabularFilterDate.vue';
-//import TabularFilterPosts from '@/components/Tabular/TabularFilterPosts.vue';
+import deleteCustomerRecord from '@/api/director/directorApiDeleteCustomerRecord';
+
+import '@vuepic/vue-datepicker/dist/main.css';
 
 import TabularTableCellTop from '@/components/Tabular/TabularTableCellTop.vue';
 import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
-//import TabularTableCellBottom from '@/components/Tabular/TabularTableCellBottom.vue';
 import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 import TabularTable from '@/components/Tabular/TabularTable.vue';
 
@@ -91,10 +91,21 @@ let cellHeight,cellWidth = '100%';
 
 
 
-// Функция для удаления элемента из списка
-// function deleteItem(item) {
-//   // Реализация удаления элемента
-// }
+async function deleteItem(item) {
+    const isConfirmed = confirm('Вы уверены, что хотите удалить этот элемент?');
+    if (!isConfirmed) {
+        return; // Если пользователь отказался, прерываем выполнение функции
+    }
+
+    try {
+        // Вызываем функцию удаления и передаём orderId
+        await deleteCustomerRecord(item.orderId);
+        // Удаляем элемент из списка
+        items.value = items.value.filter(i => i.orderId !== item.orderId);
+    } catch (error) {
+        console.error('Ошибка при удалении элемента:', error);
+    }
+}
 
 onMounted(fetchData);
 
@@ -105,7 +116,7 @@ onMounted(fetchData);
 <script>
 
 
-let filterDateStart = ref(1672544807);
+let filterDateStart = ref(1675882800);
 let filterDatePeriod = ref('year');
 
 function handleSelectedDate(date) {
@@ -114,20 +125,26 @@ function handleSelectedDate(date) {
 
 const items = ref([]);
 const filters = ref({
-  interval: filterDatePeriod.value === 'null' ? `'${filterDatePeriod.value}'` : filterDatePeriod.value,
+  interval: filterDatePeriod,
   dateStart: filterDateStart,
   works: ['11111', '22222', '33333', '44444', '55555'],
   carCenters: ['C-1111'],
   page: 1
 });
+
 async function defaultFilters() {
   try {
-    // Устанавливаем значения по умолчанию для filterDateStart и filterDatePeriod
-    filterDateStart.value = 1672544807; // Значение по умолчанию для даты
+    let __tempDateStart = filterDateStart.value;
+    let __tempPeriod = filterDatePeriod.value;
+    // значения по умолчанию для filterDateStart и filterDatePeriod
+    filterDateStart.value = null; // Значение по умолчанию для даты
     filterDatePeriod.value = null; // Значение по умолчанию для периода
+    
 
     // Применяем фильтры
     await applyFilters();
+    filterDateStart.value = __tempDateStart;
+    filterDatePeriod.value = __tempPeriod;
   } catch (error) {
     console.error('Error applying default filters:', error);
   }
@@ -166,10 +183,12 @@ export default {
     handleOptionSelected(option){
       filterDatePeriod.value = option.value;
       console.log('Значение опции:', filterDatePeriod.value);
+    },
+    handleDateChange(date) {
+      // Обработка новой выбранной даты
     }
   },
   setup() {
-    // Добавьте функцию для обработки выбора даты
     function handleDateSelected(selectedDate) {
       // Обновите фильтры, передав выбранную дату
       filters.value.dateStart = selectedDate;

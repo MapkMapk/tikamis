@@ -9,7 +9,7 @@
         <li @click="selectOption('Неделя', 'week')">Неделя</li>
         <li @click="selectOption('Месяц', 'month')">Месяц</li>
         <li @click="selectOption('Год', 'year')">Год</li>
-        <li @click="selectOption('Всё время', 'Null')">Всё время</li>
+        <!--<li @click="selectOption('Всё время', 'null')">Всё время</li>-->
       </ul>
     </div>
     <BaseSvgIcon class="report-input-arrow-down-gray" name="arrow-down-gray"/>
