@@ -14,6 +14,7 @@ import SharedAnalyticsServiceWorkloadView from '@/views/Shared/SharedAnalyticsSe
 import SharedReportPlateFakesView from '@/views/Shared/SharedReportPlateFakes/SharedReportPlateFakesView.vue';
 import SharedAnalyticsServiceHistoryView from '@/views/Shared/SharedAnalyticsServiceHistory/SharedAnalyticsServiceHistoryView.vue';
 import SharedReportSuspiciousPhonesView from '@/views/Shared/SharedReportSuspiciousPhones/SharedReportSuspiciousPhonesView.vue';
+import SharedTest from '@/views/Shared/SharedTest/SharedTest.vue';
 
 const directorRoutes = {
   path: '/director',
@@ -45,6 +46,12 @@ const directorRoutes = {
           name: 'manage.customer-records',
           component: SharedManageCustomerRecordsView,
           meta: { title: 'Записи клиентов' }
+        },
+        {
+          path: 'shared-test',
+          name: 'manage.shared-test',
+          component: SharedTest,
+          meta: { title: 'Тест' }
         }
       ]
     },
@@ -114,7 +121,7 @@ const directorRoutes = {
           path: 'plate-fakes',
           name: 'director.report.plate-fakes',
           component: SharedReportPlateFakesView,
-          meta: { title: 'Фалишовые гос. номера' }
+          meta: { title: 'Фальшивые гос. номера' }
         },
         {
           path: 'suspicious-phones',

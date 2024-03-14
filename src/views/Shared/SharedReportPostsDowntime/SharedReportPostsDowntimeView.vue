@@ -1,80 +1,214 @@
+<!-- eslint-disable vue/no-use-v-if-with-v-for -->
 <template>
   <MainHeader />
   <MainHeaderGap />
-  <TabularSection>
-    <TabularPrimeTitle>Простои постов</TabularPrimeTitle>
-    <TabularFiltersWrapper>
-      <TabularFilterPeriod />
-      <TabularFilterDate />
-      <TabularFilterEntity />
-      <TabularButtonCross />
-      <TabularButtonApplyFilters class="flex-[0.5]" />
-    </TabularFiltersWrapper>
-    <TabularTable class="mt-5">
-      <TabularTableColumn
-        class="w-1/2"
-        id="#columnMechanics"
-      >
-        <TabularTableCellTop>Механик</TabularTableCellTop>
-        <TabularTableCell>Соколов Виктор Фёдорович</TabularTableCell>
-        <TabularTableCell>Бабизян Рисов Карп</TabularTableCell>
-        <TabularTableCell>Неорденко Николаев Крисп</TabularTableCell>
-        <TabularTableCell>Рычагов Невернти</TabularTableCell>
-        <TabularTableCell>Анатолий Басурман Крехтехович</TabularTableCell>
-        <TabularTableCell>Серпиголовый Каруман</TabularTableCell>
-        <TabularTableCellBottom>Итого простоя:</TabularTableCellBottom>
-      </TabularTableColumn>
-      <TabularTableColumn
-        class="w-1/4"
-        id="#columnDowntime"
-      >
-        <TabularTableCellTop>Время простоя, мин</TabularTableCellTop>
-        <TabularTableCell>10</TabularTableCell>
-        <TabularTableCell>71</TabularTableCell>
-        <TabularTableCell>1</TabularTableCell>
-        <TabularTableCell>4</TabularTableCell>
-        <TabularTableCell>32</TabularTableCell>
-        <TabularTableCell>16</TabularTableCell>
-        <TabularTableCellBottom>135 минут</TabularTableCellBottom>
-      </TabularTableColumn>
-      <TabularTableColumn
-        class="w-1/4"
-        id="columnDate"
-      >
-        <TabularTableCellTop>Дата</TabularTableCellTop>
-        <TabularTableCell>22.06.2022 09:35</TabularTableCell>
-        <TabularTableCell>22.06.2022 09:35</TabularTableCell>
-        <TabularTableCell>22.06.2022 09:35</TabularTableCell>
-        <TabularTableCell>22.06.2022 09:35</TabularTableCell>
-        <TabularTableCell>22.06.2022 09:35</TabularTableCell>
-        <TabularTableCell>22.06.2022 09:35</TabularTableCell>
-        <TabularTableCellBottom />
-      </TabularTableColumn>
-    </TabularTable>
-    <TabularButtonsWrapper>
-      <TabularButtonSave class="mr-[15px]" />
-      <TabularButtonSend class="ml-[15px]" />
-    </TabularButtonsWrapper>
-  </TabularSection>
+  <DirectorReportComponent
+    :show-filter-or="true"
+    @filtersApplied="fetchCustomerSkipsData"
+  >
+    <template v-slot:tabular-title>
+      <TabularPrimeTitle>Простои постов</TabularPrimeTitle>
+    </template>
+
+    <template v-slot:tabular-table-header>
+      <TableHeaders :columns="columns" />
+    </template>
+
+    <template v-slot:tabular-table-table>
+      <!--<TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">-->
+      <TabularTableRow
+      v-for="item in items"
+      :key="item.orderId"
+      :item="item"
+      @click="toggleDetails($event)"
+      style="grid-template-columns: 4fr 3fr 1fr;"
+    >
+      <template v-if="currentSort === 'itemsByPosts'">
+      <!-- Пост Работы Потери Время записи Телефон Автомобиль -->
+      <TabularTableRowCell>Пост №{{ item.postNumber }}</TabularTableRowCell>
+      <!-- Перебор и отображение работ для каждой строки -->
+      <TabularTableRowCell :style="{ height: cellHeight, width: '2fr' }" style="padding-left: 10px;">
+      <strong>Все работы</strong>
+      <details  class="custom-details" :style="{ width: cellWidth }">
+        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)">
+         <strong></strong>
+        </summary>
+        <ul>
+          <li v-for="work in item.works" :key="work.id">{{ truncateText(work.workName, 50) }}</li>
+        </ul>
+      </details>
+    </TabularTableRowCell>
+      <TabularTableRowCell>{{ formatTotalLoss(item.totalLoss) }}
+        <details  class="custom-details" :style="{ width: cellWidth }">
+        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)"><strong></strong></summary>
+        <ul>
+          <li v-for="work in item.works" :key="work.id">
+          {{ formatTotalLoss(work.loss) }}
+        </li>
+        </ul>
+      </details></TabularTableRowCell>
+      </template>
+    </TabularTableRow>
+    <TabularTableCellBottom style="display: flex; justify-content: space-around;"><p style="color: white">Итого потерь:</p><p style="color: white">{{ formatTotalLoss(getTotalLossSum(items)) }}</p></TabularTableCellBottom>
+    </template>
+    
+  </DirectorReportComponent>
 </template>
 
 <script setup>
+import { onMounted, ref, watch } from 'vue';
+import DirectorReportComponent from '@/components/directorReportComponent.vue';
+import TableHeaders from '@/components/Tabular/TableHeaders.vue';
+import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
+import TabularTableCellBottom from '@/components/Tabular/TabularTableCellBottom.vue';
+import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
+import { directorApiClient } from '@/api/directorApiClient';
+import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
+
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
-import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
-import TabularFilterDate from '@/components/Tabular/TabularFilterDate.vue';
-import TabularFilterPeriod from '@/components/Tabular/TabularFilterPeriod.vue';
-import TabularFilterEntity from '@/components/Tabular/TabularFilterEntity.vue';
-import TabularButtonCross from '@/components/Tabular/TabularButtonCross.vue';
-import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFilters.vue';
-import TabularButtonSend from '@/components/Tabular/TabularButtonSend.vue';
-import TabularButtonSave from '@/components/Tabular/TabularButtonSave.vue';
-import TabularTableColumn from '@/components/Tabular/TabularTableColumn.vue';
-import TabularTableCellTop from '@/components/Tabular/TabularTableCellTop.vue';
-import TabularTableCell from '@/components/Tabular/TabularTableCell.vue';
-import TabularTableCellBottom from '@/components/Tabular/TabularTableCellBottom.vue';
-import TabularTable from '@/components/Tabular/TabularTable.vue';
-import TabularFiltersWrapper from '@/components/Tabular/TabularFiltersWrapper.vue';
-import TabularSection from '@/components/Tabular/TabularSection.vue';
-import TabularButtonsWrapper from '@/components/Tabular/TabularButtonsWrapper.vue';
+
+
+const items = ref([]);
+const currentSort = ref('itemsByPosts');
+
+onMounted(() => {
+  // Предположим, что у вас есть начальные значения для фильтров
+  const initialFilters = { date: 1675623600, period: 'month', works: null };
+  fetchCustomerSkipsData(initialFilters);
+  console.log(items.value);
+});
+// Обновление колонок в зависимости от currentSort
+const columns = ref([]);
+
+const getTotalLossSum = (items) => {
+  // Инициализация переменной для хранения суммы
+  let totalLossSum = 0;
+  // Перебор всех элементов массива items
+  items.forEach((item) => {
+    // Добавление totalLoss каждого элемента к общей сумме
+    totalLossSum += item.totalLoss;
+  });
+  // Возврат общей суммы
+  return totalLossSum;
+};
+function formatTotalLoss (sum) {
+  // Добавление отступов
+  let formattedTotalLoss = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(sum);
+  return formattedTotalLoss;
+};
+
+watch(currentSort, (newVal) => {
+  if (newVal === 'itemsByPosts') {
+    columns.value = [
+      { header: 'Пост', size: '4fr' },
+      { header: 'Работы', size: '3fr' },
+      { header: 'Потери', size: '1fr' },
+    ];
+  } else {
+    // Предполагаемая структура колонок для "mechanics"
+    columns.value = [
+      { header: 'Механик', size: '2fr' },
+      { header: 'Центр', size: '3fr' },
+      { header: 'Клиенты', size: '1fr' },
+      { header: 'Убытки', size: '1fr' },
+    ];
+  }
+}, { immediate: true });
+function unixToDate(unixTime) {
+  const date = new Date(unixTime * 1000); // Умножаем на 1000, так как в JavaScript время измеряется в миллисекундах, а не в секундах, как в Unix
+
+  const day = String(date.getDate()).padStart(2, '0'); // День месяца с ведущим нулём, если нужно
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяц с ведущим нулём, так как в JavaScript месяцы нумеруются с 0
+  const year = date.getFullYear();
+  const hours = String(date.getHours()).padStart(2, '0'); // Часы с ведущим нулём, если нужно
+  const minutes = String(date.getMinutes()).padStart(2, '0'); // Минуты с ведущим нулём, если нужно
+
+  const formattedDate = `${day}.${month}.${year} ${hours}:${minutes}`;
+  return formattedDate;
+}
+
+function toggleDetails(event) {
+  // Проверяем, что клик был не по самому элементу <summary>,
+  // чтобы избежать конфликта с его стандартным поведением.
+  if (event.target.tagName !== 'SUMMARY') {
+    const detailsElements = event.currentTarget.querySelectorAll('details');
+    detailsElements.forEach(details => {
+      // Если details уже открыт, закрываем его, и наоборот.
+      if (details.hasAttribute('open')) {
+        details.removeAttribute('open');
+      } else {
+        details.setAttribute('open', '');
+      }
+    });
+  }
+}
+function toggleSingleDetail(event) {toggleDetails(event)}
+async function fetchCustomerSkipsData({ date, period, workId }) {
+  const filters = {
+    interval: period,
+    dateStart: date,
+    works: Array.isArray(workId) ? workId : [workId],
+    carCenters: ['C-1111'], // Указаны для примера, измените по необходимости
+    page: 1 // Указано для примера, измените по необходимости
+  };
+
+  try {
+    const response = await directorApiClient.post('/report/get-posts-downtime', { filters });
+    //console.log(response.data[currentSort.value][0].works);
+    items.value = response.data[currentSort.value];
+    console.log(items.value);
+    //updateColumns(currentSort.value);
+  } catch (error) {
+    console.error('Ошибка при загрузке данных:', error);
+  }
+}
+function truncateText(text, maxLength) {
+  if (text.length > maxLength) {
+    return text.slice(0, maxLength) + '...';
+  }
+  return text;
+}
 </script>
+<style scoped>
+.custom-details summary {
+  list-style: none;
+}
+
+.custom-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.custom-details  {
+  margin-right: 50px;
+}
+
+.custom-details[open] summary:after {
+  transform: rotate(-90deg);
+}
+.report-table-row:nth-child(odd) {
+  background-color: #f5f5f5;
+}
+
+.custom-details ul {
+  padding-left: 0; /* Убираем стандартный отступ слева у списка */
+  list-style-type: none; /* Убираем маркеры списка */
+}
+
+.custom-details li {
+  display: block; /* Каждый элемент списка будет занимать всю ширину контейнера */
+  text-align: left; /* Выравнивание текста по левому краю */
+  padding: 4px 0; /* Добавляем немного отступа для каждого элемента списка */
+}
+
+/* Стили для выравнивания контента внутри details */
+.custom-details summary {
+  display: flex; /* Используем flexbox для выравнивания заголовка */
+  justify-content: space-between; /* Распределяем пространство между элементами */
+  align-items: center; /* Выравниваем элементы по центру по вертикали */
+  padding: 4px 0; /* Добавляем немного отступа */
+}
+
+</style>
+
+

@@ -13,10 +13,10 @@
     <MainHeaderGap />
 
     <TabularSection>
-      <TabularPrimeTitle class="mb-2">22 сентября 2023</TabularPrimeTitle>
+      <TabularPrimeTitle class="mb-2">Записи клиентов</TabularPrimeTitle>
       <TabularFiltersWrapper>
       <TabularFilterPeriod :option-selected="handleOptionSelected" style="flex: 184;"/>
-      <TabularFilterDate @update:date="handleSelectedDate" style="flex: 614;"/>
+      <TabularFilterDate @updateDate="handleSelectedDate" style="flex: 614;"/>
 
       <TabularButtonCross style="flex: 60; cursor: pointer;" @click="defaultFilters" />
       <TabularButtonApplyFilters style="flex: 217;" @click="applyFilters" />
@@ -43,9 +43,9 @@
         </ul>
       </details>
     </TabularTableRowCell>
-    <TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px;">{{ unixToData(item.bookingTime) }}</TabularTableRowCell>
-    <TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px;">{{ item.phone }}</TabularTableRowCell>
-    <TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px;">{{ item.plate }}</TabularTableRowCell>
+    <TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px; align-self: center;">{{ unixToData(item.bookingTime) }}</TabularTableRowCell>
+    <TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px; align-self: center;">{{ item.phone }}</TabularTableRowCell>
+    <TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px; align-self: center;">{{ item.plate }}</TabularTableRowCell>
     <TabularTableRowCell :style="{ height: cellHeight, width: '.2fr' }" >
       <!-- Кликабельное изображение крестика -->
       <svg @click="deleteItem(item)" style="cursor: pointer;" class="delete-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 16 16">
@@ -53,6 +53,7 @@
       </svg>
     </TabularTableRowCell>
   </TabularTableRow>
+  
 </TabularTable>
 
   </div>
@@ -86,7 +87,8 @@ import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFi
 
 
 
-let cellHeight,cellWidth = '100%';
+const cellHeight = '90%';
+const cellWidth = '100%';
 
 
 
@@ -120,7 +122,9 @@ let filterDateStart = ref(1675882800);
 let filterDatePeriod = ref('year');
 
 function handleSelectedDate(date) {
-  filterDateStart.value = (Math.floor(date.getTime() / 1000)+86400);
+  console.log(date);
+  filterDateStart.value = (date+86400);
+  console.log(filterDateStart.value);
 }
 
 const items = ref([]);
@@ -163,6 +167,8 @@ async function fetchData() {
   try {
     const response = await directorApiGetCustomerRecords(filters.value);
     items.value = response.items;
+    console.log(items);
+    console.log(items.value);
   } catch (error) {
     console.error('Error fetching data:', error);
   }
@@ -225,4 +231,23 @@ export default {
 .report-table-row:nth-child(odd) {
   background-color: #f5f5f5;
 }
+.custom-details ul {
+  padding-left: 0; /* Убираем стандартный отступ слева у списка */
+  list-style-type: none; /* Убираем маркеры списка */
+}
+
+.custom-details li {
+  display: block; /* Каждый элемент списка будет занимать всю ширину контейнера */
+  text-align: left; /* Выравнивание текста по левому краю */
+  padding: 4px 0; /* Добавляем немного отступа для каждого элемента списка */
+}
+
+/* Стили для выравнивания контента внутри details */
+.custom-details summary {
+  display: flex; /* Используем flexbox для выравнивания заголовка */
+  justify-content: space-between; /* Распределяем пространство между элементами */
+  align-items: center; /* Выравниваем элементы по центру по вертикали */
+  padding: 4px 0; /* Добавляем немного отступа */
+}
+
 </style>

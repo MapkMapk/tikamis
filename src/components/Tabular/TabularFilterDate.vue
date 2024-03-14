@@ -19,7 +19,7 @@ import '@vuepic/vue-datepicker/dist/main.css';
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 
 const selectedDate = ref(new Date(2023, 1, 8));
-const emits = defineEmits(['update:date']);
+const emits = defineEmits(['updateDate']);
 
 const customFormat = date => `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
 const startDate = ref(new Date(2023, 1, 8));
@@ -27,8 +27,7 @@ const startDate = ref(new Date(2023, 1, 8));
 
 
 function updateSelectedDate(date) {
-  emits('update:date', date);
-  console.log("Выбранная дата:", date);
+  emits('updateDate', Math.floor(date.getTime() / 1000)); // Отправляем timestamp
 }
 
 function simulateClickOnDatePicker() {

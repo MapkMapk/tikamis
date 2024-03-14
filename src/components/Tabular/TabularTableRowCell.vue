@@ -9,6 +9,6 @@
     /* Стили для ячейки таблицы */
     height: calc(100% + 50px); /* Для числовой высоты ячейки */
     font-size: 18px;
-    padding: 16px 0;
+    padding: 16px 0 16px 10px;
   }
   </style>
