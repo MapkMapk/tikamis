@@ -24,6 +24,5 @@ module.exports = {
     'src/components/Tabular/',
     'src/views/Shared/SharedManageCustomerRecords/SharedManageCustomerRecordsView.vue',
     'src/views/Shared/SharedAnalyticsServiceWorkload/SharedAnalyticsServiceWorkloadView.vue',
-    'src/views/Shared/SharedTest/'
   ]
 }
