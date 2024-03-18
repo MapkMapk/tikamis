@@ -6,6 +6,7 @@
     :show-filter-or="true"
     :show-Filter-All-Works="false"
     @filtersApplied="fetchCustomerSkipsData"
+    @optionSelected="changeOrsOption"
   >
     <template v-slot:tabular-title>
       <TabularPrimeTitle>Фальшивые гос.номера</TabularPrimeTitle>
@@ -17,7 +18,7 @@
     <template v-slot:tabular-table-table>
       <!--<TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">-->
       <TabularTableRow
-      v-for="item in items"
+      v-for="item in displayedItems"
       :key="item.orderId"
       :item="item"
       @click="toggleDetails($event)"
@@ -38,7 +39,8 @@
       <TabularTableRowCell>{{ item.expectedPlate }}</TabularTableRowCell>
       <TabularTableRowCell>{{ item.factPlate }}</TabularTableRowCell>
       <!-- Перебор и отображение работ для каждой строки -->
-      <TabularTableRowCell>{{ item.mechanicName }}</TabularTableRowCell>
+      <TabularTableRowCell v-if="currentSort.option === 'itemsByPosts'">Пост №{{ item.postNumber }}</TabularTableRowCell>
+      <TabularTableRowCell v-else>{{ item.mechanicName }}</TabularTableRowCell>
       
       <TabularTableRowCell>{{ unixToDate(item.unixBookingTime) }}</TabularTableRowCell>
       <!-- <TabularTableRowCell>{{ item.carCenterName }}</TabularTableRowCell>
@@ -55,7 +57,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import DirectorReportComponent from '@/components/directorReportComponent.vue';
 import TableHeaders from '@/components/Tabular/TableHeaders.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
@@ -68,7 +70,38 @@ import MainHeaderGap from '@/components/MainHeaderGap.vue';
 
 
 const items = ref([]);
+const itemsByPosts = ref([]);
+const itemsByMechanics = ref([]);
 const currentSort = ref('itemsByMechanics');
+function changeOrsOption(option){
+  currentSort.value = option;
+  console.warn(displayedItems.value.length);
+  if (currentSort.value.option === 'itemsByPosts') {
+    columns.value = [
+      { header: 'Работы', size: '3fr' },
+      { header: 'Записанный номер', size: '1fr' },
+      { header: 'Фактический номер', size: '1fr' },
+      { header: 'Пост', size: '3fr' },
+      { header: 'Время записи', size: '2fr' },
+      { header: 'Телефон', size: '2fr' },
+    ];
+  } else {
+    // Предполагаемая структура колонок для "mechanics"
+    columns.value = [
+    { header: 'Работы', size: '3fr' },
+      { header: 'Записанный номер', size: '1fr' },
+      { header: 'Фактический номер', size: '1fr' },
+      { header: 'Механик', size: '3fr' },
+      { header: 'Время записи', size: '2fr' },
+      { header: 'Телефон', size: '2fr' },
+    ];
+  }
+}
+const displayedItems = computed(() => {
+  return currentSort.value.option === 'itemsByPosts' ? itemsByPosts.value : itemsByMechanics.value;
+});
+
+
 
 function formatTotalLoss (sum) {
   // Добавление отступов
@@ -85,14 +118,14 @@ onMounted(() => {
 // Обновление колонок в зависимости от currentSort
 const columns = ref([]);
 
-watch(currentSort, (newVal) => {
+watch(currentSort.value.option, (newVal) => {
   console.log("Текущая сортировка:", newVal);
   if (newVal === 'itemsByPosts') {
     columns.value = [
       { header: 'Работы', size: '3fr' },
       { header: 'Записанный номер', size: '1fr' },
       { header: 'Фактический номер', size: '1fr' },
-      { header: 'Механик', size: '3fr' },
+      { header: 'Пост', size: '3fr' },
       { header: 'Время записи', size: '2fr' },
       { header: 'Телефон', size: '2fr' },
     ];
@@ -155,10 +188,8 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
   try {
     const response = await directorApiClient.post('/report/get-plate-fakes', { filters });
     //console.log(response.data[currentSort.value][0].works);
-    items.value = response.data['itemsByMechanics'];
-    console.log('!!!!!!!!!!!!!!!!!!!!!');
-    console.log(items.value);
-    console.log('!!!!!!!!!!!!!!!!!!!!!');
+    itemsByPosts.value = response.data.itemsByPosts;
+    itemsByMechanics.value = response.data.itemsByMechanics;
     //updateColumns(currentSort.value);
   } catch (error) {
     console.error('Ошибка при загрузке данных:', error);

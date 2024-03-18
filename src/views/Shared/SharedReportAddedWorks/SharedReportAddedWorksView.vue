@@ -5,6 +5,7 @@
   <DirectorReportComponent
     :show-filter-or="true"
     @filtersApplied="fetchCustomerSkipsData"
+    @optionSelected="changeOrsOption"
   >
     <template v-slot:tabular-title>
       <TabularPrimeTitle>Дополнительные работы</TabularPrimeTitle>
@@ -17,15 +18,16 @@
     <template v-slot:tabular-table-table>
       <!--<TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">-->
       <TabularTableRow
-      v-for="item in items"
+      v-for="item in displayedItems"
       :key="item.orderId"
       :item="item"
       @click="toggleDetails($event)"
       style="grid-template-columns: 4fr 3fr 1fr;"
     >
-      <template v-if="currentSort === 'itemsByPosts'">
+      
       <!-- Пост Работы Потери Время записи Телефон Автомобиль -->
-      <TabularTableRowCell>Пост №{{ item.postNumber }}</TabularTableRowCell>
+      <TabularTableRowCell v-if="currentSort.option === 'itemsByPosts'">Пост №{{ item.postNumber }}</TabularTableRowCell>
+      <TabularTableRowCell v-else>{{ item.mechanicName }}</TabularTableRowCell>
       <!-- Перебор и отображение работ для каждой строки -->
       <TabularTableRowCell :style="{ height: cellHeight, width: '2fr' }" style="padding-left: 10px;">
       <strong>Все работы</strong>
@@ -47,7 +49,6 @@
         </li>
         </ul>
       </details></TabularTableRowCell>
-      </template>
     </TabularTableRow>
     <TabularTableCellBottom style="display: flex; justify-content: space-around;"><p style="color: white">Итого потерь:</p><p style="color: white">{{ formatTotalLoss(getTotalLossSum(items)) }}</p></TabularTableCellBottom>
     </template>
@@ -56,7 +57,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import DirectorReportComponent from '@/components/directorReportComponent.vue';
 import TableHeaders from '@/components/Tabular/TableHeaders.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
@@ -70,7 +71,28 @@ import MainHeaderGap from '@/components/MainHeaderGap.vue';
 
 
 const items = ref([]);
-const currentSort = ref('itemsByPosts');
+const itemsByPosts = ref([]);
+const itemsByMechanics = ref([]);
+const currentSort = ref('itemsByMechanics');
+function changeOrsOption(option){
+  currentSort.value = option;
+  console.warn(displayedItems.value.length);
+  if (currentSort.value.option === 'itemsByPosts') {
+    columns.value = [
+      { header: 'Пост', size: '4fr' },
+      { header: 'Работы', size: '3fr' },
+      { header: 'Потери', size: '1fr' },
+    ];
+  } else {
+    // Предполагаемая структура колонок для "mechanics"
+    columns.value = [
+      { header: 'Механик', size: '4fr' },
+      { header: 'Работы', size: '3fr' },
+      { header: 'Потери', size: '1fr' },
+    ];
+  }
+}
+
 
 onMounted(() => {
   // Предположим, что у вас есть начальные значения для фильтров
@@ -98,7 +120,7 @@ function formatTotalLoss (sum) {
   return formattedTotalLoss;
 };
 
-watch(currentSort, (newVal) => {
+watch(currentSort.value.option, (newVal) => {
   if (newVal === 'itemsByPosts') {
     columns.value = [
       { header: 'Пост', size: '4fr' },
@@ -108,10 +130,9 @@ watch(currentSort, (newVal) => {
   } else {
     // Предполагаемая структура колонок для "mechanics"
     columns.value = [
-      { header: 'Механик', size: '2fr' },
-      { header: 'Центр', size: '3fr' },
-      { header: 'Клиенты', size: '1fr' },
-      { header: 'Убытки', size: '1fr' },
+    { header: 'Механик', size: '4fr' },
+      { header: 'Работы', size: '3fr' },
+      { header: 'Потери', size: '1fr' },
     ];
   }
 }, { immediate: true });
@@ -144,6 +165,12 @@ function toggleDetails(event) {
   }
 }
 function toggleSingleDetail(event) {toggleDetails(event)}
+
+const displayedItems = computed(() => {
+  return currentSort.value.option === 'itemsByPosts' ? itemsByPosts.value : itemsByMechanics.value;
+});
+
+
 async function fetchCustomerSkipsData({ date, period, workId }) {
   const filters = {
     interval: period,
@@ -156,7 +183,8 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
   try {
     const response = await directorApiClient.post('/report/get-customer-skips', { filters });
     //console.log(response.data[currentSort.value][0].works);
-    items.value = response.data[currentSort.value];
+    itemsByPosts.value = response.data.itemsByPosts;
+    itemsByMechanics.value = response.data.itemsByMechanics;
     console.log(items.value);
     //updateColumns(currentSort.value);
   } catch (error) {

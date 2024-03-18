@@ -23,8 +23,8 @@
       @click="toggleDetails($event)"
     >
       <template style="display: grid;;grid-template-columns: 3fr 1fr 2fr 2fr 2fr;" ><!--v-if="currentSort === 'itemsByMechanics'"-->
-        <TabularTableRowCell v-if="item.type == 1">{{ item.smileContext }} </TabularTableRowCell>
-        <TabularTableRowCell v-if="item.type == 2">{{ item.textContent }} </TabularTableRowCell>
+        <TabularTableRowCell v-if="item.type == '1'">{{ item.smileContent }} </TabularTableRowCell>
+        <TabularTableRowCell v-if="item.type == '2'">{{ item.textContent }} </TabularTableRowCell>
       <!-- Пост Работы Потери Время записи Телефон Автомобиль -->
       <TabularTableRowCell>{{ item.tone }}</TabularTableRowCell>
       <TabularTableRowCell>{{ unixToDate(item.date) }}</TabularTableRowCell>
@@ -139,7 +139,8 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
   try {
     const response = await directorApiClient.post('/analytics/get-reviews', { filters });
     //console.log(response.data[currentSort.value][0].works);
-    items.value = response.data['itemsByMechanics'];
+    items.value = response.data.items;
+    console.log(items.value);
     //updateColumns(currentSort.value);
   } catch (error) {
     console.error('Ошибка при загрузке данных:', error);

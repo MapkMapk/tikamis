@@ -20,17 +20,17 @@
       v-for="item in items"
       :key="item.orderId"
       :item="item"
-      @click="toggleDetails($event)"
+      @click.stop="toggleSingleDetail($event)"
       style="grid-template-columns: 2fr 4fr 1fr 2fr 2fr 2fr;"
     >
       <template v-if="currentSort === 'itemsByPosts'">
       <!-- Пост Работы Потери Время записи Телефон Автомобиль -->
       <TabularTableRowCell>Пост №{{ item.postNumber }}</TabularTableRowCell>
       <!-- Перебор и отображение работ для каждой строки -->
-      <TabularTableRowCell :style="{ height: cellHeight, width: '2fr' }" style="padding-left: 10px;">
+      <TabularTableRowCell :style="{ height: cellHeight, width: '2fr' }" style="padding-left: 10px;" >
       <p style="opacity: 0;">dsfdsfdsfsdsfsdfsd</p>
       <details  class="custom-details" :style="{ width: cellWidth }">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)">
+        <summary class="flex" style="justify-content: space-between;">
          <strong></strong>
         </summary>
         <ul>
@@ -40,7 +40,7 @@
     </TabularTableRowCell>
       <TabularTableRowCell>{{ formatTotalLoss(item.totalLoss) }}
         <details  class="custom-details" :style="{ width: cellWidth }">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)"><strong></strong></summary>
+        <summary class="flex" style="justify-content: space-between;"><strong></strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.id">
           {{ work.loss }}
@@ -49,7 +49,7 @@
       </details></TabularTableRowCell>
       <TabularTableRowCell><p style="opacity: 0;">dsfdsfdsfsdsfsdfsd</p>
         <details  class="custom-details" :style="{ width: cellWidth }">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)"><strong></strong></summary>
+        <summary class="flex" style="justify-content: space-between;" ><strong></strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.id">
           {{ unixToDate(work.unixBookingTime) }}
@@ -64,7 +64,7 @@
         
       <TabularTableRowCell>
         <details  class="custom-details" :style="{ width: cellWidth }">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)"><strong>Клиенты ({{ item.works.length }})</strong></summary>
+        <summary class="flex" style="justify-content: space-between;" ><strong>Клиенты ({{ item.works.length }})</strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.id">
           {{ work.phone }}
@@ -74,7 +74,7 @@
         </TabularTableRowCell>
         <TabularTableRowCell><p style="opacity: 0;">dsfdsfdsfsdsfsdfsd</p>
         <details  class="custom-details" :style="{ width: cellWidth }">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)"><strong></strong></summary>
+        <summary class="flex" style="justify-content: space-between;" ><strong></strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.id">
           {{ work.plate }}
@@ -151,22 +151,76 @@ function unixToDate(unixTime) {
   const formattedDate = `${day}.${month}.${year} ${hours}:${minutes}`;
   return formattedDate;
 }
+///////  Тут находится код, который убирает баг с раскрытием строк
+//////   при нажатии на тэг summary в некоторых браузерах (возможно во всех)
+/////    Он ужасен и требует доработки или фикса самого бага, но Хот фикс есть Хот фикс
+function closeAllDetails(detailsElements) {
+  detailsElements.forEach((details) => {
+    details.removeAttribute('open');
+  });
+}
 
+// Функция для открытия всех элементов details
+function openAllDetails(detailsElements) {
+  detailsElements.forEach((details) => {
+    details.setAttribute('open', true);
+  });
+}
+function countDetailsStatus(detailsElements) {
+  let openCount = 0;
+  let closedCount = 0;
+
+  detailsElements.forEach((details) => {
+    if (details.open) {
+      openCount++;
+    } else {
+      closedCount++;
+    }
+  });
+
+  return { openCount, closedCount };
+}
+// Основная функция для переключения состояния элементов details
 function toggleDetails(event) {
-  // Проверяем, что клик был не по самому элементу <summary>,
-  // чтобы избежать конфликта с его стандартным поведением.
-  if (event.target.tagName !== 'SUMMARY') {
-    const detailsElements = event.currentTarget.querySelectorAll('details');
-    detailsElements.forEach(details => {
-      // Если details уже открыт, закрываем его, и наоборот.
-      if (details.hasAttribute('open')) {
-        details.removeAttribute('open');
+  console.log('toggleSingleDetail вызван');
+
+  // Получаем все элементы `details` внутри текущего TabularTableRow.
+  const detailsElements = event.currentTarget.querySelectorAll('details');
+  console.log(`Найдено ${detailsElements.length} элементов 'details'`);
+
+  // Подсчитываем количество открытых и закрытых элементов details
+  const { openCount, closedCount } = countDetailsStatus(detailsElements);
+
+  if (openCount > closedCount) {
+    console.log('Закрываем все элементы `details`');
+    // Закрываем все элементы details через 100 миллисекунд
+    setTimeout(() => {
+      closeAllDetails(detailsElements);
+    }, 10);
+  } else {
+    console.log('Открываем все элементы `details`');
+    // Открываем все элементы details через 100 миллисекунд
+    setTimeout(() => {
+      openAllDetails(detailsElements);
+    }, 10);
+  }
+
+  // Добавляем небольшую задержку перед проверкой состояний, чтобы изменения успели примениться
+  setTimeout(() => {
+    detailsElements.forEach((details, index) => {
+      if (details.open) {
+        console.log(`Элемент details[${index}] остался открытым после обработки`);
       } else {
-        details.setAttribute('open', '');
+        console.log(`Элемент details[${index}] закрыт после обработки`);
       }
     });
-  }
+  }, 20); // Увеличил время задержки, чтобы учесть также задержку на закрытие/открытие
 }
+//\\\
+//\\\\
+//\\\\\
+
+
 function toggleSingleDetail(event) {toggleDetails(event)}
 async function fetchCustomerSkipsData({ date, period, workId }) {
   const filters = {

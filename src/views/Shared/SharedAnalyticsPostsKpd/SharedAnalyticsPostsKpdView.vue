@@ -6,6 +6,7 @@
     :show-filter-or="true"
     @filtersApplied="fetchCustomerSkipsData"
     @worksLoaded="handleAllWorksLoaded"
+    @optionSelected="changeOrsOption"
   >
     <template v-slot:tabular-title>
       <TabularPrimeTitle>Кпд постов</TabularPrimeTitle>
@@ -18,15 +19,15 @@
     <template v-slot:tabular-table-table>
       <!--<TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">-->
       <TabularTableRow
-      v-for="item in items"
+      v-for="item in displayedItems"
       :key="item.orderId"
       :item="item"
       @click="toggleDetails($event)"
       style="grid-template-columns: 4fr 3fr 1fr;"
     >
-      <template v-if="currentSort === 'itemsByMechanics'">
       <!-- Пост Работы Потери Время записи Телефон Автомобиль -->
-      <TabularTableRowCell>{{ item.mechanicName }}</TabularTableRowCell>
+      <TabularTableRowCell v-if="currentSort.option === 'itemsByPosts'">Пост №{{ item.postNumber }}</TabularTableRowCell>
+      <TabularTableRowCell v-else>{{ item.mechanicName }}</TabularTableRowCell>
       <!-- Перебор и отображение работ для каждой строки -->
       <TabularTableRowCell :style="{ height: cellHeight, width: '2fr' }" style="padding-left: 10px;">
       <strong>Все работы</strong>
@@ -48,7 +49,6 @@
         </li>
         </ul>
       </details></TabularTableRowCell>
-      </template>
     </TabularTableRow>
     </template>
     
@@ -56,7 +56,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import DirectorReportComponent from '@/components/directorReportComponent.vue';
 import TableHeaders from '@/components/Tabular/TableHeaders.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
@@ -70,7 +70,27 @@ import MainHeaderGap from '@/components/MainHeaderGap.vue';
 
 
 const items = ref([]);
+const itemsByPosts = ref([]);
+const itemsByMechanics = ref([]);
 const currentSort = ref('itemsByMechanics');
+function changeOrsOption(option){
+  currentSort.value = option;
+  console.warn(displayedItems.value.length);
+  if (currentSort.value.option === 'itemsByPosts') {
+    columns.value = [
+      { header: 'Пост', size: '4fr' },
+      { header: 'Работы', size: '3fr' },
+      { header: 'Потери', size: '1fr' },
+    ];
+  } else {
+    // Предполагаемая структура колонок для "mechanics"
+    columns.value = [
+      { header: 'Механик', size: '4fr' },
+      { header: 'Работы', size: '3fr' },
+      { header: 'Потери', size: '1fr' },
+    ];
+  }
+}
 
 
 const initialFilters = { date: 1675623600, period: 'month', works: 'null' };
@@ -114,20 +134,19 @@ function formatTotalLoss (sum) {
   return formattedTotalLoss;
 };
 
-watch(currentSort, (newVal) => {
-  if (newVal === 'itemsByMechanics') {
+watch(currentSort.value.option, (newVal) => {
+  if (newVal === 'itemsByPosts') {
     columns.value = [
-      { header: 'Механик', size: '4fr' },
+      { header: 'Пост', size: '4fr' },
       { header: 'Работы', size: '3fr' },
       { header: 'Потери', size: '1fr' },
     ];
   } else {
     // Предполагаемая структура колонок для "mechanics"
     columns.value = [
-      { header: 'Механик', size: '2fr' },
-      { header: 'Центр', size: '3fr' },
-      { header: 'Клиенты', size: '1fr' },
-      { header: 'Убытки', size: '1fr' },
+    { header: 'Механик', size: '4fr' },
+      { header: 'Работы', size: '3fr' },
+      { header: 'Потери', size: '1fr' },
     ];
   }
 }, { immediate: true });
@@ -160,7 +179,9 @@ function toggleDetails(event) {
   }
 }
 function toggleSingleDetail(event) {toggleDetails(event)}
-
+const displayedItems = computed(() => {
+  return currentSort.value.option === 'itemsByPosts' ? itemsByPosts.value : itemsByMechanics.value;
+});
 async function fetchCustomerSkipsData({ date, period, workId }) {
   const filters = ref({
     interval: period,
@@ -173,8 +194,10 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
   try {
     const response = await directorApiClient.post('/analytics/get-posts-KPD', { filters });
     //console.log(response.data[currentSort.value][0].works);
-    items.value = response.data['itemsByMechanics'];
-    console.log(items.value);
+    itemsByPosts.value = response.data.itemsByPosts;
+    itemsByMechanics.value = response.data.itemsByMechanics;
+    console.log(itemsByPosts.value);
+    console.log(itemsByMechanics.value);
     //updateColumns(currentSort.value);
   } catch (error) {
     console.error('Ошибка при загрузке данных:', error);
