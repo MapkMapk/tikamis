@@ -20,7 +20,7 @@
 			<!-- Обертка для фильтров таблицы -->
 			<TabularFiltersWrapper>
 				<!-- Фильтр по периоду -->
-				<TabularFilterPeriod :option-selected="handleOptionSelected" style="flex: 184;" />
+				<TabularFilterPeriod @updatePeriod="handleOptionSelected" style="flex: 184;" />
 				<!-- Фильтр по дате -->
 				<TabularFilterDate @updateDate="handleSelectedDate" style="flex: 614;" />
 				<!-- Кнопка сброса фильтров -->
@@ -205,8 +205,8 @@ export default {
 	},
 	methods: {
 		handleOptionSelected(option) {
-			filterDatePeriod.value = option.value;
-			console.log('Значение опции:', filterDatePeriod.value);
+			filterDatePeriod.value = option;
+			console.log('Значение опции:', option);
 		},
 		handleDateChange(date) {
 			// Обработка новой выбранной даты
