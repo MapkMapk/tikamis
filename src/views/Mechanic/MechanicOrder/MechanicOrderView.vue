@@ -33,8 +33,8 @@
             />
             <span class="text-white font-medium">Начало работы</span>
           </div>
-          <span class="font-light text-5xl text-white">{{ mechanicOrderStore.startTime }}</span>
-          <span class="text-gray-a1a4ad text-sm">{{ mechanicOrderStore.startDate }}</span>
+          <span class="font-light text-5xl text-white">{{ unixToTime(mechanicOrderStore.startTimeUnix) }}</span>
+          <span class="text-gray-a1a4ad text-sm">{{ unixToDate(mechanicOrderStore.startTimeUnix) }}</span>
         </div>
         <div
           :class="{ '!border-red': isLowTime, '!bg-red-light': isLowTime }"
@@ -143,7 +143,7 @@ import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 
 import MechanicOrderWork from '@/views/Mechanic/MechanicOrder/MechanicOrderWork.vue';
 import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
-import { ref, computed, onBeforeMount, onBeforeUnmount } from 'vue';
+import { ref, computed, onBeforeMount, onBeforeUnmount, onMounted } from 'vue';
 import ModalBoolean from '@/components/ModalBoolean.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
@@ -162,7 +162,14 @@ async function orderCancel(isConfirmed) {
   }
   isModalVisible.value = false;
 }
-
+function  unixToTime(unixTimestamp) {
+      const date = new Date(unixTimestamp * 1000);
+      return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+}
+function unixToDate(unixTimestamp) {
+      const date = new Date(unixTimestamp * 1000);
+      return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', weekday: 'long' });
+}
 async function orderComplete() {
   if (odometer.value > 0) {
     clearInterval(updateOrderInfoInterval);
@@ -182,8 +189,24 @@ function navigateToOrderWorKAddView() {
 
 // Интервал необходим, чтобы поддерживать данные заказа в актуальном состоянии
 // Чтобы например если клиент откажется от заказа механик тоже смог это увидеть
-onBeforeMount(async () => {
-  await mechanicOrderStore.orderGetNext();
+
+onMounted(async () => {
+  try {
+    const response = await mechanicOrderStore.orderGetNext();
+    // Успешный ответ
+    console.log(response);
+  } catch (error) {
+    if (error.response) {
+      // Сервер вернул ответ с кодом состояния, который вышел из диапазона 2xx
+      console.log(error.response.status);
+    } else if (error.request) {
+      // Запрос был сделан, но ответ не был получен (error.request — экземпляр XMLHttpRequest в браузерах)
+      alert("Ошибка сервера");
+    } else {
+      // Что-то пошло не так при настройке запроса
+      console.log('Error', error.message);
+    }
+  }
   updateOrderInfoInterval = setInterval(() => mechanicOrderStore.orderGetNext(), 30000);
 });
 

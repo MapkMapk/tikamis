@@ -9,7 +9,7 @@ export const useMechanicOrderStore = defineStore(
     let orderId = ref();
     let isOrderAccepted = ref(false);
     let plateNumber = ref('');
-    let startTime = ref('');
+    let startTimeUnix = ref('');
     let startDate = ref('');
     let completionTimeHours = ref();
     let works = ref();
@@ -34,7 +34,7 @@ export const useMechanicOrderStore = defineStore(
       orderId.value = data.orderId;
       isOrderAccepted.value = data.isOrderAccepted;
       plateNumber.value = data.plateNumber;
-      startTime.value = data.startTime;
+      startTimeUnix.value = data.startTimeUnix;
       startDate.value = data.startDate;
       completionTimeHours.value = data.completionTimeHours;
       works.value = data.works;
@@ -84,7 +84,7 @@ export const useMechanicOrderStore = defineStore(
     return {
       orderId,
       plateNumber,
-      startTime,
+      startTimeUnix,
       startDate,
       completionTimeHours,
       works,
