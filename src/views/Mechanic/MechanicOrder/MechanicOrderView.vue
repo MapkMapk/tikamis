@@ -164,7 +164,7 @@ async function orderCancel(isConfirmed) {
 }
 function  unixToTime(unixTimestamp) {
       const date = new Date(unixTimestamp * 1000);
-      return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      return date.toUTCString().slice(-12, -7);
 }
 function unixToDate(unixTimestamp) {
       const date = new Date(unixTimestamp * 1000);
