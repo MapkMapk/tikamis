@@ -96,7 +96,13 @@ function getDefaultChartOptions() {
       categories: []
     },
     yaxis: {
-      max: maxyaxis.value
+      max: maxyaxis.value,
+      labels: {
+      formatter: function(value) {
+        // Округляем до двух знаков после запятой и преобразуем в строку
+        return parseFloat(value.toFixed(2)).toString();
+      }
+    }
     }
   };
 }
@@ -159,7 +165,7 @@ function processDataForChart(apiResponse, chartOptions, series) {
   chartKey2.value++;
 
   chartOptions.value.xaxis.categories = apiResponse.bars.map(bar => bar.label);
-  chartOptions.value.yaxis.max = apiResponse.totalCapacity;
+  chartOptions.value.yaxis.max = Math.round(apiResponse.totalCapacity);
   // console.log(123);
   // console.log(chartOptions.value.yaxis.max);
   // console.log(123);
