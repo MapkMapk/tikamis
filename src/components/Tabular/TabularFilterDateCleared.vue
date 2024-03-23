@@ -2,7 +2,7 @@
     <div class="report-filter justify-between min-w-min flex-1" @click="simulateClickOnDatePicker">
       <div class="flex-col">
         <div class="report-input-header-text-gray">Начало отсчета</div>
-        <VueDatePicker v-model="selectedDate" :format="customFormat" focus-start-date auto-apply @update:modelValue="updateSelectedDate" locale="ru" :enable-time-picker="false" id="DatePickerPTPRO" />
+        <VueDatePicker v-model="selectedDate" :format="customFormat" focus-start-date auto-apply @update:modelValue="updateSelectedDate" locale="ru" :enable-time-picker="false" id="DatePickerPTPROC" />
       </div>
       <BaseSvgIcon
         class="max-w-[18px] max-h-[18px]"
@@ -31,7 +31,7 @@
   }
   
   function simulateClickOnDatePicker() {
-    const datePickerInput = document.getElementById('DatePickerPTPRO').querySelector('.dp__input_wrap');
+    const datePickerInput = document.getElementById('DatePickerPTPROC').querySelector('.dp__input_wrap');
     datePickerInput.click();
   }
   </script>
@@ -40,7 +40,7 @@
   import { ref } from 'vue';
   
   function simulateClickOnDatePicker() {
-    const DatePickerPT1 = document.querySelector('#DatePickerPTPRO');
+    const DatePickerPT1 = document.querySelector('#DatePickerPTPROC');
   const DatePickerPT2 = DatePickerPT1.getElementsByTagName('div')[0];
   const DatePickerPT3 = DatePickerPT2.querySelector('.dp__input_wrap'); // Исправлено на DatePickerPT1
   DatePickerPT3.click();
