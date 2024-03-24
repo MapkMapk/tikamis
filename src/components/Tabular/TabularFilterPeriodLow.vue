@@ -1,7 +1,7 @@
 <template>
     <div class="report-filter justify-between min-w-min flex-1"  @click="toggleDropdown" ref="dropdownRef">
       <div class="flex-col">
-        <div class="report-input-header-text-gray">Период</div>
+        <div class="report-input-header-text-gray">Шаг</div>
         <div class="report-input-body-text">{{ selectedOption }}</div>
         <!-- Вывод выпадающего списка -->
         <ul v-show="showDropdown" class="dropdown" v-click-outside="closeDropdown">
