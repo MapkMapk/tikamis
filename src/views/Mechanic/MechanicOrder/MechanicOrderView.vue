@@ -39,6 +39,7 @@
         <div
           :class="{ '!border-red': isLowTime, '!bg-red-light': isLowTime }"
           class="pt-5 pb-5 flex flex-col justify-center items-center bg-white w-[280px] border-gray-a1a4ad border"
+          v-if="mechanicOrderStore.isOrderAccepted"
         >
           <div class="flex flex-col w-fit items-start">
             <div class="relative flex items-center">
