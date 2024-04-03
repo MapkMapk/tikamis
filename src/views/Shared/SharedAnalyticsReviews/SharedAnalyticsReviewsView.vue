@@ -67,7 +67,7 @@ import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
 
-
+const isPlaying = ref(false);
 const items = ref([]);
 const currentSort = ref('itemsByMechanics');
 
