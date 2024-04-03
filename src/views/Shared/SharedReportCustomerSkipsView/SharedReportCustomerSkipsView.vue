@@ -72,8 +72,15 @@
         </ul>
       </details>
         </TabularTableRowCell>
-        <TabularTableRowCell><p style="opacity: 0;">dsfdsfdsfsdsfsdfsd</p>
-        <details  class="custom-details" :style="{ width: cellWidth }">
+        <TabularTableRowCell>
+        
+        <div style="display: flex;justify-content: flex-end; padding-right: 10px">
+          <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+          <i class="material-icons" @click="toggleDetails(item.orderId)">
+            {{ item.detailsOpen ? 'expand_less' : 'expand_more' }}
+          </i>
+        </div>
+        <details :open="item.detailsOpen" @toggle="item.detailsOpen = !item.detailsOpen" class="custom-details" :style="{ width: cellWidth }">
         <summary class="flex" style="justify-content: space-between;" ><strong></strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.id">
@@ -247,6 +254,11 @@ function truncateText(text, maxLength) {
   }
   return text;
 }
+
+
+
+
+
 </script>
 <style scoped>
 .custom-details summary {

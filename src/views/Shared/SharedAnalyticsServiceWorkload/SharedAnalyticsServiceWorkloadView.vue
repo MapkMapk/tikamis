@@ -82,6 +82,12 @@ import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFi
 //import ModalServiceLoadClient from '@/components/ModalServiceLoadClient.vue';
 import ModalServiceLoadClient from '@/components/ModalServiceLoadClient.vue';
 import directorApiGetServiceWorkload from '@/api/director/directorApiGetServiceWorkload.js';
+import sadminApiGetServiceWorkload from '@/api/sadmin/sadminApiGetServiceWorkload.js';
+import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
+import isEnv from '@/utils/isEnv.js';
+const sadminServiceStationsStore = useSadminServiceStationsStore();
+
+
 
 let baseWidthPerHour = 130;
 
@@ -106,6 +112,16 @@ const items = ref([]); // Используем для хранения данн�
 const orderMinutes = computed(() => totalMinutes.value);
 const dateStart = computed(() => filterDateStart.value);
 
+const carCenterId = computed(() => {
+      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
+      return isEnv('sadmin') 
+        ? sadminServiceStationsStore?.getSelectedServiceStation()?.id 
+        : "C-1111";
+    });
+//console.log(sadminServiceStationsStore?.getSelectedServiceStation().id);
+const apiCall = isEnv('sadmin') ? sadminApiGetServiceWorkload : directorApiGetServiceWorkload;
+console.log(carCenterId.value);
+
 const request = computed(() => ({
   orderMinutes: orderMinutes.value, 
   posts: [1, 2, 3, 4, 5, 6], // список постов
@@ -113,7 +129,7 @@ const request = computed(() => ({
     interval: null,
     dateStart: dateStart.value, 
     works: ['11111', '22222', '33333', '44444', '55555'], //список работ
-    carCenters: ['C-1111'], //центр
+    carCenters: [carCenterId.value], //центр
     page: 1
   }
 }));
@@ -121,7 +137,7 @@ const request = computed(() => ({
 
 const applyFilters = async () => {
   try {
-    const response = await directorApiGetServiceWorkload(request.value); // Используйте .value здесь
+    const response = await apiCall(request.value);
     items.value = response.items;
     // Обнуляем значения перед пересчетом
     freePostsCount.value = 0;

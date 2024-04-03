@@ -163,21 +163,75 @@ function unixToDate(unixTime) {
   return formattedDate;
 }
 
+///////  Тут находится код, который убирает баг с раскрытием строк
+//////   при нажатии на тэг summary в некоторых браузерах (возможно во всех)
+/////    Он ужасен и требует доработки или фикса самого бага, но Хот фикс есть Хот фикс
+function closeAllDetails(detailsElements) {
+  detailsElements.forEach((details) => {
+    details.removeAttribute('open');
+  });
+}
+
+// Функция для открытия всех элементов details
+function openAllDetails(detailsElements) {
+  detailsElements.forEach((details) => {
+    details.setAttribute('open', true);
+  });
+}
+function countDetailsStatus(detailsElements) {
+  let openCount = 0;
+  let closedCount = 0;
+
+  detailsElements.forEach((details) => {
+    if (details.open) {
+      openCount++;
+    } else {
+      closedCount++;
+    }
+  });
+
+  return { openCount, closedCount };
+}
+// Основная функция для переключения состояния элементов details
 function toggleDetails(event) {
-  // Проверяем, что клик был не по самому элементу <summary>,
-  // чтобы избежать конфликта с его стандартным поведением.
-  if (event.target.tagName !== 'SUMMARY') {
-    const detailsElements = event.currentTarget.querySelectorAll('details');
-    detailsElements.forEach(details => {
-      // Если details уже открыт, закрываем его, и наоборот.
-      if (details.hasAttribute('open')) {
-        details.removeAttribute('open');
+  console.log('toggleSingleDetail вызван');
+
+  // Получаем все элементы `details` внутри текущего TabularTableRow.
+  const detailsElements = event.currentTarget.querySelectorAll('details');
+  console.log(`Найдено ${detailsElements.length} элементов 'details'`);
+
+  // Подсчитываем количество открытых и закрытых элементов details
+  const { openCount, closedCount } = countDetailsStatus(detailsElements);
+
+  if (openCount > closedCount) {
+    console.log('Закрываем все элементы `details`');
+    // Закрываем все элементы details через 100 миллисекунд
+    setTimeout(() => {
+      closeAllDetails(detailsElements);
+    }, 10);
+  } else {
+    console.log('Открываем все элементы `details`');
+    // Открываем все элементы details через 100 миллисекунд
+    setTimeout(() => {
+      openAllDetails(detailsElements);
+    }, 90);
+  }
+
+  // Добавляем небольшую задержку перед проверкой состояний, чтобы изменения успели примениться
+  setTimeout(() => {
+    detailsElements.forEach((details, index) => {
+      if (details.open) {
+        console.log(`Элемент details[${index}] остался открытым после обработки`);
       } else {
-        details.setAttribute('open', '');
+        console.log(`Элемент details[${index}] закрыт после обработки`);
       }
     });
-  }
+  }, 100); // Увеличил время задержки, чтобы учесть также задержку на закрытие/открытие
 }
+//\\\
+//\\\\
+//\\\\\
+
 function toggleSingleDetail(event) {toggleDetails(event)}
 const displayedItems = computed(() => {
   return currentSort.value.option === 'itemsByPosts' ? itemsByPosts.value : itemsByMechanics.value;

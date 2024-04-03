@@ -18,10 +18,31 @@
         <slot name="tabular-table-table"></slot>
       </TabularTable>
     </div>
+    <div class="flex flex-col items-center">
+            <div class="w-full flex mt-10 mb-3" style="justify-content: center">
+              <div style="width: 400px;margin-right: 20px;">
+              <BaseButtonFilledGreen
+                class="flex flex-1 mr-5"
+                style="width: inherit;"
+                >Сохранить</BaseButtonFilledGreen
+              >
+            </div>
+            <div style="width: 400px;margin-left: 20px">
+              <BaseButtonFilledDark
+                class="flex flex-1"
+                style="width: inherit;"
+                >Отправить</BaseButtonFilledDark
+              >
+            </div>
+            </div>
+          </div>
   </template>
   
   <script setup>
   import { defineEmits, ref, onBeforeMount } from 'vue';
+  import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
+  import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
+
   import TabularSection from '@/components/Tabular/TabularSection.vue';
   import TabularFiltersWrapper from '@/components/Tabular/TabularFiltersWrapper.vue';
   import TabularFilterPeriod from '@/components/Tabular/TabularFilterPeriod.vue';

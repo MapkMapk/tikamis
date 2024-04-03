@@ -25,6 +25,21 @@
       <template style="display: grid;;grid-template-columns: 3fr 1fr 2fr 2fr 2fr;" ><!--v-if="currentSort === 'itemsByMechanics'"-->
         <TabularTableRowCell v-if="item.type == '1'">{{ item.smileContent }} </TabularTableRowCell>
         <TabularTableRowCell v-if="item.type == '2'">{{ item.textContent }} </TabularTableRowCell>
+        <TabularTableRowCell v-if="item.type == '4'">
+          <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+          <div class="voice-message">
+            <button class="play-button" @click="togglePlay">
+              <span class="material-icons" v-if="!isPlaying">play_arrow</span>
+              <span class="material-icons" v-if="isPlaying">pause</span>
+            </button>
+            <div class="audio-waves">
+              <span v-for="n in 16" :key="`high-${n}`" class="wave" :style="{ animationDelay: `${Math.random() * -2}s` }"></span>
+              <span v-for="n in 16" :key="`low-${n}`" class="wave-low" :style="{ animationDelay: `${Math.random() * -1}s` }"></span>
+
+            </div>
+            <div >0:05</div>
+          </div>
+        </TabularTableRowCell>
       <!-- Пост Работы Потери Время записи Телефон Автомобиль -->
       <TabularTableRowCell>{{ item.tone }}</TabularTableRowCell>
       <TabularTableRowCell>{{ unixToDate(item.date) }}</TabularTableRowCell>
@@ -153,6 +168,42 @@ function truncateText(text, maxLength) {
   return text;
 }
 </script>
+<script>
+export default {
+  setup() {
+    const isPlaying = ref(false);
+    const progress = ref(0);
+    let intervalId = null;
+    const waves = ref([]);
+
+    const togglePlay = () => {
+      isPlaying.value = !isPlaying.value;
+
+      if (isPlaying.value) {
+        intervalId = setInterval(() => {
+          if (progress.value < 100) {
+            progress.value += 1;
+          } else {
+            clearInterval(intervalId);
+            isPlaying.value = false;
+            progress.value = 0; // Сбросить прогресс, когда сообщение закончилось
+          }
+        }, 100); // Обновлять прогресс каждые 100 мс
+      } else if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+    onMounted(() => {
+      // Для каждой из 32 волн создаем случайную задержку
+      waves.value = Array.from({ length: 32 }, () => ({
+        animationDelay: `${Math.random() * -2}s` // Задержка от 0 до -2 секунд
+      }));
+    });
+
+    return { isPlaying, progress, togglePlay, waves  };
+  },
+};
+</script>
 <style scoped>
 .custom-details summary {
   list-style: none;
@@ -193,5 +244,87 @@ function truncateText(text, maxLength) {
 }
 .fat-boy {
   overflow-x: auto; /* Добавляет горизонтальный скроллбар при необходимости */
+}
+
+
+
+.voice-message {
+  display: flex;
+  align-items: center;
+  color: orange;
+}
+
+.play-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid orange;
+  background-color: transparent;
+  color: orange;
+  cursor: pointer;
+}
+
+.audio-waves {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+}
+.audio-waves-low{
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px 0 4px;
+  color: #A3A4A6;}
+.wave {
+  display: block;
+  width: 3px;
+  height: 10px;
+  background-color: orange;
+  animation: wave-animation 1.5s infinite ease-in-out;
+}
+.wave-low {
+  display: block;
+  width: 3px;
+  height: 10px;
+  background-color: #A3A4A6;
+  animation: wave-animation 1.5s infinite ease-in-out;
+}
+
+.wave:nth-child(2) {
+  animation-delay: -1.2s;
+}
+
+.wave:nth-child(3) {
+  animation-delay: -0.9s;
+}
+
+@keyframes wave-animation {
+  0%, 100% {
+    transform: scaleY(0.4);
+  }
+  10% {
+    transform: scaleY(1.5);
+  }
+  30% {
+    transform: scaleY(0.6);
+  }
+  50% {
+    transform: scaleY(2);
+  }
+  70% {
+    transform: scaleY(0.8);
+  }
+  90% {
+    transform: scaleY(1.2);
+  }
+}
+
+.time {
+  font-size: 14px;
+  color: orange;
 }
 </style>

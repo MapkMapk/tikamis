@@ -24,8 +24,8 @@
       >
         <form class="flex flex-col w-full max-w-[540px]">
           <h1 class="text-4xl leading-normal font-medium">
-            Технические настройки<br />
-            {{ formattedFullAddress }}
+            Технические настройки
+            <!-- <br />{{ formattedFullAddress }} -->
           </h1>
           <div
             v-if="isEnv('sadmin')"
@@ -115,6 +115,14 @@
               class="base-input text-2xl w-40 mt-3"
             />
           </div>
+          <div class="flex flex-col mt-10">
+            <span class="text-2xl font-medium">Ссылка на карту</span>
+            <input
+              v-model="mapmapEquipment"
+              class="base-input text-2xl w-40 mt-3"
+              style="width: 520px;"
+            />
+          </div>
           <div
             v-if="isEnv('sadmin')"
             class="flex flex-col mt-10"
@@ -201,6 +209,7 @@ let changesSinceFormatted = computed(
 );
 let bookingAvailable = ref(false);
 let postsEquipment = ref();
+let mapmapEquipment = ref("https://go.2gis.com/7stxt");
 let shiftsFinish = ref();
 let shiftsStart = ref();
 let timezoneOffsetHours = ref();

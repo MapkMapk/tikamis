@@ -5,6 +5,8 @@
   <DirectorReportComponent
     :show-filter-or="true"
     @filtersApplied="fetchCustomerSkipsData"
+    @optionSelected="changeOrsOption"
+    @worksLoaded="handleAllWorksLoaded"
   >
     <template v-slot:tabular-title>
       <TabularPrimeTitle>Простои постов</TabularPrimeTitle>
@@ -15,48 +17,59 @@
     </template>
 
     <template v-slot:tabular-table-table>
-      <!--<TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">-->
-      <TabularTableRow
-      v-for="item in items"
-      :key="item.orderId"
-      :item="item"
-      @click="toggleDetails($event)"
-      style="grid-template-columns: 4fr 3fr 1fr;"
-    >
-      <template v-if="currentSort === 'itemsByPosts'">
-      <!-- Пост Работы Потери Время записи Телефон Автомобиль -->
-      <TabularTableRowCell>Пост №{{ item.postNumber }}</TabularTableRowCell>
-      <!-- Перебор и отображение работ для каждой строки -->
-      <TabularTableRowCell :style="{ height: cellHeight, width: '2fr' }" style="padding-left: 10px;">
-      <strong>Все работы</strong>
-      <details  class="custom-details" :style="{ width: cellWidth }">
+  <TabularTableRow 
+    v-for="item in displayedItems"
+    :key="item.postNumber || item.mechanicName" 
+    :item="item" 
+    @click="toggleDetails($event)" 
+    style="grid-template-columns: 4fr 2fr 1fr;">
+    <!-- Условное отображение номера поста или имени механика -->
+    <TabularTableRowCell v-if="currentSort.option === 'itemsByPosts'">Пост №{{ item.postNumber }}</TabularTableRowCell>
+    <TabularTableRowCell v-else>{{ item.mechanicName }}</TabularTableRowCell>
+    <!-- Перебор и отображение работ для каждой строки -->
+    <TabularTableRowCell :style="{width: '2fr'}" style="padding-left: 10px;">
+      <strong>{{ item.totalDowntime }}</strong>
+      <details class="custom-details">
         <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)">
-         <strong></strong>
+          <strong></strong>
         </summary>
         <ul>
-          <li v-for="work in item.works" :key="work.id">{{ truncateText(work.workName, 50) }}</li>
+          <li v-for="downtime in item.downtimes" :key="downtime.id">
+            {{ downtime.downtimeMinutes }}
+          </li>
         </ul>
       </details>
     </TabularTableRowCell>
-      <TabularTableRowCell>{{ formatTotalLoss(item.totalLoss) }}
-        <details  class="custom-details" :style="{ width: cellWidth }">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)"><strong></strong></summary>
+    <TabularTableRowCell><div style="display: flex;justify-content: space-between"><strong>Все простои</strong>
+      <div style="display: flex;justify-content: flex-end; padding-right: 10px">
+          <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+          <i class="material-icons" @click="toggleDetails(item.orderId)">
+            {{ item.detailsOpen ? 'expand_less' : 'expand_more' }}
+          </i>
+        </div></div>
+        <details :open="item.detailsOpen" @toggle="item.detailsOpen = !item.detailsOpen" class="custom-details" :style="{ width: cellWidth }">
+        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)">
+          <strong></strong>
+        </summary>
         <ul>
-          <li v-for="work in item.works" :key="work.id">
-          {{ formatTotalLoss(work.loss) }}
-        </li>
+          <li v-for="downtime in item.downtimes" :key="downtime.id">
+            {{ unixToDate(downtime.unixTime) }}
+          </li>
         </ul>
-      </details></TabularTableRowCell>
-      </template>
-    </TabularTableRow>
-    <TabularTableCellBottom style="display: flex; justify-content: space-around;"><p style="color: white">Итого потерь:</p><p style="color: white">{{ formatTotalLoss(getTotalLossSum(items)) }}</p></TabularTableCellBottom>
-    </template>
+      </details>
+    </TabularTableRowCell>
+  </TabularTableRow>
+  <TabularTableCellBottom style="display: grid; grid-template-columns: 4fr 3fr;">
+    <p style="color: white;padding-left: 10px;">Итого простоя:</p>
+    <p style="color: white;padding-left: 10px">{{ formatTotalDowntime(totalLoss) }}</p>
+  </TabularTableCellBottom>
+</template>
     
   </DirectorReportComponent>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import DirectorReportComponent from '@/components/directorReportComponent.vue';
 import TableHeaders from '@/components/Tabular/TableHeaders.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
@@ -68,50 +81,79 @@ import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
 
-
-const items = ref([]);
-const currentSort = ref('itemsByPosts');
-
-onMounted(() => {
-  // Предположим, что у вас есть начальные значения для фильтров
+const totalLoss = ref(0);
+const itemsByPosts = ref([]);
+const itemsByMechanics = ref([]);
+const currentSort = ref('itemsByMechanics');
+function changeOrsOption(option){
+  currentSort.value = option;
+  console.warn(displayedItems.value.length);
+  if (currentSort.value.option === 'itemsByPosts') {
+    columns.value = [
+      { header: 'Пост', size: '4fr' },
+      { header: 'Время простоя, мин', size: '1fr' },
+      { header: 'Дата', size: '1fr' },
+    ];
+  } else {
+    // Предполагаемая структура колонок для "mechanics"
+    columns.value = [
+      { header: 'Механик', size: '4fr' },
+      { header: 'Время простоя, мин', size: '1fr' },
+      { header: 'Дата', size: '1fr' },
+    ];
+  }
+}
+onMounted(async () => {
   const initialFilters = { date: 1675623600, period: 'month', works: null };
   fetchCustomerSkipsData(initialFilters);
-  console.log(items.value);
 });
+function handleAllWorksLoaded(ids) {
+    const { dateStart, period, workId } = ids;
+    console.log(dateStart);
+    console.log(period);
+    console.log(workId);
+    fetchCustomerSkipsData({ date: dateStart, period, workId });
+  }
 // Обновление колонок в зависимости от currentSort
 const columns = ref([]);
 
-const getTotalLossSum = (items) => {
-  // Инициализация переменной для хранения суммы
-  let totalLossSum = 0;
-  // Перебор всех элементов массива items
-  items.forEach((item) => {
-    // Добавление totalLoss каждого элемента к общей сумме
-    totalLossSum += item.totalLoss;
-  });
-  // Возврат общей суммы
-  return totalLossSum;
-};
+// const getTotalLossSum = (items) => {
+//   // Инициализация переменной для хранения суммы
+//   let totalLossSum = 0;
+//   // Перебор всех элементов массива items
+//   items.forEach((item) => {
+//     // Добавление totalLoss каждого элемента к общей сумме
+//     totalLossSum += item.totalLoss;
+//   });
+//   // Возврат общей суммы
+//   return totalLossSum;
+// };
 function formatTotalLoss (sum) {
   // Добавление отступов
   let formattedTotalLoss = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(sum);
   return formattedTotalLoss;
 };
+function formatTotalDowntime (dt){
+  let lastNum = dt%10;
+  let minut = "минут";
+  if (lastNum==1){return `${dt}  минута`;}
+  if (lastNum == 2 || lastNum == 3 || lastNum == 4){return `${dt}  минуты`;}
+  return `${dt}  минут`;
+}
 
-watch(currentSort, (newVal) => {
+watch(currentSort.value.option, (newVal) => {
   if (newVal === 'itemsByPosts') {
     columns.value = [
       { header: 'Пост', size: '4fr' },
-      { header: 'Работы', size: '3fr' },
-      { header: 'Потери', size: '1fr' },
+      { header: 'Время простоя, мин', size: '2fr' },
+      { header: 'Дата', size: '1fr' },
     ];
   } else {
     // Предполагаемая структура колонок для "mechanics"
     columns.value = [
-      { header: 'Механик', size: '2fr' },
-      { header: 'Центр', size: '3fr' },
-      { header: 'Клиенты', size: '1fr' },
-      { header: 'Убытки', size: '1fr' },
+      { header: 'Механик', size: '4fr' },
+      { header: 'Время простоя, мин', size: '2fr' },
+      { header: 'Дата', size: '1fr' },
     ];
   }
 }, { immediate: true });
@@ -128,22 +170,83 @@ function unixToDate(unixTime) {
   return formattedDate;
 }
 
+///////  Тут находится код, который убирает баг с раскрытием строк
+//////   при нажатии на тэг summary в некоторых браузерах (возможно во всех)
+/////    Он ужасен и требует доработки или фикса самого бага, но Хот фикс есть Хот фикс
+function closeAllDetails(detailsElements) {
+  detailsElements.forEach((details) => {
+    details.removeAttribute('open');
+  });
+}
+
+// Функция для открытия всех элементов details
+function openAllDetails(detailsElements) {
+  detailsElements.forEach((details) => {
+    details.setAttribute('open', true);
+  });
+}
+function countDetailsStatus(detailsElements) {
+  let openCount = 0;
+  let closedCount = 0;
+
+  detailsElements.forEach((details) => {
+    if (details.open) {
+      openCount++;
+    } else {
+      closedCount++;
+    }
+  });
+
+  return { openCount, closedCount };
+}
+// Основная функция для переключения состояния элементов details
 function toggleDetails(event) {
-  // Проверяем, что клик был не по самому элементу <summary>,
-  // чтобы избежать конфликта с его стандартным поведением.
-  if (event.target.tagName !== 'SUMMARY') {
-    const detailsElements = event.currentTarget.querySelectorAll('details');
-    detailsElements.forEach(details => {
-      // Если details уже открыт, закрываем его, и наоборот.
-      if (details.hasAttribute('open')) {
-        details.removeAttribute('open');
+  console.log('toggleSingleDetail вызван');
+
+  // Получаем все элементы `details` внутри текущего TabularTableRow.
+  const detailsElements = event.currentTarget.querySelectorAll('details');
+  console.log(`Найдено ${detailsElements.length} элементов 'details'`);
+
+  // Подсчитываем количество открытых и закрытых элементов details
+  const { openCount, closedCount } = countDetailsStatus(detailsElements);
+
+  if (openCount > closedCount) {
+    console.log('Закрываем все элементы `details`');
+    // Закрываем все элементы details через 100 миллисекунд
+    setTimeout(() => {
+      closeAllDetails(detailsElements);
+    }, 10);
+  } else {
+    console.log('Открываем все элементы `details`');
+    // Открываем все элементы details через 100 миллисекунд
+    setTimeout(() => {
+      openAllDetails(detailsElements);
+    }, 10);
+  }
+
+  // Добавляем небольшую задержку перед проверкой состояний, чтобы изменения успели примениться
+  setTimeout(() => {
+    detailsElements.forEach((details, index) => {
+      if (details.open) {
+        console.log(`Элемент details[${index}] остался открытым после обработки`);
       } else {
-        details.setAttribute('open', '');
+        console.log(`Элемент details[${index}] закрыт после обработки`);
       }
     });
-  }
+  }, 20); // Увеличил время задержки, чтобы учесть также задержку на закрытие/открытие
 }
+//\\\
+//\\\\
+//\\\\\
+
 function toggleSingleDetail(event) {toggleDetails(event)}
+
+const displayedItems = computed(() => {
+  return currentSort.value.option === 'itemsByPosts' ? itemsByPosts.value : itemsByMechanics.value;
+});
+
+
+
 async function fetchCustomerSkipsData({ date, period, workId }) {
   const filters = {
     interval: period,
@@ -156,9 +259,11 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
   try {
     const response = await directorApiClient.post('/report/get-posts-downtime', { filters });
     //console.log(response.data[currentSort.value][0].works);
-    items.value = response.data[currentSort.value];
-    console.log(items.value);
-    //updateColumns(currentSort.value);
+    //items.value = response.data[currentSort.value];
+    //totalLoss.value = response.data.allLoss;
+    itemsByPosts.value = response.data.itemsByPosts;
+    itemsByMechanics.value = response.data.itemsByMechanics;
+    totalLoss.value = response.data.allDownTime;
   } catch (error) {
     console.error('Ошибка при загрузке данных:', error);
   }
