@@ -1,14 +1,17 @@
 <template>
+	<ModalBoolean
+    @callback="modal.callback"
+    :is-visible="modal.isVisible"
+    :primary-button-component="modal.color"
+    :primary-count-text="modal.primaryCountText"
+    :main-title="modal.mainTitle"
+    :main-text="modal.mainText"
+    :primary-button-text="modal.primaryButtonText"
+    :secondary-button-text="modal.secondaryButtonText"
+  />
 	<div>
 		<!-- Модальное окно для подтверждения действия -->
-		<ModalBoolean 
-      v-if="modal && modal.callback" 
-      @callback="modal.callback" 
-      :is-visible="modal.isVisible" 
-      :primary-button-component="BaseButtonFilledDark" 
-      :main-title="modal.mainTitle" 
-      :primary-button-text="modal.primaryButtonText" 
-      :secondary-button-text="modal.secondaryButtonText" />
+		
 		<!-- Главный заголовок страницы -->
 		<MainHeader />
 		<!-- Промежуток для главного заголовка -->
@@ -59,8 +62,8 @@
 				<TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px; align-self: center;">{{ item.plate }}</TabularTableRowCell>
 				<!-- Ячейка для действий -->
 				<TabularTableRowCell :style="{ height: cellHeight, width: '.2fr' }">
-					<!-- Кликабельное изображение крестика для удаления записи -->
-					<svg @click="deleteItem(item)" style="cursor: pointer;" class="delete-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 16 16">
+					<!-- Кликабельное изображение крестика для удаления записи deleteItem(item)-->
+					<svg @click="deleteModal()" style="cursor: pointer;" class="delete-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 16 16">
 						<path d="M14.2929 0.292893C14.6834 -0.0976311 15.3166 -0.0976311 15.7071 0.292893C16.0976 0.683417 16.0976 1.31658 15.7071 1.70711L9.41421 8L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L8 9.41421L1.70711 15.7071C1.31658 16.0976 0.683418 16.0976 0.292894 15.7071C-0.0976312 15.3166 -0.0976312 14.6834 0.292894 14.2929L6.58579 8L0.292894 1.70711C-0.0976306 1.31658 -0.0976306 0.683417 0.292894 0.292893C0.683418 -0.0976311 1.31658 -0.0976311 1.70711 0.292893L8 6.58579L14.2929 0.292893Z" fill="#A1A4AD" />
 					</svg>
 				</TabularTableRowCell>
@@ -74,6 +77,7 @@ import { ref, onMounted } from 'vue';
 import MainHeader from '@/components/MainHeader.vue';
 import ModalBoolean from '@/components/ModalBoolean.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
+import BaseButtonFilledRed from '@/components/BaseButtonFilledRed.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
 import directorApiGetCustomerRecords from '@/api/director/directorApiGetCustomerRecords.js';
 import unixToData from '@/utils/time/unixToData.js';
@@ -94,6 +98,32 @@ import TabularTable from '@/components/Tabular/TabularTable.vue';
 
 import TabularButtonCross from '@/components/Tabular/TabularButtonCross.vue';
 import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFilters.vue';
+
+let modal = ref({});
+
+function deleteModal() {
+  
+  modal.value.callback = save;
+    modal.value.color = BaseButtonFilledRed;
+    modal.value.primaryButtonText = `Удалить`;
+  modal.value.isVisible = true;
+  modal.value.mainTitle = 'Удалить запись клиента?';
+  
+  //modal.value.primaryButtonText = 'Продолжить';
+  modal.value.secondaryButtonText = 'Отмена';
+
+  async function save() {
+    // Sadmin
+    modal.value.isVisible = false;
+  }
+}
+
+
+
+
+
+
+
 
 const cellHeight = '90%';
 const cellWidth = '100%';

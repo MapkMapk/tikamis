@@ -1,13 +1,22 @@
 <template>
   <!-- Модальное окно для отображения деталей блока -->
+  
+  <OrderReceptionScreen 
+    v-if="order.isVisible"
+    @callback="FakeOpen"
+    @close="orderClose"/>
   <ModalServiceLoadClient
       v-if="showModal"
       :is-visible="showModal"
       :block-data="selectedBlock"
       @close-modal="closeModal"
+      @submit="orderOpen"
     />
   <MainHeader />
   <MainHeaderGap />
+  <FakeWorkAdd 
+  v-if="Fake.isVisible"
+  @close="FakeClose"/>
   <!-- <TabularSection> -->
     <TabularSection>
     <TabularPrimeTitle class="mb-2">22 сентября 2023, 11:25</TabularPrimeTitle>
@@ -65,6 +74,9 @@
 </template>
 <script setup>
 import { ref, computed } from 'vue';
+
+import OrderReceptionScreen from '@/components/OrderReceptionScreen.vue';
+import FakeWorkAdd from '@/components/FakeWorkAdd.vue';
 
 import TabularSection from '@/components/Tabular/TabularSection.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
@@ -256,7 +268,25 @@ function closeModal() {
   showModal.value = false;
 }
 
+let order = ref({});
 
+function orderOpen(){
+  showModal.value = false;
+  order.value.isVisible = true;
+}
+function orderClose(){
+  order.value.isVisible = false;
+}
+
+let Fake = ref({});
+
+function FakeOpen(){
+  Fake.value.isVisible = true;
+  order.value.isVisible = false;
+}
+function FakeClose(){
+  Fake.value.isVisible = false;
+}
 applyFilters();
 </script>
 

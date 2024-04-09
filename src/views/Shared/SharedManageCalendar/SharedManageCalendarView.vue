@@ -1,4 +1,14 @@
 <template>
+  <ModalBoolean
+    @callback="modal.callback"
+    :is-visible="modal.isVisible"
+    :primary-button-component="modal.color"
+    :primary-count-text="modal.primaryCountText"
+    :main-title="modal.mainTitle"
+    :main-text="modal.mainText"
+    :primary-button-text="modal.primaryButtonText"
+    :secondary-button-text="modal.secondaryButtonText"
+  />
   <div>
     
     <MainHeader />
@@ -42,6 +52,8 @@
           class="empty-cell white-cell flex-half border border-gray-d9d9d9"
           :class="{'clicked-cell': clickedCells[`child-${parentIndex}-${childIndex}`]}"
           @click="handleClick(`child-${parentIndex}-${childIndex}`)"
+          @click.prevent="saveModal(
+          child.firstValue,child.secondValue)"
           :style="{ width: '14.285%', height: computedHeight + 'px', position: 'relative' }"
         >
           <!-- Условное отображение элемента <p> для firstValue, отображается только если child существует -->
@@ -72,9 +84,53 @@ import TabularSection from '@/components/Tabular/TabularSection.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
 import TabularFilterDate from '@/components/Tabular/TabularFilterDate.vue';
 
+import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
+import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
+import BaseButtonFilledRed from '@/components/BaseButtonFilledRed.vue';
+import ModalBoolean from '@/components/ModalBooleanGreen.vue';
+import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
+
 import '@vuepic/vue-datepicker/dist/main.css';
 
+let modal = ref({});
 
+function saveModal(uno,dos) {
+  let isRed = event.target.classList.contains('clicked-cell');
+  modal.value.callback = save;
+  if(isRed){
+    modal.value.color = BaseButtonFilledRed;
+    modal.value.primaryButtonText = `Отменить выходной`;
+    }
+  else{
+    modal.value.color = BaseButtonFilledDark;
+    modal.value.primaryButtonText = `Установить выходной`;
+  }
+  modal.value.mainText = 'Количество постов';
+  modal.value.primaryCountText = `${dos}`;
+  modal.value.isVisible = true;
+  modal.value.mainTitle = `${uno} июня`;
+  
+  //modal.value.primaryButtonText = 'Продолжить';
+  modal.value.secondaryButtonText = 'Применить';
+
+  async function save() {
+    // Sadmin
+    modal.value.isVisible = false;
+  }
+}
+
+function closeModal() {
+  modal.value.callback = close;
+  modal.value.isVisible = true;
+  modal.value.mainTitle = 'Закрыть без сохранения?';
+  modal.value.mainText = 'Настройки не будут применены';
+  modal.value.primaryButtonText = 'Сохранить изменения';
+  modal.value.secondaryButtonText = 'Закрыть без сохранения';
+
+  function close() {
+    router.push('/');
+  }
+}
 
 
 
@@ -166,7 +222,7 @@ export default {
     
     this.$nextTick(() => {
       // Предположим, что у вас есть элемент с классом 'empty-cell' для вычисления ширины
-      const elementWidth = this.$el.querySelector('.empty-cell').clientWidth;
+      const elementWidth = document.querySelector('.empty-cell').clientWidth;
       this.computedHeight = elementWidth * 0.4; // Высота равна половине ширины
     });
   },

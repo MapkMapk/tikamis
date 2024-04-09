@@ -1,7 +1,7 @@
 <template>
   <div class="report-filter justify-between min-w-min flex-1" @click="simulateClickOnDatePicker">
     <div class="flex-col">
-      <div class="report-input-header-text-gray">Начало отсчета</div>
+      <div v-if="isVisible" class="report-input-header-text-gray">Начало отсчета</div>
       <VueDatePicker v-model="selectedDate" :format="customFormat" :start-date="startDate" focus-start-date auto-apply @update:modelValue="updateSelectedDate" locale="ru" :enable-time-picker="false" id="DatePickerPTPRO" />
     </div>
     <BaseSvgIcon
@@ -34,6 +34,14 @@ function simulateClickOnDatePicker() {
   const datePickerInput = document.getElementById('DatePickerPTPRO').querySelector('.dp__input_wrap');
   datePickerInput.click();
 }
+
+
+let props = defineProps({
+        isVisible: {
+            type: Boolean,
+            default: true // Значение по умолчанию для isVisible
+        },
+    });
 </script>
 
 <script>
@@ -75,6 +83,7 @@ export default {
     };
   },
 };
+
 
 
 </script>
