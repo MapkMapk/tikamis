@@ -1,4 +1,8 @@
 <template>
+  <ModalBooleanGray
+  @callback="grayClose"
+  :is-visible="gray.isVisible"
+  />
   <ModalBoolean
     @callback="modal.callback"
     :is-visible="modal.isVisible"
@@ -52,8 +56,8 @@
           class="empty-cell white-cell flex-half border border-gray-d9d9d9"
           :class="{'clicked-cell': clickedCells[`child-${parentIndex}-${childIndex}`]}"
           @click="handleClick(`child-${parentIndex}-${childIndex}`)"
-          @click.prevent="saveModal(
-          child.firstValue,child.secondValue)"
+          @click.prevent="
+          child && child.firstValue ? saveModal(child.firstValue, child.secondValue) : grayOpen()"
           :style="{ width: '14.285%', height: computedHeight + 'px', position: 'relative' }"
         >
           <!-- Условное отображение элемента <p> для firstValue, отображается только если child существует -->
@@ -88,12 +92,20 @@ import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
 import BaseButtonFilledRed from '@/components/BaseButtonFilledRed.vue';
 import ModalBoolean from '@/components/ModalBooleanGreen.vue';
+import ModalBooleanGray from '@/components/ModalBooleanGray.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
 
 import '@vuepic/vue-datepicker/dist/main.css';
 
 let modal = ref({});
+let gray = ref({});
 
+function grayOpen(){
+gray.value.isVisible = true
+}
+function grayClose(){
+gray.value.isVisible = false
+}
 function saveModal(uno,dos) {
   let isRed = event.target.classList.contains('clicked-cell');
   modal.value.callback = save;
@@ -112,7 +124,6 @@ function saveModal(uno,dos) {
   
   //modal.value.primaryButtonText = 'Продолжить';
   modal.value.secondaryButtonText = 'Применить';
-
   async function save() {
     // Sadmin
     modal.value.isVisible = false;
