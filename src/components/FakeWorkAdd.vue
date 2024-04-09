@@ -106,11 +106,17 @@
     });
     return counter;
   });
-  
+  function getRandomPrice() {
+  const possiblePrices = [500, 1000, 1500];
+  const randomIndex = Math.floor(Math.random() * possiblePrices.length);
+  return possiblePrices[randomIndex];
+}
+
   onMounted(async () => {
     let { works: originalWorks } = await DirectorApiAllWorks.workList();
     originalWorks.forEach((work) => {
       work.isSelected = false;
+      work.price = getRandomPrice();
     });
     works.value = originalWorks;
   });
@@ -139,6 +145,7 @@
             default: true // Значение по умолчанию для isVisible
         }
     });
+
   </script>
   <style>
 section{
