@@ -10,7 +10,7 @@
     <MainHeader />
     <MainHeaderGap />
     <FakeSellView
-        :is-visible="modal.isVisible"
+        :is-visible="Fake.isVisible"
         @close="FakeClose"/>
 
     <div class="w-full flex overflow-x-hidden">
@@ -127,10 +127,10 @@
   let isRequestSuccess = ref();
   let formattedFullAddress = ref();
   
-  const Fake = ref({})
+  const Fake = ref({isVisible: false})
 
-  function FakeClose(){modal.value.isVisible = false;}
-  function FakeOpen(){modal.value.isVisible = true;}
+  function FakeClose(){Fake.value.isVisible = false;}
+  function FakeOpen(){Fake.value.isVisible = true;}
   let modal = ref({});
   
   function emitSetTimezone(value) {
