@@ -118,7 +118,7 @@
           <div class="flex flex-col mt-10">
             <span class="text-2xl font-medium">Ссылка на карту</span>
             <input
-              v-model="mapmapEquipment"
+              v-model="mapLink"
               class="base-input text-2xl w-40 mt-3"
               style="width: 520px;"
             />
@@ -209,7 +209,7 @@ let changesSinceFormatted = computed(
 );
 let bookingAvailable = ref(false);
 let postsEquipment = ref();
-let mapmapEquipment = ref("https://go.2gis.com/7stxt");
+let mapLink = ref();
 let shiftsFinish = ref();
 let shiftsStart = ref();
 let timezoneOffsetHours = ref();
@@ -237,6 +237,7 @@ function saveModal() {
         password.value,
         bookingAvailable.value,
         postsEquipment.value,
+        mapLink.value,
         HHMMtoMinutes(shiftsStart.value),
         HHMMtoMinutes(shiftsFinish.value),
         timezoneOffsetHours.value,
@@ -249,6 +250,7 @@ function saveModal() {
       response = await directorApiManageSettingsPost(
         bookingAvailable.value,
         postsEquipment.value,
+        mapLink.value,
         HHMMtoMinutes(shiftsStart.value),
         HHMMtoMinutes(shiftsFinish.value),
         timezoneOffsetHours.value
@@ -289,6 +291,7 @@ onBeforeMount(async () => {
     const data = await directorApiManageSettings();
     bookingAvailable.value = data.bookingAvailable;
     postsEquipment.value = data.postsEquipment;
+    mapLink.value = data.mapLink;
     shiftsStart.value = minutesToHHMM(data.shiftsStart);
     shiftsFinish.value = minutesToHHMM(data.shiftsFinish);
     changesSince.value = data.changesSince;
@@ -310,6 +313,7 @@ onBeforeMount(async () => {
     shiftsStart.value = minutesToHHMM(data.shiftsStart);
     shiftsFinish.value = minutesToHHMM(data.shiftsFinish);
     changesSince.value = data.changesSince;
+    mapLink.value = data.mapLink;
     timezoneOffsetHours.value = data.timeZoneOffsetHours;
     clearanceMinutes.value = data.clearanceMinutes;
     orderDepthDays.value = data.orderDepthDays;

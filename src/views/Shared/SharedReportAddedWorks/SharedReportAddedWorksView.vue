@@ -4,6 +4,7 @@
   <MainHeaderGap />
   <DirectorReportComponent
     :show-filter-or="true"
+    :show-filter-all-works="false"
     @filtersApplied="fetchCustomerSkipsData"
     @optionSelected="changeOrsOption"
   >
@@ -83,6 +84,7 @@ import MainHeaderGap from '@/components/MainHeaderGap.vue';
 const items = ref([]);
 const itemsByPosts = ref([]);
 const itemsByMechanics = ref([]);
+const date = ref({})
 const currentSort = ref('itemsByMechanics');
 function changeOrsOption(option){
   currentSort.value = option;
