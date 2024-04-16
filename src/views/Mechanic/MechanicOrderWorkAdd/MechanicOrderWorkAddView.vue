@@ -133,4 +133,5 @@ async function addWorksToOrder() {
   await mechanicOrderStore.workAdd(allSelectedWorkIds);
   await router.push('/mechanic/order');
 }
+
 </script>

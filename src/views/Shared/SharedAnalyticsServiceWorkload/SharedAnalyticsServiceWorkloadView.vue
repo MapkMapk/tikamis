@@ -73,11 +73,9 @@
   /> -->
 </template>
 <script setup>
-import { ref, computed } from 'vue';
-
+import { ref, onMounted } from 'vue';
 import OrderReceptionScreen from '@/components/OrderReceptionScreen.vue';
 import FakeWorkAdd from '@/components/FakeWorkAdd.vue';
-
 import TabularSection from '@/components/Tabular/TabularSection.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
 import TabularPrimeDescription from '@/components/Tabular/TabularPrimeDescription.vue';
@@ -95,11 +93,26 @@ import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFi
 import ModalServiceLoadClient from '@/components/ModalServiceLoadClient.vue';
 import directorApiGetServiceWorkload from '@/api/director/directorApiGetServiceWorkload.js';
 import sadminApiGetServiceWorkload from '@/api/sadmin/sadminApiGetServiceWorkload.js';
-import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
+//////////
+//оч важный блок
+//////////
 import isEnv from '@/utils/isEnv.js';
+import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
+import { sadminApiClient } from '@/api/sadminApiClient';
+import { directorApiClient } from '@/api/directorApiClient';
+import { computed } from 'vue';
 const sadminServiceStationsStore = useSadminServiceStationsStore();
+const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 
-
+const carCenterIds = computed(() => {
+      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
+      return isEnv('sadmin') 
+        ? sadminServiceStationsStore?.getSelectedServiceStationIds()[0]
+        : "C-1111";
+    });
+//////////
+//
+//////////
 
 let baseWidthPerHour = 130;
 
@@ -118,30 +131,31 @@ let handleSelectedDate = (date) => {
 
 
 let posts = [1, 2, 3, 4, 5, 6];
-let carCenter = ref('ИБ-29388');
+//let carCenter = ref('ИБ-29388');
 const items = ref([]); // Используем для хранения данных о постах
 
 const orderMinutes = computed(() => totalMinutes.value);
 const dateStart = computed(() => filterDateStart.value);
 
-const carCenterId = computed(() => {
-      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
-      return isEnv('sadmin') 
-        ? sadminServiceStationsStore?.getSelectedServiceStation()?.id 
-        : "C-1111";
-    });
+
 //console.log(sadminServiceStationsStore?.getSelectedServiceStation().id);
-const apiCall = isEnv('sadmin') ? sadminApiGetServiceWorkload : directorApiGetServiceWorkload;
-console.log(carCenterId.value);
+const apiCallServiceWorkload = isEnv('sadmin') ? sadminApiGetServiceWorkload : directorApiGetServiceWorkload;
+
+onMounted(() => {
+  // const workList = async () => {
+  // console.log(await apiCall.get('/all-works'));}
+  // workList();
+  console.log();
+});
 
 const request = computed(() => ({
-  orderMinutes: orderMinutes.value, 
+  orderMinutes: orderMinutes.value,  
   posts: [1, 2, 3, 4, 5, 6], // список постов
   filters: {
     interval: null,
     dateStart: dateStart.value, 
     works: ['11111', '22222', '33333', '44444', '55555'], //список работ
-    carCenters: [carCenterId.value], //центр
+    carCenters: [carCenterIds.value], //центр
     page: 1
   }
 }));
@@ -149,7 +163,7 @@ const request = computed(() => ({
 
 const applyFilters = async () => {
   try {
-    const response = await apiCall(request.value);
+    const response = await apiCallServiceWorkload(request.value);
     items.value = response.items;
     // Обнуляем значения перед пересчетом
     freePostsCount.value = 0;

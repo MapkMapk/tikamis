@@ -94,8 +94,28 @@ import BaseButtonFilledRed from '@/components/BaseButtonFilledRed.vue';
 import ModalBoolean from '@/components/ModalBooleanGreen.vue';
 import ModalBooleanGray from '@/components/ModalBooleanGray.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
-
 import '@vuepic/vue-datepicker/dist/main.css';
+
+//////////
+//оч важный блок
+//////////
+import isEnv from '@/utils/isEnv.js';
+import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
+import { sadminApiClient } from '@/api/sadminApiClient';
+import { directorApiClient } from '@/api/directorApiClient';
+import { computed } from 'vue';
+const sadminServiceStationsStore = useSadminServiceStationsStore();
+const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+
+const carCenterIds = computed(() => {
+      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
+      return isEnv('sadmin') 
+        ? sadminServiceStationsStore?.getSelectedServiceStationIds()[0]
+        : "none";
+    });
+//////////
+//
+//////////
 
 let modal = ref({});
 let gray = ref({});
@@ -144,8 +164,15 @@ function closeModal() {
 }
 
 
-
-
+const responseBody = {filters: {
+          interval: 'month',
+          dateStart: 1677504000,// дата в unix
+          works: null,
+          carCenters: [carCenterIds.value], // Указаны для примера, измените по необходимости
+          page: 1 // Указано для примера, измените по необходимости
+          }}
+//const response = await apiCall.post('/manage/get-shift-calendar', responseBody);
+//console.log(response);
 
 </script>
 <script>

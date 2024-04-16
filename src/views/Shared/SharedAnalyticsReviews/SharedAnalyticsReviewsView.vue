@@ -33,8 +33,8 @@
               <span class="material-icons" v-if="isPlaying">pause</span>
             </button>
             <div class="audio-waves">
-              <span v-for="n in 16" :key="`high-${n}`" class="wave" :style="{ animationDelay: `${Math.random() * -2}s` }"></span>
-              <span v-for="n in 16" :key="`low-${n}`" class="wave-low" :style="{ animationDelay: `${Math.random() * -1}s` }"></span>
+              <span v-for="n in 24" :key="`high-${n}`" class="wave" :style="{ animationDelay: `${Math.random() * -2}s` }"></span>
+              <span v-for="n in 8" :key="`low-${n}`" class="wave-low" :style="{ animationDelay: `${Math.random() * -1}s` }"></span>
 
             </div>
             <div >0:05</div>
@@ -61,11 +61,31 @@ import DirectorReportComponent from '@/components/directorReportComponent.vue';
 import TableHeaders from '@/components/Tabular/TableHeaders.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
 import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
-import { directorApiClient } from '@/api/directorApiClient';
 import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
+
+//////////
+//оч важный блок
+//////////
+import isEnv from '@/utils/isEnv.js';
+import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
+import { sadminApiClient } from '@/api/sadminApiClient';
+import { directorApiClient } from '@/api/directorApiClient';
+import { computed } from 'vue';
+const sadminServiceStationsStore = useSadminServiceStationsStore();
+const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+
+const carCenterIds = computed(() => {
+      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
+      return isEnv('sadmin') 
+        ? sadminServiceStationsStore?.getSelectedServiceStationIds()
+        : ["none"];
+    });
+//////////
+//
+//////////
 
 const isPlaying = ref(false);
 const items = ref([]);
@@ -137,23 +157,18 @@ function toggleDetails(event) {
 }
 function toggleSingleDetail(event) {toggleDetails(event)}
 
-async function fetchCustomerSkipsData({ date, period, workId }) {
-  console.log('*************************');
-  console.log(date);
-  console.log(period);
-  console.log(workId);
-  console.log('*************************');
+async function fetchCustomerSkipsData({ date, period }) {
   const filters = {
     interval: period,
     dateStart: date,
-    works: Array.isArray(workId) ? workId : [workId],
-    carCenters: ['C-1111'], // Указаны для примера, измените по необходимости
-    page: 1 // Указано для примера, измените по необходимости
+    //works: Array.isArray(workId) ? workId : [workId],
+    works: ['nope'],
+    carCenters: carCenterIds.value,
+    page: 1
   };
 
   try {
-    const response = await directorApiClient.post('/analytics/get-reviews', { filters });
-    //console.log(response.data[currentSort.value][0].works);
+    const response = await apiCall.post('/analytics/get-reviews', { filters });
     items.value = response.data.items;
     console.log(items.value);
     //updateColumns(currentSort.value);
@@ -161,6 +176,7 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
     console.error('Ошибка при загрузке данных:', error);
   }
 }
+//обрезание текста
 function truncateText(text, maxLength) {
   if (text.length > maxLength) {
     return text.slice(0, maxLength) + '...';

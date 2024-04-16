@@ -1,6 +1,6 @@
 <template>
   <ModalSelectServiceStations
-    @callback="callbackModalSelectServiceStation"
+    @callback="callbackModalSelectServiceStations"
     :is-visible="isVisibleModalSelectServiceStations"
   />
   <header class="fixed z-10 bg-white flex w-full h-the-header">
@@ -38,15 +38,18 @@
         <div
           @click="isVisibleModalSelectServiceStations = true"
           v-if="isEnv('sadmin')"
-          class="flex pr-[30px] border-l border-l-gray-dcdcdc h-full"
+          class="flex pr-[17px] border-l border-l-gray-dcdcdc h-full"
         >
           <div class="flex items-center pl-[20px] cursor-pointer">
             <div class="flex flex-col justify-center">
-              {{
+              <p class="servicesText">сервисы</p>
+              <p style="font-family: Inter;font-size: 24px;font-weight: 400;line-height: 29.05px;text-align: left;">
+                Выбранные({{ selectedServiceStationsCount }})</p>
+              <!-- {{
                 sadminServiceStationsStore?.getSelectedServiceStation().city +
                 ', ' +
                 sadminServiceStationsStore?.getSelectedServiceStation().addressName
-              }}
+              }} -->
             </div>
             <BaseSvgIcon
               name="arrow-down-gray"
@@ -90,10 +93,30 @@ async function getCenterInfo() {
   address.value = data.addressName;
 }
 
-function callbackModalSelectServiceStation(isChanged, id) {
+const selectedServiceStationsCount = computed(() => {
+  return sadminServiceStationsStore.getSelectedServiceStations().length;
+});
+
+function callbackModalSelectServiceStations(isChanged, ids, num) {
+  console.log("-----callbackModalSelectServiceStations-----");
+  console.log(isChanged);
+  console.log(ids);
+  console.log(num);
+  console.log("---------");
   isVisibleModalSelectServiceStations.value = false;
   if (isChanged) {
-    sadminServiceStationsStore.setNewSelectedServiceStation(id);
+    sadminServiceStationsStore.setNewSelectedServiceStations(ids);
   }
 }
 </script>
+<style>
+.servicesText{
+  font-family: Inter;
+font-size: 14px;
+font-weight: 600;
+line-height: 16.94px;
+text-align: left;
+color: #A1A4AD;
+
+}
+</style>

@@ -56,19 +56,37 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch, computed } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import DirectorReportComponent from '@/components/directorReportComponent.vue';
 import TableHeaders from '@/components/Tabular/TableHeaders.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
 import TabularTableCellBottom from '@/components/Tabular/TabularTableCellBottom.vue';
 import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
-import { directorApiClient } from '@/api/directorApiClient';
 import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
 
+//////////
+//оч важный блок
+//////////
+import isEnv from '@/utils/isEnv.js';
+import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
+import { sadminApiClient } from '@/api/sadminApiClient';
+import { directorApiClient } from '@/api/directorApiClient';
+import { computed } from 'vue';
+const sadminServiceStationsStore = useSadminServiceStationsStore();
+const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 
+const carCenterIds = computed(() => {
+      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
+      return isEnv('sadmin') 
+        ? sadminServiceStationsStore?.getSelectedServiceStationIds()[0]
+        : "C-1111";
+    });
+//////////
+//
+//////////
 const items = ref([]);
 const itemsByPosts = ref([]);
 const itemsByMechanics = ref([]);
@@ -241,12 +259,12 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
     interval: period,
     dateStart: date,
     works: Array.isArray(workId) ? workId : [workId],
-    carCenters: ['C-1111'], // Указаны для примера, измените по необходимости
+    carCenters: [carCenterIds.value], // Указаны для примера, измените по необходимости
     page: 1 // Указано для примера, измените по необходимости
   });
 
   try {
-    const response = await directorApiClient.post('/analytics/get-posts-KPD', { filters });
+    const response = await apiCall.post('/analytics/get-posts-KPD', { filters });
     //console.log(response.data[currentSort.value][0].works);
     itemsByPosts.value = response.data.itemsByPosts;
     itemsByMechanics.value = response.data.itemsByMechanics;

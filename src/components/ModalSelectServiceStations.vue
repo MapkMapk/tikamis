@@ -17,9 +17,9 @@
             :class="{ '!bg-gray-2c2d2f': station.isSelected }"
             v-for="station in localCopyOfServiceStations"
             :key="station.id"
-            @click="changeSelectedStation(station)"
+            @click="toggleSelectedStation(station)"
           >
-            <BaseRadioButton :is-active="station.isSelected" />
+            <BaseCheckbox :is-Selected="station.isSelected" />
             <div
               :class="{ '!text-white': station.isSelected }"
               class="ml-[10px]"
@@ -31,44 +31,42 @@
       </div>
       <div class="flex w-full mt-auto">
         <BaseButtonFilledGreen
-          @click="emit('callback', true, getSelectedServiceStation().id)"
+          @click="emit('callback', true, getSelectedServiceStations(), getSelectedServiceStationsCount())"
           class="flex-1"
-          >Выбрать</BaseButtonFilledGreen
+        >Выбрать</BaseButtonFilledGreen
         >
         <BaseButtonFilledLight
           @click="emit('callback', false)"
           class="flex-1"
-          >Отмена</BaseButtonFilledLight
+        >Отмена</BaseButtonFilledLight
         >
       </div>
     </div>
   </section>
 </template>
+
 <script setup>
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
-import { ref } from 'vue';
+import { ref, defineEmits, defineProps } from 'vue';
 import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
-import BaseRadioButton from '@/components/BaseRadioButton.vue';
+import BaseCheckbox from '@/components/BaseCheckbox.vue';
 
 const sadminServiceStationsStore = useSadminServiceStationsStore();
 let localCopyOfServiceStations = ref(JSON.parse(JSON.stringify(sadminServiceStationsStore.serviceStations)));
 
-function changeSelectedStation(station) {
-  localCopyOfServiceStations.value.forEach((element) => {
-    element.isSelected = element.id === station.id;
-  })
+function toggleSelectedStation(station) {
+  station.isSelected = !station.isSelected;
 }
 
-function getSelectedServiceStation() {
-  let result;
-  localCopyOfServiceStations.value.forEach((station) => {
-    if (station.isSelected) {
-      result = station
-    }
-  })
-  return result
+function getSelectedServiceStations() {
+  console.log(localCopyOfServiceStations.value.filter(station => station.isSelected));
+  return localCopyOfServiceStations.value.filter(station => station.isSelected);
+}
+
+function getSelectedServiceStationsCount() {
+  return getSelectedServiceStations().length;
 }
 
 let emit = defineEmits(['callback']);

@@ -15,6 +15,8 @@ import SharedReportPlateFakesView from '@/views/Shared/SharedReportPlateFakes/Sh
 import SharedAnalyticsServiceHistoryView from '@/views/Shared/SharedAnalyticsServiceHistory/SharedAnalyticsServiceHistoryView.vue';
 import SharedReportSuspiciousPhonesView from '@/views/Shared/SharedReportSuspiciousPhones/SharedReportSuspiciousPhonesView.vue';
 import SadminManageCarCentersView from '@/views/Sadmin/SadminManageCarCenters/SadminManageCarCentersView.vue';
+import SadminManageWorksDescription from '@/views/Sadmin/SadminManageCarCenters/SadminManageWorksDescription.vue';
+import SadminEditSellDescription from '@/views/Sadmin/SadminManageCarCenters/SadminEditSellDescription.vue';
 import sadminApiAllCarCenters from '@/api/sadmin/sadminApiAllCarCenters.js';
 import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 
@@ -50,9 +52,22 @@ const sadminRoutes = {
           meta: { title: 'Записи клиентов' }
         },
         {
+          path: 'works-description',
+          name: 'sadmin.manage.works-description',
+          component: SadminManageWorksDescription,
+          meta: { title: 'Описание работ' }
+        },
+        {
+          path: 'text-edit',
+          name: 'sadmin.manage.text-edit',
+          component: SadminEditSellDescription,
+          meta: { title: 'Редактирование описания акций' }
+        },
+        {
           path: 'car-centers',
           name: 'sadmin.manage.car-centers',
-          component: SadminManageCarCentersView
+          component: SadminManageCarCentersView,
+          meta: { title: 'Управление автосервисами' }
         }
       ]
     },
@@ -126,7 +141,7 @@ const sadminRoutes = {
         },
         {
           path: 'suspicious-phones',
-          name: 'director.report.suspicious-phones',
+          name: 'sadmin.report.suspicious-phones',
           component: SharedReportSuspiciousPhonesView,
           meta: { title: 'Подозрительная привязка телефонов' }
         }
@@ -160,6 +175,14 @@ async function sadminBeforeEach(to) {
     }
 
     if (to.path === '/sadmin/manage/settings') {
+      if (to.query.id) {
+        return true;
+      } else {
+        return '/sadmin/manage/car-centers'
+      }
+    }
+
+    if (to.path === '/sadmin/manage/edit-text') {
       if (to.query.id) {
         return true;
       } else {

@@ -56,8 +56,27 @@ import ApexCharts from 'vue3-apexcharts';
 
 import TabularButtonCross from '@/components/Tabular/TabularButtonCross.vue';
 import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFilters.vue';
+//////////
+//оч важный блок
+//////////
+import isEnv from '@/utils/isEnv.js';
+import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
+import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
+import { computed } from 'vue';
+const sadminServiceStationsStore = useSadminServiceStationsStore();
+const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 
+const carCenterIds = computed(() => {
+      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
+      return isEnv('sadmin') 
+        ? sadminServiceStationsStore?.getSelectedServiceStationIds()[0]
+        : "none";
+    });
+console.log(carCenterIds.value);
+//////////
+//
+//////////
 const filterDatePeriod = ref('day');
 function handleOptionSelected(option) {filterDatePeriod.value = option; console.log(option)}
 const DateFirst = ref(1675796400);
@@ -126,7 +145,7 @@ async function fetchCustomerSkipsData() {
   }
 }
 async function fetchDataAndProcess(date, chartOptions, series) {
-  const apiUrl = 'http://127.0.0.1:5000/api/new-endpoint'; // Пример URL API
+  //const apiUrl = 'http://127.0.0.1:5000/api/new-endpoint'; // Пример URL API
   try {
     // const response = await fetch(apiUrl, {
     //   method: 'POST',
@@ -148,11 +167,12 @@ async function fetchDataAndProcess(date, chartOptions, series) {
           interval: 'month',
           dateStart: date,// дата в unix
           works: null,
-          carCenters: ['C-1111'], // Указаны для примера, измените по необходимости
+          carCenters: [carCenterIds.value], // Указаны для примера, измените по необходимости
           page: 1 // Указано для примера, измените по необходимости
           },
           step: filterDatePeriod.value}
-    const response = await directorApiClient.post('/analytics/get-center-KPD', responseBody);
+    //const response = await apiCall.post('/analytics/get-center-KPD', responseBody);
+    const response = await apiCall.post('/analytics/get-center-KPD', responseBody);
     if (response.data && response.data.bars) {
       processDataForChart(response.data, chartOptions, series);
     }

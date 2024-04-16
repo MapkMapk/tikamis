@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="mainStore.isHeaderMenuOpen"
-    class="absolute top-[60px] flex flex-col min-w-[276px] max-w-[276px] overflow-y-auto h-[calc(100vh-60px)] bg-gray-2c2d2f"
+    class="absolute top-[60px] flex flex-col min-w-[276px] max-w-[276px] overflow-y-auto h-[calc(100vh-60px)] bg-gray-2c2d2f z-30"
   >
     <div class="w-full flex flex-col pt-[10px]">
       <TheHeaderMenuPartition
@@ -59,7 +59,8 @@ if (isEnv('sadmin')) {
       routes: [
         { name: 'Аккаунты директоров', url: '/sadmin/manage/car-centers' },
         { name: 'Записи клиентов', url: '/sadmin/manage/customer-records' },
-        { name: 'Календарь рабочих смен', url: '/sadmin/manage/calendar' }
+        { name: 'Календарь рабочих смен', url: '/sadmin/manage/calendar' },
+        { name: 'Описание работ', url: '/sadmin/manage/works-description' }
       ]
     },
     {
@@ -67,7 +68,6 @@ if (isEnv('sadmin')) {
       partition: 'Аналитика',
       routes: [
         { name: 'Загруженность сервиса', url: '/sadmin/analytics/service-workload' },
-        { name: 'Видеоархив', url: '/sadmin/analytics' },
         { name: 'КПД постов', url: '/sadmin/analytics/posts-kpd' },
         { name: 'КПД сервиса', url: '/sadmin/analytics/service-kpd' },
         { name: 'Сервисная история', url: '/sadmin/analytics/service-history' },
@@ -82,7 +82,7 @@ if (isEnv('sadmin')) {
         { name: 'Не приехавшие клиенты', url: '/sadmin/report/customer-skips' },
         { name: 'Заказанные, но не выполненные работы', url: '/sadmin/report/canceled-works' },
         { name: 'Дополнительные работы', url: '/sadmin/report/added-works' },
-        { name: 'Фальшивые гос.номера', url: '/sadmin//report/plate-fakes' },
+        { name: 'Фальшивые гос.номера', url: '/sadmin/report/plate-fakes' },
         { name: 'Подозрительная привязка телефонов', url: '/sadmin/report/suspicious-phones' }
       ]
     }
@@ -105,7 +105,6 @@ if (isEnv('director')) {
       partition: 'Аналитика',
       routes: [
         { name: 'Загруженность сервиса', url: '/director/analytics/service-workload' },
-        { name: 'Видеоархив', url: '/director' },
         { name: 'КПД постов', url: '/director/analytics/posts-kpd' },
         { name: 'КПД сервиса', url: '/director/analytics/service-kpd' },
         { name: 'Сервисная история', url: '/director/analytics/service-history' },

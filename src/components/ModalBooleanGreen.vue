@@ -8,14 +8,7 @@
         <span class="font-medium text-3xl">{{ props.mainTitle }}</span>
         <span class="text-lg mt-[15px] leading-7">{{ props.mainText }}</span>
       </div>
-      <div class="flex flex-col items-center bg-white mb-[30px] w-[520px]">
-          <input
-              v-model="countText"
-              type="string"
-              class="base-input text-2xl w-40"
-            />
-          
-      </div>
+      <CINOP></CINOP>
       <div class="flex w-full mt-auto">
         <component
           :is="primaryButtonComponent"
@@ -36,6 +29,7 @@
 <script setup>
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import { ref } from 'vue';
+import CINOP from '@/components/CalendarInputNumberOfPosts.vue';
 
 let emit = defineEmits(['callback']);
 let props = defineProps({
