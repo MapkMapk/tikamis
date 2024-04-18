@@ -36,21 +36,21 @@
             
         </div>
         <div>
-            <TabularButtonApplyFilters
+            <BaseButtonFilledGreen
             v-if="blockData.type === 'free'"
             @click="handleButtonClick"
             class="apply-button"
             style="height: 60px; width: 240px;"
             >
             Записать
-            </TabularButtonApplyFilters>
+            </BaseButtonFilledGreen>
         </div>
       </div>
     </section>
   </template>
 <script setup>
 import { defineProps, defineEmits } from 'vue';
-  import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFilters.vue'
+  import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue'
 
   const emit = defineEmits(['close', 'submit', 'close-modal']);
   const { isVisible, blockData } = defineProps({

@@ -119,4 +119,6 @@ text-align: left;
 color: #A1A4AD;
 
 }
+summary{
+pointer-events: none;}
 </style>

@@ -4,6 +4,7 @@
   <MainHeaderGap />
   <DirectorReportComponent
     :show-filter-or="true"
+    :show-filter-all-works="false"
     @filtersApplied="fetchCustomerSkipsData"
     @optionSelected="changeOrsOption"
     @worksLoaded="handleAllWorksLoaded"
@@ -21,7 +22,6 @@
     v-for="item in displayedItems"
     :key="item.postNumber || item.mechanicName" 
     :item="item" 
-    @click="toggleDetails($event)" 
     style="grid-template-columns: 4fr 2fr 1fr;">
     <!-- Условное отображение номера поста или имени механика -->
     <TabularTableRowCell v-if="currentSort.option === 'itemsByPosts'">Пост №{{ item.postNumber }}</TabularTableRowCell>
@@ -47,7 +47,7 @@
             {{ item.detailsOpen ? 'expand_less' : 'expand_more' }}
           </i>
         </div></div>
-        <details :open="item.detailsOpen" @toggle="item.detailsOpen = !item.detailsOpen" class="custom-details" :style="{ width: cellWidth }">
+        <details class="custom-details">
         <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)">
           <strong></strong>
         </summary>
@@ -75,7 +75,11 @@ import TableHeaders from '@/components/Tabular/TableHeaders.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
 import TabularTableCellBottom from '@/components/Tabular/TabularTableCellBottom.vue';
 import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
+
+import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
+import isEnv from '@/utils/isEnv.js';
+
 import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 
 import MainHeader from '@/components/MainHeader.vue';
@@ -91,14 +95,14 @@ function changeOrsOption(option){
   if (currentSort.value.option === 'itemsByPosts') {
     columns.value = [
       { header: 'Пост', size: '4fr' },
-      { header: 'Время простоя, мин', size: '1fr' },
+      { header: 'Время простоя, мин', size: '2fr' },
       { header: 'Дата', size: '1fr' },
     ];
   } else {
     // Предполагаемая структура колонок для "mechanics"
     columns.value = [
       { header: 'Механик', size: '4fr' },
-      { header: 'Время простоя, мин', size: '1fr' },
+      { header: 'Время простоя, мин', size: '2fr' },
       { header: 'Дата', size: '1fr' },
     ];
   }
@@ -173,73 +177,40 @@ function unixToDate(unixTime) {
 ///////  Тут находится код, который убирает баг с раскрытием строк
 //////   при нажатии на тэг summary в некоторых браузерах (возможно во всех)
 /////    Он ужасен и требует доработки или фикса самого бага, но Хот фикс есть Хот фикс
+function toggleAllDetails(event) {
+  console.log('toggleAllDetails вызван');
+
+  // Получаем все элементы `details` внутри текущей TabularTableRow.
+  const detailsElements = event.currentTarget.querySelectorAll('details');
+  console.log(`Найдено ${detailsElements.length} элементов 'details'`);
+
+  // Проверяем, открыты ли все `details`
+  const allOpen = [...detailsElements].every(details => details.open);
+
+  // Если все `details` открыты, закрываем их, иначе открываем
+  if (allOpen) {
+    closeAllDetails(detailsElements);
+  } else {
+    openAllDetails(detailsElements);
+  }
+}
+
 function closeAllDetails(detailsElements) {
   detailsElements.forEach((details) => {
     details.removeAttribute('open');
   });
 }
 
-// Функция для открытия всех элементов details
 function openAllDetails(detailsElements) {
   detailsElements.forEach((details) => {
     details.setAttribute('open', true);
   });
 }
-function countDetailsStatus(detailsElements) {
-  let openCount = 0;
-  let closedCount = 0;
-
-  detailsElements.forEach((details) => {
-    if (details.open) {
-      openCount++;
-    } else {
-      closedCount++;
-    }
-  });
-
-  return { openCount, closedCount };
-}
-// Основная функция для переключения состояния элементов details
-function toggleDetails(event) {
-  console.log('toggleSingleDetail вызван');
-
-  // Получаем все элементы `details` внутри текущего TabularTableRow.
-  const detailsElements = event.currentTarget.querySelectorAll('details');
-  console.log(`Найдено ${detailsElements.length} элементов 'details'`);
-
-  // Подсчитываем количество открытых и закрытых элементов details
-  const { openCount, closedCount } = countDetailsStatus(detailsElements);
-
-  if (openCount > closedCount) {
-    console.log('Закрываем все элементы `details`');
-    // Закрываем все элементы details через 100 миллисекунд
-    setTimeout(() => {
-      closeAllDetails(detailsElements);
-    }, 10);
-  } else {
-    console.log('Открываем все элементы `details`');
-    // Открываем все элементы details через 100 миллисекунд
-    setTimeout(() => {
-      openAllDetails(detailsElements);
-    }, 10);
-  }
-
-  // Добавляем небольшую задержку перед проверкой состояний, чтобы изменения успели примениться
-  setTimeout(() => {
-    detailsElements.forEach((details, index) => {
-      if (details.open) {
-        console.log(`Элемент details[${index}] остался открытым после обработки`);
-      } else {
-        console.log(`Элемент details[${index}] закрыт после обработки`);
-      }
-    });
-  }, 20); // Увеличил время задержки, чтобы учесть также задержку на закрытие/открытие
-}
 //\\\
 //\\\\
 //\\\\\
 
-function toggleSingleDetail(event) {toggleDetails(event)}
+//function toggleSingleDetail(event) {toggleDetails(event)}
 
 const displayedItems = computed(() => {
   return currentSort.value.option === 'itemsByPosts' ? itemsByPosts.value : itemsByMechanics.value;
@@ -257,7 +228,9 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
   };
 
   try {
-    const response = await directorApiClient.post('/report/get-posts-downtime', { filters });
+
+    const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+    const response = await apiCall.post('/report/get-posts-downtime', { filters });
     //console.log(response.data[currentSort.value][0].works);
     //items.value = response.data[currentSort.value];
     //totalLoss.value = response.data.allLoss;

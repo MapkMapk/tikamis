@@ -3,8 +3,10 @@
   <MainHeader />
   <MainHeaderGap />
   <DirectorReportComponent
-    :show-filter-or="false"
+    :show-filter-or="true"
+    :show-filter-all-works="false"
     @filtersApplied="fetchCustomerSkipsData"
+    @optionSelected="changeOrsOption"
   >
     <template v-slot:tabular-title>
       <TabularPrimeTitle>Не приехавшие клиенты</TabularPrimeTitle>
@@ -17,19 +19,18 @@
     <template v-slot:tabular-table-table>
       <!--<TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">-->
       <TabularTableRow
-      v-for="item in items"
+      v-for="item in displayedItems"
       :key="item.orderId"
       :item="item"
-      @click.stop="toggleSingleDetail($event)"
       style="grid-template-columns: 2fr 4fr 1fr 2fr 2fr 2fr;"
     >
-      <template v-if="currentSort === 'itemsByPosts'">
       <!-- Пост Работы Потери Время записи Телефон Автомобиль -->
-      <TabularTableRowCell>Пост №{{ item.postNumber }}</TabularTableRowCell>
+      <TabularTableRowCell v-if="currentSort.option === 'itemsByPosts'">Пост №{{ item.postNumber }}</TabularTableRowCell>
+      <TabularTableRowCell v-else>{{ item.mechanicName }}</TabularTableRowCell>
       <!-- Перебор и отображение работ для каждой строки -->
       <TabularTableRowCell :style="{ height: cellHeight, width: '2fr' }" style="padding-left: 10px;" >
       <p style="opacity: 0;">dsfdsfdsfsdsfsdfsd</p>
-      <details  class="custom-details" :style="{ width: cellWidth }">
+      <details  class="custom-details">
         <summary class="flex" style="justify-content: space-between;">
          <strong></strong>
         </summary>
@@ -39,7 +40,7 @@
       </details>
     </TabularTableRowCell>
       <TabularTableRowCell>{{ formatTotalLoss(item.totalLoss) }}
-        <details  class="custom-details" :style="{ width: cellWidth }">
+        <details  class="custom-details">
         <summary class="flex" style="justify-content: space-between;"><strong></strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.id">
@@ -48,7 +49,7 @@
         </ul>
       </details></TabularTableRowCell>
       <TabularTableRowCell><p style="opacity: 0;">dsfdsfdsfsdsfsdfsd</p>
-        <details  class="custom-details" :style="{ width: cellWidth }">
+        <details  class="custom-details">
         <summary class="flex" style="justify-content: space-between;" ><strong></strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.id">
@@ -63,7 +64,7 @@
       
         
       <TabularTableRowCell>
-        <details  class="custom-details" :style="{ width: cellWidth }">
+        <details  class="custom-details">
         <summary class="flex" style="justify-content: space-between;" ><strong>Клиенты ({{ item.works.length }})</strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.id">
@@ -76,11 +77,11 @@
         
         <div style="display: flex;justify-content: flex-end; padding-right: 10px">
           <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-          <i class="material-icons" @click="toggleDetails(item.orderId)">
+          <i class="material-icons">
             {{ item.detailsOpen ? 'expand_less' : 'expand_more' }}
           </i>
         </div>
-        <details :open="item.detailsOpen" @toggle="item.detailsOpen = !item.detailsOpen" class="custom-details" :style="{ width: cellWidth }">
+        <details class="custom-details">
         <summary class="flex" style="justify-content: space-between;" ><strong></strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.id">
@@ -89,33 +90,66 @@
         </ul>
       </details>
         </TabularTableRowCell>
-      </template>
     </TabularTableRow>
     </template>
   </DirectorReportComponent>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, watch, computed } from 'vue';
 import DirectorReportComponent from '@/components/directorReportComponent.vue';
 import TableHeaders from '@/components/Tabular/TableHeaders.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
 import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
-import { directorApiClient } from '@/api/directorApiClient';
 import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
 
+import { sadminApiClient } from '@/api/sadminApiClient';
+import { directorApiClient } from '@/api/directorApiClient';
+import isEnv from '@/utils/isEnv.js';
 
 const items = ref([]);
-const currentSort = ref('itemsByPosts');
+const itemsByPosts = ref([]);
+const itemsByMechanics = ref([]);
+const currentSort = ref('itemsByMechanics');
 
 function formatTotalLoss (sum) {
   // Добавление отступов
   let formattedTotalLoss = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(sum);
   return formattedTotalLoss;
 };
+
+const columns = ref([]);
+
+
+function changeOrsOption(option){
+  currentSort.value = option;
+  console.warn(displayedItems.value.length);
+  if (currentSort.value.option === 'itemsByPosts') {
+    columns.value = [
+      { header: 'Пост', size: '2fr' },
+      { header: 'Работы', size: '4fr' },
+      { header: 'Потери', size: '1fr' },
+      { header: 'Время записи', size: '2fr' },
+      { header: 'Телефон', size: '2fr' },
+      { header: 'Автомобиль', size: '2fr' },
+    ];
+  } else {
+    // Предполагаемая структура колонок для "mechanics"
+    columns.value = [
+      { header: 'Механик', size: '2fr' },
+      { header: 'Работы', size: '4fr' },
+      { header: 'Потери', size: '1fr' },
+      { header: 'Время записи', size: '2fr' },
+      { header: 'Телефон', size: '2fr' },
+      { header: 'Автомобиль', size: '2fr' },
+    ];
+  }
+}
+
+
 
 onMounted(() => {
   // Предположим, что у вас есть начальные значения для фильтров
@@ -124,9 +158,8 @@ onMounted(() => {
   console.log(items.value);
 });
 // Обновление колонок в зависимости от currentSort
-const columns = ref([]);
 
-watch(currentSort, (newVal) => {
+watch(currentSort.value.option, (newVal) => {
   if (newVal === 'itemsByPosts') {
     columns.value = [
       { header: 'Пост', size: '2fr' },
@@ -140,9 +173,11 @@ watch(currentSort, (newVal) => {
     // Предполагаемая структура колонок для "mechanics"
     columns.value = [
       { header: 'Механик', size: '2fr' },
-      { header: 'Центр', size: '3fr' },
-      { header: 'Клиенты', size: '1fr' },
-      { header: 'Убытки', size: '1fr' },
+      { header: 'Работы', size: '4fr' },
+      { header: 'Потери', size: '1fr' },
+      { header: 'Время записи', size: '2fr' },
+      { header: 'Телефон', size: '2fr' },
+      { header: 'Автомобиль', size: '2fr' },
     ];
   }
 }, { immediate: true });
@@ -229,6 +264,13 @@ function toggleDetails(event) {
 
 
 function toggleSingleDetail(event) {toggleDetails(event)}
+
+
+const displayedItems = computed(() => {
+  return currentSort.value.option === 'itemsByPosts' ? itemsByPosts.value : itemsByMechanics.value;
+  });
+
+
 async function fetchCustomerSkipsData({ date, period, workId }) {
   const filters = {
     interval: period,
@@ -237,17 +279,21 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
     carCenters: ['C-1111'], // Указаны для примера, измените по необходимости
     page: 1 // Указано для примера, измените по необходимости
   };
-
+  
   try {
-    const response = await directorApiClient.post('/report/get-customer-skips', { filters });
+  
+    const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+    const response = await apiCall.post('/report/get-customer-skips', { filters });
     //console.log(response.data[currentSort.value][0].works);
-    items.value = response.data[currentSort.value];
-    console.log(items.value);
+    itemsByPosts.value = response.data.itemsByPosts;
+    itemsByMechanics.value = response.data.itemsByMechanics;
+    console.log(itemsByPosts.value);
     //updateColumns(currentSort.value);
   } catch (error) {
     console.error('Ошибка при загрузке данных:', error);
   }
 }
+
 function truncateText(text, maxLength) {
   if (text.length > maxLength) {
     return text.slice(0, maxLength) + '...';
@@ -298,5 +344,6 @@ function truncateText(text, maxLength) {
   align-items: center; /* Выравниваем элементы по центру по вертикали */
   padding: 4px 0; /* Добавляем немного отступа */
 }
-
+p{cursor: pointer;}
+text{cursor: pointer;}
 </style>

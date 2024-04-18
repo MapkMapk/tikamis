@@ -2,7 +2,7 @@
     <MainHeader />
     <MainHeaderGap />
     <TabularSection>
-      <TabularPrimeTitle>Управление автосервисами</TabularPrimeTitle>
+      <TabularPrimeTitle>Описание работ</TabularPrimeTitle>
       <TabularTable>
         <TabularTableColumn class="flex-1">
           <TabularTableCellTop>Работа</TabularTableCellTop>

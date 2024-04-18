@@ -62,11 +62,15 @@ import DirectorReportComponent from '@/components/directorReportComponent.vue';
 import TableHeaders from '@/components/Tabular/TableHeaders.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
 import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
-import { directorApiClient } from '@/api/directorApiClient';
+
 import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
+
+import { sadminApiClient } from '@/api/sadminApiClient';
+import { directorApiClient } from '@/api/directorApiClient';
+import isEnv from '@/utils/isEnv.js';
 
 
 const items = ref([]);
@@ -186,7 +190,8 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
   };
 
   try {
-    const response = await directorApiClient.post('/report/get-plate-fakes', { filters });
+    const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+    const response = await apiCall.post('/report/get-plate-fakes', { filters });
     //console.log(response.data[currentSort.value][0].works);
     itemsByPosts.value = response.data.itemsByPosts;
     itemsByMechanics.value = response.data.itemsByMechanics;

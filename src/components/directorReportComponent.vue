@@ -12,14 +12,15 @@
 
         </TabularFiltersWrapper>
       </TabularSection>
-  
-      <TabularTable style="display: block; padding: 30px;">
+      <div class="w-full overflow-y-hidden">
+      <TabularTable class="tabletabletabletable" style="display: block; padding: 30px;">
         <slot name="tabular-table-header"></slot>
         <slot name="tabular-table-table"></slot>
       </TabularTable>
+      </div>
     </div>
     <div class="flex flex-col items-center">
-            <div class="w-full flex mt-10 mb-3" style="justify-content: center">
+            <div id="234" class="w-full flex mt-10 mb-3" style="justify-content: center">
               <div style="width: 400px;margin-right: 20px;">
               <BaseButtonFilledGreen
                 class="flex flex-1 mr-5"

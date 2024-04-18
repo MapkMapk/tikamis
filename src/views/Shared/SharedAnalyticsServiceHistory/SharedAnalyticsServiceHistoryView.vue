@@ -66,6 +66,7 @@ import ModalBoolean from '@/components/ModalBoolean.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
 import directorApiGetCustomerRecords from '@/api/director/directorApiGetServiceHistory.js';
+import sadminApiGetCustomerRecords from '@/api/sadmin/sadminApiGetServiceHistory.js';
 import unixToData from '@/utils/time/unixToData.js';
 
 import TabularSection from '@/components/Tabular/TabularSection.vue';
@@ -86,10 +87,11 @@ import TabularButtonCross from '@/components/Tabular/TabularButtonCross.vue';
 import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFilters.vue';
 
 
+import isEnv from '@/utils/isEnv.js';
+
 
 const cellHeight = '90%';
 const cellWidth = '100%';
-
 
 
 
@@ -115,6 +117,7 @@ onMounted(fetchData);
 </script>
 
 <script>
+
 
 
 let filterDateStart = ref(1675882800);
@@ -153,8 +156,9 @@ async function defaultFilters() {
   }
 }
 async function applyFilters() {
+  const apiCall = isEnv('sadmin') ? sadminApiGetCustomerRecords : directorApiGetCustomerRecords ;
   try {
-    const response = await directorApiGetCustomerRecords(filters.value);
+    const response = await apiCall(filters.value);
     
     items.value = response.items;
   } catch (error) {
@@ -163,8 +167,9 @@ async function applyFilters() {
 }
 
 async function fetchData() {
+  const apiCall = isEnv('sadmin') ? sadminApiGetCustomerRecords : directorApiGetCustomerRecords ;
   try {
-    const response = await directorApiGetCustomerRecords(filters.value);
+    const response = await apiCall(filters.value);
     items.value = response.items;
     console.log(items);
     console.log(items.value);

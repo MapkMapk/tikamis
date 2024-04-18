@@ -310,7 +310,7 @@ applyFilters();
   display: flex;
   align-items: center;
   height: 40px;
-  z-index: 9;
+  z-index: 8;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

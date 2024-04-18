@@ -4,6 +4,15 @@
       v-if="props.isVisible"
       class="z-50 flex justify-center items-center fixed  w-full h-screen left-0 top-0 bg-gray-848484"
     >
+    <ModalBoolean
+      @callback="removeWork"
+      :is-visible="isModalVisible"
+      :primary-button-component="BaseButtonFilledRed"
+      main-title="Удалить услугу из заказа?"
+      main-text="Вы сможете её снова включить в заказ"
+      primary-button-text="Да, удалить"
+      secondary-button-text="Отмена"
+    />
     <div class="flex flex-col justify-start items-start bg-white w-[1133px] h-[971px]">
         <div class="ml-[30px] w-[1103px] mtForAnyone">
         <!-- Заголовок -->
@@ -73,19 +82,26 @@
                 </div>
                 <div class="workList flex justify-between items-center h-[80px]">
                     <p>Замена масла</p>
-                    <svg width="23" height="25" viewBox="0 0 23 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <div @click="openworkwind"  class="h-[80px] flex justify-between items-center">
+                    <svg
+                        width="23" height="25" viewBox="0 0 23 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M6.25 3.75H1.25C0.559644 3.75 0 4.30964 0 5C0 5.69036 0.559644 6.25 1.25 6.25H1.4056L3.47169 21.7456C3.72009 23.6086 5.30928 25 7.18879 25H15.3112C17.1907 25 18.7799 23.6086 19.0283 21.7456L21.0944 6.25H21.25C21.9404 6.25 22.5 5.69036 22.5 5C22.5 4.30964 21.9404 3.75 21.25 3.75H16.25C16.25 1.67893 14.5711 0 12.5 0H10C7.92893 0 6.25 1.67893 6.25 3.75ZM8.75 3.75C8.75 3.05964 9.30964 2.5 10 2.5H12.5C13.1904 2.5 13.75 3.05964 13.75 3.75H8.75ZM5.94976 21.4152L3.92773 6.25H18.5723L16.5502 21.4152C16.4674 22.0362 15.9377 22.5 15.3112 22.5H7.18879C6.56229 22.5 6.03256 22.0362 5.94976 21.4152Z" fill="#080808"/>
                         <rect x="8" y="10" width="2.3" height="9" fill="#080808"/>
                         <rect x="12" y="10" width="2.3" height="9" fill="#080808"/>
                         </svg>
+                    </div>
                 </div>
                 <div class="workList flex justify-between items-center h-[80px]">
                     <p>Проверка тормозных шлангов</p>
-                    <svg width="23" height="25" viewBox="0 0 23 25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <div @click="openworkwind"  class="h-[80px] flex justify-between items-center">
+                    <svg 
+                        
+                        width="23" height="25" viewBox="0 0 23 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M6.25 3.75H1.25C0.559644 3.75 0 4.30964 0 5C0 5.69036 0.559644 6.25 1.25 6.25H1.4056L3.47169 21.7456C3.72009 23.6086 5.30928 25 7.18879 25H15.3112C17.1907 25 18.7799 23.6086 19.0283 21.7456L21.0944 6.25H21.25C21.9404 6.25 22.5 5.69036 22.5 5C22.5 4.30964 21.9404 3.75 21.25 3.75H16.25C16.25 1.67893 14.5711 0 12.5 0H10C7.92893 0 6.25 1.67893 6.25 3.75ZM8.75 3.75C8.75 3.05964 9.30964 2.5 10 2.5H12.5C13.1904 2.5 13.75 3.05964 13.75 3.75H8.75ZM5.94976 21.4152L3.92773 6.25H18.5723L16.5502 21.4152C16.4674 22.0362 15.9377 22.5 15.3112 22.5H7.18879C6.56229 22.5 6.03256 22.0362 5.94976 21.4152Z" fill="#080808"/>
                         <rect x="8" y="10" width="2.3" height="9" fill="#080808"/>
                         <rect x="12" y="10" width="2.3" height="9" fill="#080808"/>
                         </svg>
+                    </div>
                 </div>
             </div>
 
@@ -135,10 +151,20 @@
   </template>
 
   <script setup>
+  import ModalBoolean from '@/components/ModalBoolean.vue';
   import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
   import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
+  import BaseButtonFilledRed from '@/components/BaseButtonFilledRed.vue';
+  import { ref } from 'vue';
   import BaseButtonFilledAdd from '@/components/BaseButtonFilledAdd.vue';
   import TabularFilterDate from '@/components/Tabular/TabularFilterDate.vue';
+  let isModalVisible = ref(false);
+  function openworkwind(){
+    isModalVisible.value = true;
+  }
+  function removeWork() {
+  isModalVisible.value = false;
+  }
   let emit = defineEmits(['callback','close']);
 //   let props = defineProps({
 //     isVisible: Boolean,

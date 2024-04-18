@@ -1,6 +1,6 @@
 <template>
     <!--  h-[calc(100vh-theme('height.the-header')-theme('padding.10')-theme('margin.10'))]-->
-    <section v-if="props.isVisible" class="z-30 flex flex-col justify-center items-center fixed  w-full h-screen left-0 top-[60px] bg-white-ffffff">
+    <section v-if="props.isVisible" class="z-[9] flex flex-col justify-center items-center fixed  w-full h-screen left-0 top-[60px] bg-white-ffffff">
         
       <span class="flex justify-center text-center text-4xl font-medium">Добавить услуги</span>
       <div class="relative container w-full">
@@ -91,9 +91,15 @@
   import getQuantitativeDeclination from '@/utils/getQuantitativeDeclination.js';
   import { onMounted, ref, computed } from 'vue';
   import { useMainStore } from '@/stores/shared/main.js';
+  import { useSadminStore } from '@/stores/sadmin/main.js';
   import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
+  import isEnv from '@/utils/isEnv.js';
   
   const DirectorApiAllWorks = useMainStore();
+  const SadminApiAllWorks = useSadminStore();
+
+  const apiCall = isEnv('sadmin') ? SadminApiAllWorks : DirectorApiAllWorks;
+
   let searchInputText = ref('');
   let works = ref([]);
   
@@ -113,7 +119,7 @@
 }
 
   onMounted(async () => {
-    let { works: originalWorks } = await DirectorApiAllWorks.workList();
+    let { works: originalWorks } = await apiCall.workList();
     originalWorks.forEach((work) => {
       work.isSelected = false;
       work.price = getRandomPrice();

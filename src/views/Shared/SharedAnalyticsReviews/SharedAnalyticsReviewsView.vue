@@ -2,7 +2,9 @@
 <template>
   <MainHeader />
   <MainHeaderGap />
+  
   <DirectorReportComponent
+    class=""
     :show-filter-or="false"
     :show-Filter-All-Works="false"
     @filtersApplied="fetchCustomerSkipsData"
@@ -221,6 +223,7 @@ export default {
 };
 </script>
 <style scoped>
+
 .custom-details summary {
   list-style: none;
 }
@@ -343,4 +346,9 @@ export default {
   font-size: 14px;
   color: orange;
 }
+
+</style>
+<style>
+.tabletabletabletable{
+width: 2000px;}
 </style>

@@ -20,8 +20,7 @@
   <TabularTableRow 
     v-for="item in displayedItems"
     :key="item.postNumber || item.mechanicName" 
-    :item="item" 
-    @click="toggleDetails($event)" 
+    :item="item"
     style="grid-template-columns: 4fr 3fr 1fr;">
     <!-- Условное отображение номера поста или имени механика -->
     <TabularTableRowCell v-if="currentSort.option === 'itemsByPosts'">Пост №{{ item.postNumber }}</TabularTableRowCell>
@@ -30,7 +29,7 @@
     <TabularTableRowCell :style="{width: '2fr'}" style="padding-left: 10px;">
       <strong>Все работы</strong>
       <details class="custom-details">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)">
+        <summary class="flex" style="justify-content: space-between;">
           <strong></strong>
         </summary>
         <ul>
@@ -42,12 +41,12 @@
       <div style="display: flex;justify-content: space-between">{{ formatTotalLoss(item.totalLoss) }}
 <div style="display: flex;justify-content: flex-end; padding-right: 10px">
           <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-          <i class="material-icons" @click="toggleDetails(item.orderId)">
+          <i class="material-icons">
             {{ item.detailsOpen ? 'expand_less' : 'expand_more' }}
           </i>
         </div></div>
-        <details :open="item.detailsOpen" @toggle="item.detailsOpen = !item.detailsOpen" class="custom-details" :style="{ width: cellWidth }">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)">
+        <details  class="custom-details" :style="{ width: cellWidth }">
+        <summary class="flex" style="justify-content: space-between;">
           <strong></strong>
         </summary>
         <ul>

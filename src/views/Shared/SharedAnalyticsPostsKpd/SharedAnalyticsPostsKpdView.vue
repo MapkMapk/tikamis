@@ -22,7 +22,6 @@
       v-for="item in displayedItems"
       :key="item.orderId"
       :item="item"
-      @click="toggleDetails($event)"
       style="grid-template-columns: 4fr 3fr 1fr;"
     >
       <!-- Пост Работы Потери Время записи Телефон Автомобиль -->
@@ -32,7 +31,7 @@
       <TabularTableRowCell :style="{ height: cellHeight, width: '2fr' }" style="padding-left: 10px;">
       <strong>Все работы</strong>
       <details  class="custom-details" :style="{ width: cellWidth }">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)">
+        <summary class="flex" style="justify-content: space-between;">
          <strong></strong>
         </summary>
         <ul>
@@ -41,8 +40,8 @@
       </details>
     </TabularTableRowCell>
       <TabularTableRowCell :class="getDeviationClass(item.totalDeviationMinutes)">{{ formatDeviation(item.totalDeviationMinutes) }}
-        <details  class="custom-details" :style="{ width: cellWidth }">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)"><strong></strong></summary>
+        <details class="custom-details" :style="{ width: cellWidth }">
+        <summary class="flex" style="justify-content: space-between;"><strong></strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.id" :class="getDeviationClass(work.deviationMinutes)">
             {{ formatDeviation(work.deviationMinutes) }}
@@ -70,10 +69,11 @@ import MainHeaderGap from '@/components/MainHeaderGap.vue';
 //////////
 //оч важный блок
 //////////
-import isEnv from '@/utils/isEnv.js';
-import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
+import isEnv from '@/utils/isEnv.js';
+import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
+
 import { computed } from 'vue';
 const sadminServiceStationsStore = useSadminServiceStationsStore();
 const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;

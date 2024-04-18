@@ -116,8 +116,26 @@
   </TabularTableRow> -->
   
 </TabularTable>
-
+<div class="flex flex-col items-center">
+            <div id="234" class="w-full flex mt-10 mb-3" style="justify-content: center">
+              <div style="width: 400px;margin-right: 20px;">
+              <BaseButtonFilledGreen
+                class="flex flex-1 mr-5"
+                style="width: inherit;"
+                >Сохранить</BaseButtonFilledGreen
+              >
+            </div>
+            <div style="width: 400px;margin-left: 20px">
+              <BaseButtonFilledDark
+                class="flex flex-1"
+                style="width: inherit;"
+                >Отправить</BaseButtonFilledDark
+              >
+            </div>
+            </div>
+          </div>
   </div>
+  
 </template>
 
 <script setup>
@@ -125,6 +143,7 @@ import { ref, onMounted } from 'vue';
 import MainHeader from '@/components/MainHeader.vue';
 import ModalBoolean from '@/components/ModalBoolean.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
+import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
 import directorApiGetCustomerRecords from '@/api/director/directorApiGetSuspiciousPhones.js';
 import unixToData from '@/utils/time/unixToData.js';

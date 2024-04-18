@@ -22,7 +22,6 @@
       v-for="item in displayedItems"
       :key="item.orderId"
       :item="item"
-      @click="toggleDetails($event)"
       style="grid-template-columns: 4fr 3fr 1fr;"
     >
       
@@ -33,7 +32,7 @@
       <TabularTableRowCell :style="{ height: cellHeight, width: '2fr' }" style="padding-left: 10px;">
       <strong>Все работы</strong>
       <details  class="custom-details" :style="{ width: cellWidth }">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)">
+        <summary class="flex" style="justify-content: space-between;">
          <strong></strong>
         </summary>
         <ul>
@@ -49,8 +48,8 @@
             {{ item.detailsOpen ? 'expand_less' : 'expand_more' }}
           </i>
         </div></div>
-        <details :open="item.detailsOpen" @toggle="item.detailsOpen = !item.detailsOpen" class="custom-details" :style="{ width: cellWidth }">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)"><strong></strong></summary>
+        <details class="custom-details" :style="{ width: cellWidth }">
+        <summary class="flex" style="justify-content: space-between;"><strong></strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.id">
           {{ formatTotalLoss(work.loss) }}
@@ -79,6 +78,8 @@ import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
+import { sadminApiClient } from '@/api/sadminApiClient';
+import isEnv from '@/utils/isEnv.js';
 
 
 const items = ref([]);
@@ -247,7 +248,8 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
   };
 
   try {
-    const response = await directorApiClient.post('/report/get-customer-skips', { filters });
+    const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+    const response = await apiCall.post('/report/get-customer-skips', { filters });
     //console.log(response.data[currentSort.value][0].works);
     itemsByPosts.value = response.data.itemsByPosts;
     itemsByMechanics.value = response.data.itemsByMechanics;
