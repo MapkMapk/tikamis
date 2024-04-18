@@ -102,7 +102,7 @@ import TabularTable from '@/components/Tabular/TabularTable.vue';
 import TabularButtonCross from '@/components/Tabular/TabularButtonCross.vue';
 import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFilters.vue';
 
-const apiCall = isEnv('sadmin') ? sadminApiGetCustomerRecords : directorApiGetCustomerRecords;
+
 let modal = ref({});
 
 function deleteModal() {
@@ -209,6 +209,7 @@ async function defaultFilters() {
 }
 async function applyFilters() {
 	try {
+		const apiCall = isEnv('sadmin') ? sadminApiGetCustomerRecords : directorApiGetCustomerRecords;
 		const response = await apiCall(filters.value);
 
 		items.value = response.items;
@@ -219,6 +220,7 @@ async function applyFilters() {
 
 async function fetchData() {
 	try {
+		const apiCall = isEnv('sadmin') ? sadminApiGetCustomerRecords : directorApiGetCustomerRecords;
 		const response = await apiCall(filters.value);
 		items.value = response.items;
 		console.log(items);
