@@ -1,1 +1,8 @@
-//загруженность сервиса, записи клиентов, простои постов, заказанные/дополнительные работы, неприехавшие клиенты, Кпд постов, сервисная история, гос номера
+import router from '@/router/index.js'
+export default function isEnv(env) {
+  if (env) {
+    return String(router.currentRoute.value.fullPath.split('/')[3]) === env.toLowerCase()
+  }
+  console.log('Ошибка в utils/isEnv, не был передан параметр');
+  return false;
+}

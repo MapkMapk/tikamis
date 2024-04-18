@@ -24,7 +24,7 @@
       :item="item"
       @click="toggleDetails($event)"
     >
-      <template style="display: grid;;grid-template-columns: 3fr 1fr 2fr 2fr 2fr;" ><!--v-if="currentSort === 'itemsByMechanics'"-->
+      <template style="display: grid;grid-template-columns: 3fr 1fr 2fr 2fr 2fr;" ><!--v-if="currentSort === 'itemsByMechanics'"-->
         <TabularTableRowCell v-if="item.type == '1'">{{ item.smileContent }} </TabularTableRowCell>
         <TabularTableRowCell v-if="item.type == '2'">{{ item.textContent }} </TabularTableRowCell>
         <TabularTableRowCell v-if="item.type == '4'">
@@ -346,9 +346,10 @@ export default {
   font-size: 14px;
   color: orange;
 }
-
-</style>
-<style>
 .tabletabletabletable{
 width: 2000px;}
+.jjjj{overflow-y: hidden;}
+</style>
+<style>
+
 </style>

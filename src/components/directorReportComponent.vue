@@ -12,7 +12,7 @@
 
         </TabularFiltersWrapper>
       </TabularSection>
-      <div class="w-full overflow-y-hidden">
+      <div class="w-full jjjj">
       <TabularTable class="tabletabletabletable" style="display: block; padding: 30px;">
         <slot name="tabular-table-header"></slot>
         <slot name="tabular-table-table"></slot>
@@ -40,7 +40,7 @@
   </template>
   
   <script setup>
-  import { defineEmits, ref, onBeforeMount } from 'vue';
+  import { defineEmits, ref, onBeforeMount, onMounted } from 'vue';
   import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
   import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
 
@@ -53,7 +53,23 @@
   import TabularButtonCross from '@/components/Tabular/TabularButtonCross.vue';
   import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFilters.vue';
   import TabularTable from '@/components/Tabular/TabularTable.vue';
+  import isEnv from '@/utils/isSpecEnv.js';
   
+  onMounted(() => {
+  if (isEnv('reviews')){
+    console.log('reviews');
+    const tableElement = document.querySelector('.tabletabletabletable');
+    if (tableElement) {
+      tableElement.style.width = '2000px';
+    }
+
+    const jjjjElement = document.querySelector('.jjjj');
+    if (jjjjElement) {
+      jjjjElement.style.overflowY = 'hidden';
+    }
+  }
+});
+
   const emit = defineEmits(['filtersApplied', 'filtersReset', 'filterChange', 'workLoaded']);
   
   const props = defineProps({
