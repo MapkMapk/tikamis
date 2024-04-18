@@ -74,6 +74,9 @@ import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
 import TabularTableCellBottom from '@/components/Tabular/TabularTableCellBottom.vue';
 import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
 import { directorApiClient } from '@/api/directorApiClient';
+import { sadminApiClient } from '@/api/sadminApiClient';
+import isEnv from '@/utils/isEnv.js';
+const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 
 import MainHeader from '@/components/MainHeader.vue';
@@ -248,7 +251,7 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
   };
 
   try {
-    const response = await directorApiClient.post('/report/get-cancelled-works', { filters });
+    const response = await apiCall.post('/report/get-cancelled-works', { filters });
     //console.log(response.data[currentSort.value][0].works);
     //items.value = response.data[currentSort.value];
     //totalLoss.value = response.data.allLoss;

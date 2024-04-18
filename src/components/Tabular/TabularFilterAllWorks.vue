@@ -17,8 +17,10 @@
   <script setup>
   import { ref, onMounted, onUnmounted, defineEmits, computed } from 'vue';
   import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
+  import { sadminApiClient } from '@/api/sadminApiClient';
   import { directorApiClient } from '@/api/directorApiClient';
-  
+  import isEnv from '@/utils/isEnv.js';
+  const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
   const emit = defineEmits(['optionSelected', 'worksLoaded']);
   const works = ref([]);
   const showDropdown = ref(false);
@@ -27,7 +29,7 @@
   
   async function fetchOptions() {
     try {
-      const response = await directorApiClient.get('/all-works');
+      const response = await apiCall.get('/all-works');
       works.value = response.data.works;
       emit('worksLoaded', works.value.map(work => work.id)); // Передаем IDs всех работ
     } catch (error) {
