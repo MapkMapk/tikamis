@@ -115,14 +115,6 @@
               class="base-input text-2xl w-40 mt-3"
             />
           </div>
-          <div class="flex flex-col mt-10">
-            <span class="text-2xl font-medium">Ссылка на карту</span>
-            <input
-              v-model="mapLink"
-              class="base-input text-2xl w-40 mt-3"
-              style="width: 520px;"
-            />
-          </div>
           <div
             v-if="isEnv('sadmin')"
             class="flex flex-col mt-10"
@@ -147,6 +139,14 @@
               v-model="orderDepthDays"
               type="number"
               class="base-input text-2xl w-40 mt-3"
+            />
+          </div>
+          <div class="flex flex-col mt-10">
+            <span class="text-2xl font-medium">Ссылка на карту</span>
+            <input
+              v-model="mapLink"
+              class="base-input text-2xl w-40 mt-3"
+              style="width: 520px;"
             />
           </div>
           <div class="flex flex-col items-center">
