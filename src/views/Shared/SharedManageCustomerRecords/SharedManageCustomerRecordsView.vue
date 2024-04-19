@@ -35,7 +35,7 @@
 		<!-- Таблица с данными -->
 		<TabularTable style="display: block; padding: 30px;">
 			<!-- Заголовки столбцов -->
-			<TabularTableRow style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 0.2fr;">
+			<TabularTableRow style="display: grid; grid-template-columns: 2.2fr 1fr 1fr 1fr 0.2fr;">
 				<TabularTableCellTop style="padding-left: 10px;">Работы</TabularTableCellTop>
 				<TabularTableCellTop style="padding-left: 10px;">Время записи</TabularTableCellTop>
 				<TabularTableCellTop style="padding-left: 10px;">Телефон</TabularTableCellTop>
@@ -43,9 +43,9 @@
 				<TabularTableCellTop></TabularTableCellTop>
 			</TabularTableRow>
 			<!-- Ряды данных -->
-			<TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 0.2fr;">
+			<TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2.2fr 1fr 1fr 1fr 0.2fr;">
 				<!-- Ячейка с данными о работах -->
-				<TabularTableRowCell :style="{ height: cellHeight, width: '2fr' }" style="padding-left: 10px;">
+				<TabularTableRowCell :style="{ height: cellHeight, width: '2.2fr' }" style="padding-left: 10px;">
 					{{ item.works.length === 1 ? item.works[0].name : '' }}
 					<details v-if="item.works.length > 1" class="custom-details" :style="{ width: cellWidth }">
 						<summary class="flex" style="justify-content: space-between;"> {{ item.works[0].name }} <strong >ещё {{ item.works.length - 1 }}</strong> </summary>
