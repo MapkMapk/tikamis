@@ -92,13 +92,15 @@
   import { onMounted, ref, computed } from 'vue';
   import { useMainStore } from '@/stores/shared/main.js';
   import { useSadminStore } from '@/stores/sadmin/main.js';
+  import { sadminApiClient } from '@/api/sadminApiClient';
+  import { directorApiClient } from '@/api/directorApiClient';
   import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
   import isEnv from '@/utils/isEnv.js';
   
-  const DirectorApiAllWorks = useMainStore();
+  const DirectorApiAllWorks = useMainStore;
   const SadminApiAllWorks = useSadminStore();
 
-  const apiCall = isEnv('sadmin') ? SadminApiAllWorks : DirectorApiAllWorks;
+
 
   let searchInputText = ref('');
   let works = ref([]);
@@ -119,7 +121,10 @@
 }
 
   onMounted(async () => {
-    let { works: originalWorks } = await apiCall.workList();
+    const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+    let response = await apiCall.get('/all-works');
+    const originalWorks = response.data.works;
+    console.log(response);
     originalWorks.forEach((work) => {
       work.isSelected = false;
       work.price = getRandomPrice();

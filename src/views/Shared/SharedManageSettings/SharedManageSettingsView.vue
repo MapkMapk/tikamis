@@ -300,10 +300,11 @@ onBeforeMount(async () => {
 
   if (isEnv('sadmin')) {
     const sadminServiceStationsStore = useSadminServiceStationsStore();
+    console.log(sadminServiceStationsStore);
     formattedFullAddress.value =
-      sadminServiceStationsStore.getSelectedServiceStation().city +
+      sadminServiceStationsStore.city +
       ', ' +
-      sadminServiceStationsStore.getSelectedServiceStation().addressName;
+      sadminServiceStationsStore.addressName;
 
     const data = await sadminApiManageSettings(router.currentRoute.value.query.id);
     login.value = data.login;
