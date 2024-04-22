@@ -25,7 +25,6 @@
         <form class="flex flex-col w-full max-w-[540px]">
           <h1 class="text-4xl leading-normal font-medium">
             Технические настройки
-            <!-- <br />{{ formattedFullAddress }} -->
           </h1>
           <div
             v-if="isEnv('sadmin')"
