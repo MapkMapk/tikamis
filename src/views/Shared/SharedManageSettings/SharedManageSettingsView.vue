@@ -38,6 +38,7 @@
                   v-model="login"
                   class="base-input text-2xl w-full mt-3"
                   type="text"
+                  autocomplete="off"
                 />
               </div>
               <div class="flex flex-col w-full">
@@ -46,7 +47,7 @@
                   v-model="password"
                   class="base-input text-2xl w-full mt-3"
                   type="password"
-                  autocomplete="false"
+                  autocomplete="off"
                 />
               </div>
             </div>
