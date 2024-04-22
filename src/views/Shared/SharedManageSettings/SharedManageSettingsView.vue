@@ -18,6 +18,13 @@
       >
         Изменения вступят в силу начиная с {{ changesSinceFormatted }}
       </div>
+      <div class="hidden">
+                <span class="hidden"></span>
+                <input
+                  class="hidden"
+                  type="password"
+                />
+              </div>
       <section
         :class="{ 'pl-[300px]': mainStore.isHeaderMenuOpen }"
         class="pt-[20px] pl-[122px] flex flex-1 mr-[30px] mb-10"
