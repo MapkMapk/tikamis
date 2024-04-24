@@ -9,9 +9,9 @@
         name="cross-black"
         class="ml-auto w-[25px] h-[25px] mt-[22px] mr-[20px] cursor-pointer"
       />
-      <div class="flex flex-col items-center mt-[20px] mb-[60px] pl-3 pr-3 text-center">
+      <div class="flex flex-col items-center mt-[20px] mb-[10px] pl-3 pr-3 text-center">
         <span class="font-medium text-3xl">Выберите автосервисы</span>
-        <div class="flex flex-col w-full mt-5">
+        <div class="flex flex-col w-full mt-5 max-h-[600px] overflow-y-auto">
           <div
             class="flex cursor-pointer p-3 mb-1"
             :class="{ '!bg-gray-2c2d2f': station.isSelected }"
