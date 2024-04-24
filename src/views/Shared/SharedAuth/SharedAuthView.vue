@@ -6,7 +6,7 @@
           name="logo"
           class="w-[86px] h-[84px]"
         />
-        <h1 class="text-4xl font-medium pt-6">{{ props.title }}</h1>
+        <h1 class="text-4xl font-medium pt-6 text-center">{{ props.title }}</h1>
         <form class="w-full flex flex-col items-center pt-4">
           <input
             type="text"

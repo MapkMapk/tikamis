@@ -28,7 +28,7 @@ const sadminRoutes = {
       name: 'sadmin.auth',
       component: SharedAuthView,
       meta: { title: 'Аутентификация' },
-      props: { title: 'Панель админа' }
+      props: { title: 'Панель суперадмина' }
     },
     {
       path: 'manage',

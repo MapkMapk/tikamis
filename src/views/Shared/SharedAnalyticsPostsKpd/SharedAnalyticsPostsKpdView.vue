@@ -81,8 +81,8 @@ const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 const carCenterIds = computed(() => {
       // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
       return isEnv('sadmin') 
-        ? sadminServiceStationsStore?.getSelectedServiceStationIds()[0]
-        : "C-1111";
+        ? sadminServiceStationsStore?.getSelectedServiceStation().id
+        : "none";
     });
 //////////
 //
@@ -258,13 +258,13 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
   const filters = ref({
     interval: period,
     dateStart: date,
-    works: Array.isArray(workId) ? workId : [workId],
+    works: [null],
     carCenters: [carCenterIds.value], // Указаны для примера, измените по необходимости
     page: 1 // Указано для примера, измените по необходимости
   });
 
   try {
-    const response = await apiCall.post('/analytics/get-posts-KPD', { filters });
+    const response = await apiCall.post('/analytics/get-posts-KPD', { filters: filters.value });
     //console.log(response.data[currentSort.value][0].works);
     itemsByPosts.value = response.data.itemsByPosts;
     itemsByMechanics.value = response.data.itemsByMechanics;

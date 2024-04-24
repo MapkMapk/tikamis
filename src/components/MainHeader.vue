@@ -19,7 +19,7 @@
         />
       </div>
       <div class="flex justify-between items-center w-full border-b border-gray-dcdcdc">
-        <div class="flex items-center ml-7">
+        <div class="flex items-center ml-3.5">
           <BaseSvgIcon
             name="logo"
             class="w-[32px] h-[32px]"
@@ -44,12 +44,11 @@
             <div class="flex flex-col justify-center">
               <p class="servicesText">сервисы</p>
               <p style="font-family: Inter;font-size: 24px;font-weight: 400;line-height: 29.05px;text-align: left;">
-                Выбранные({{ selectedServiceStationsCount }})</p>
-              <!-- {{
+              {{
                 sadminServiceStationsStore?.getSelectedServiceStation().city +
                 ', ' +
                 sadminServiceStationsStore?.getSelectedServiceStation().addressName
-              }} -->
+              }}</p>
             </div>
             <BaseSvgIcon
               name="arrow-down-gray"
@@ -93,19 +92,16 @@ async function getCenterInfo() {
   address.value = data.addressName;
 }
 
-const selectedServiceStationsCount = computed(() => {
-  return sadminServiceStationsStore.getSelectedServiceStations().length;
-});
 
-function callbackModalSelectServiceStations(isChanged, ids, num) {
+function callbackModalSelectServiceStations(isChanged, id, num) {
   console.log("-----callbackModalSelectServiceStations-----");
   console.log(isChanged);
-  console.log(ids);
+  console.log(id);
   console.log(num);
   console.log("---------");
   isVisibleModalSelectServiceStations.value = false;
   if (isChanged) {
-    sadminServiceStationsStore.setNewSelectedServiceStations(ids);
+    sadminServiceStationsStore.setNewSelectedServiceStation(id);
   }
 }
 </script>

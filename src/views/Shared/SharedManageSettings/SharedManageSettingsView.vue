@@ -30,9 +30,18 @@
         class="pt-[20px] pl-[122px] flex flex-1 mr-[30px] mb-10"
       >
         <form class="flex flex-col w-full max-w-[540px]">
+          
           <h1 class="text-4xl leading-normal font-medium">
             Технические настройки
           </h1>
+          <h1
+            v-if="isEnv('sadmin')"
+            class="flex flex-col mt-2 w-full max-w-full"
+          >{{
+                city +
+                ', ' +
+                address
+              }}</h1>
           <div
             v-if="isEnv('sadmin')"
             class="flex flex-col mt-10 w-full max-w-full"
@@ -205,10 +214,12 @@ import router from '@/router/index.js';
 import minutesToHHMM from '@/utils/time/minutesToHHMM.js';
 import HHMMtoMinutes from '@/utils/time/HHMMtoMinutes.js';
 import directorApiCenterInfo from '@/api/director/directorApiCenterInfo.js';
-
+const sadminServiceStationsStore = useSadminServiceStationsStore();
 const mainStore = useMainStore();
 
 let login = ref();
+let address = ref();
+let city = ref();
 let password = ref();
 let changesSince = ref();
 let changesSinceFormatted = computed(
@@ -240,6 +251,8 @@ function saveModal() {
     if (isEnv('sadmin')) {
       response = await sadminApiManageSettingsPost(
         router.currentRoute.value.query.id,
+        address.value,
+        city.value,
         login.value,
         password.value,
         bookingAvailable.value,
@@ -314,6 +327,8 @@ onBeforeMount(async () => {
       sadminServiceStationsStore.addressName;
 
     const data = await sadminApiManageSettings(router.currentRoute.value.query.id);
+    address.value = data.address;
+    city.value = data.city;
     login.value = data.login;
     password.value = data.password;
     bookingAvailable.value = data.bookingAvailable;

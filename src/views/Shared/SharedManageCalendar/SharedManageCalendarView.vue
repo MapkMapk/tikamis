@@ -70,12 +70,12 @@
       </div>
 
       <div class="flex w-full" style="margin-top: 20px;">
-        <div class="flex" style="margin-right: 150px;"><div style="width: 30px; height: 30px; background-color: #C2C3C7; margin-right: 20px"></div><p>Нет работает, нет постов</p></div>
-        <div class="flex" style="margin-right: 150px;"><div style="width: 30px; height: 30px; background-color: #87C23E; margin-right: 20px"></div><p>Изменено количество постов</p></div>
-        <div v-if="isAnyCellClicked" class="flex"><div style="width: 30px; height: 30px; background-color: #E31E24; margin-right: 20px"></div><p>Добавлен выходной день</p></div>
+        <div class="flex" style="margin-right: 150px;"><div style="width: 30px; height: 30px; background-color: #C2C3C7; margin-right: 20px"></div><p style="align-self: center;">Нет данных по сотрудникам</p></div>
+        <div class="flex" style="margin-right: 150px;"><div style="width: 30px; height: 30px; background-color: #87C23E; margin-right: 20px"></div><p style="align-self: center;">Изменено количество постов</p></div>
+        <div v-if="isAnyCellClicked" class="flex"><div style="width: 30px; height: 30px; background-color: #E31E24; margin-right: 20px"></div><p style="align-self: center;">Добавлен выходной день</p></div>
       </div>
     </TabularSection>
-    
+
   </div>
 </template>
 
@@ -110,7 +110,7 @@ const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 const carCenterIds = computed(() => {
       // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
       return isEnv('sadmin') 
-        ? sadminServiceStationsStore?.getSelectedServiceStationIds()[0]
+        ? sadminServiceStationsStore?.getSelectedServiceStation().id
         : "none";
     });
 //////////

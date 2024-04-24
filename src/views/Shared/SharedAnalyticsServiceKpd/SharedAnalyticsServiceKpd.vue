@@ -70,7 +70,7 @@ const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 const carCenterIds = computed(() => {
       // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
       return isEnv('sadmin') 
-        ? sadminServiceStationsStore?.getSelectedServiceStationIds()[0]
+        ? sadminServiceStationsStore?.getSelectedServiceStation().id
         : "none";
     });
 console.log(carCenterIds.value);

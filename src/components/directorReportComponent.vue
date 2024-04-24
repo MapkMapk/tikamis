@@ -19,7 +19,7 @@
       </TabularTable>
       </div>
     </div>
-    <div class="flex flex-col items-center">
+    <div v-if="showButtons!== false" class="flex flex-col items-center">
             <div id="234" class="w-full flex mt-10 mb-3" style="justify-content: center">
               <div style="width: 400px;margin-right: 20px;">
               <BaseButtonFilledGreen
@@ -88,6 +88,10 @@
   showButtonApplyFilters: {
     type: Boolean,
     default: true // Дефолтное значение для showButtonApplyFilters
+  },
+  showButtons: {
+    type: Boolean,
+    default: true
   },
   showFilterOr: {
     type: Boolean,

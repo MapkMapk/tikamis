@@ -7,6 +7,7 @@
     class=""
     :show-filter-or="false"
     :show-Filter-All-Works="false"
+    :show-Buttons="false"
     @filtersApplied="fetchCustomerSkipsData"
   >
     <template v-slot:tabular-title>
@@ -55,9 +56,43 @@
     </template>
 
   </DirectorReportComponent>
+  <div class="flex flex-col items-center">
+            <div id="234" class="w-full flex mt-10 mb-3" style="justify-content: center">
+              <div style="width: 400px;margin-right: 20px;">
+              <BaseButtonFilledGreen
+                class="flex justify-between flex-1 mr-5 pt-3 pb-3"
+                style="width: inherit;"
+                >
+                
+                <div class="">
+                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="48px" height="48px" viewBox="0 0 96 96" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g><path style="opacity:0.998" fill="#e7f4e8" d="M 15.5,5.5 C 30.5037,5.33342 45.5037,5.50008 60.5,6C 66.6667,12.1667 72.8333,18.3333 79,24.5C 79.5,46.1641 79.6666,67.8308 79.5,89.5C 58.1667,89.5 36.8333,89.5 15.5,89.5C 15.5,61.5 15.5,33.5 15.5,5.5 Z"/></g>
+                <g><path style="opacity:1" fill="#fdfefe" d="M 57.5,8.5 C 63.9648,14.4639 70.2981,20.6306 76.5,27C 70.1754,27.4995 63.8421,27.6662 57.5,27.5C 57.5,21.1667 57.5,14.8333 57.5,8.5 Z"/></g>
+                <g><path style="opacity:1" fill="#409243" d="M 36.5,43.5 C 38.5273,43.3379 40.5273,43.5045 42.5,44C 43.8742,46.5829 45.3742,49.0829 47,51.5C 48.6258,49.0829 50.1258,46.5829 51.5,44C 53.5787,43.1923 55.5787,43.359 57.5,44.5C 55.4819,48.5363 53.4819,52.5363 51.5,56.5C 53.4367,60.8719 55.77,65.0385 58.5,69C 56.1667,69.6667 53.8333,69.6667 51.5,69C 50.1258,66.4171 48.6258,63.9171 47,61.5C 45.3742,63.9171 43.8742,66.4171 42.5,69C 40.1667,69.6667 37.8333,69.6667 35.5,69C 38.23,65.0385 40.5633,60.8719 42.5,56.5C 40.2115,52.259 38.2115,47.9256 36.5,43.5 Z"/></g>
+                </svg></div>
+                <div class="flex items-center">Выбрать</div>
+                <div class="w-[48px] h-[48px]"></div>
+                </BaseButtonFilledGreen
+              >
+            </div>
+            <div style="width: 400px;margin-left: 20px">
+              <BaseButtonFilledDark
+                class="flex flex-1 justify-between pt-3 pb-3"
+                style="width: inherit;"
+                >
+                <div class="w-[48px] h-[48px]"></div>
+                <div class="flex items-center text-white">Отправить</div>
+                <div><svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="48px" height="48px" viewBox="0 0 100.000000 100.000000" preserveAspectRatio="xMidYMid meet"> <g transform="translate(0.000000,100.000000) scale(0.100000,-0.100000)" fill="#ffffff" stroke="none"> <path d="M60 540 l0 -320 230 0 c223 0 230 1 230 20 0 19 -7 20 -210 20 -264 0 -263 -2 -84 140 69 55 129 100 133 100 4 0 18 -12 32 -26 13 -15 42 -35 65 -45 66 -30 92 -17 278 146 l166 145 0 -173 c0 -161 1 -175 20 -192 20 -18 20 -17 20 243 l0 262 -440 0 -440 0 0 -320z m840 257 c0 -18 -41 -59 -171 -173 -175 -153 -214 -179 -248 -166 -11 4 -97 75 -192 157 -94 83 -176 152 -180 153 -5 2 -9 15 -9 28 l0 24 400 0 400 0 0 -23z m-672 -181 c51 -44 92 -82 92 -85 0 -7 -206 -171 -214 -171 -3 0 -6 81 -6 181 0 172 1 180 18 167 10 -7 59 -49 110 -92z"/><path d="M764 389 c-3 -6 20 -37 52 -70 l58 -59 -137 0 c-130 0 -137 -1 -137 -20 0 -19 7 -20 137 -20 l137 0 -59 -60 c-47 -47 -57 -62 -47 -72 10 -10 30 5 95 70 l82 82 -80 80 c-44 44 -83 80 -87 80 -4 0 -10 -5 -14 -11z"/></g></svg></div>
+          </BaseButtonFilledDark>
+            </div>
+            </div>
+          </div>
 </template>
 
 <script setup>
+  import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
+  import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
+
 import { onMounted, ref, watch } from 'vue';
 import DirectorReportComponent from '@/components/directorReportComponent.vue';
 import TableHeaders from '@/components/Tabular/TableHeaders.vue';
@@ -82,7 +117,7 @@ const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 const carCenterIds = computed(() => {
       // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
       return isEnv('sadmin') 
-        ? sadminServiceStationsStore?.getSelectedServiceStationIds()
+        ? [sadminServiceStationsStore?.getSelectedServiceStation().id]
         : ["none"];
     });
 //////////
