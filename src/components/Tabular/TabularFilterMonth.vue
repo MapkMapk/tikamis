@@ -35,7 +35,7 @@
   }
   
   function toggleDatepicker() {
-    selectedDate.value = {
+    month.value = {
     month: new Date(2023, 1, 8).getMonth(),
     year: new Date(2023, 1, 8).getFullYear()
     }
@@ -44,7 +44,7 @@
   const emits = defineEmits(['updateDate']);
   
   function handleSelectedDate(date) {
-    selectedDate.value = date;
+    month.value = date;
     const { month, year } = date;
     const unixTime = Math.floor(new Date(year, month).getTime() / 1000);
     emits('updateDate', unixTime);
