@@ -2,12 +2,19 @@
   <ModalBooleanGray
   @callback="grayClose"
   :is-visible="gray.isVisible"
+  :main-title="gray.mainTitle"
+    :main-text="gray.mainText"
+    :primary-button-text="gray.primaryButtonText"
   />
   <ModalBoolean
+    @updateData="handleUpdateData"
     @callback="modal.callback"
+    :day="modal.day"
+    :is-weekend="modal.isWeekend"
     :is-visible="modal.isVisible"
-    :primary-button-component="modal.color"
+    :primary-button-component="modal.buttonComponent"
     :primary-count-text="modal.primaryCountText"
+    :primary-max-number="postLim"
     :main-title="modal.mainTitle"
     :main-text="modal.mainText"
     :primary-button-text="modal.primaryButtonText"
@@ -17,18 +24,23 @@
     
     <MainHeader />
     <MainHeaderGap />
-
+<!--были ли изменения-->
+<!--можно ли изменить-->
+ <!-- "wereChanges": true, = /* значение, указывающее были ли изменения */; 
+ "canChange": true, = /* значение, указывающее можно ли изменить */; 
+ "isWeekend": true = /* значение, указывающее стоит ли выходной */; -->
+<!--стоит ли выходной-->
     <TabularSection>
       <div class="flex w-full" style="align-items: center; justify-content: center; margin-bottom: 40px;">
       <TabularPrimeTitle class="mb-2">Календарь рабочих смен</TabularPrimeTitle>
-      <select v-model="selectedMonth" placeholder="Июнь-2023" class="text-4xl font-medium text-center mt-[39px] mb-[26px] mb-2" 
+      <TabularFilterMonth class="text-4xl flex-none w-[300px] font-medium text-center mt-[39px] mb-[26px] mb-2" 
         style="
         border: 1px solid #A1A4AD;
         padding: 0 10px;
         margin-left: 10px;
-      ">
-        <option value="2023-06" selected >Июнь-2023</option>
-      </select>
+      "
+      @updateDate="handleSelectedDate">
+      </TabularFilterMonth>
       <!-- <TabularFilterDate @updateDate="handleSelectedDateFirst" style="flex: 307;"/> -->
       </div>
       <div id="nusdfdsfll" class="flex flex-1 relative w-full" style="align-items: center;">
@@ -42,14 +54,22 @@
       </div>
 
       <!-- Рендер каждой строки таблицы  -->
-      <div 
-        v-for="(parent, parentIndex) in parentDivs"  
+      <!--
+      v-for="(parent, parentIndex) in parentDivs"  
         :key="`parent-${parentIndex}`" 
+      -->
+      <div  
+        v-for="(week, weekIndex) in Calendar" 
+        :key="weekIndex"
         class="flex flex-1 relative w-full"
         style="align-items: center;"
       >
-        <!-- Внутренний цикл для ячеек постов внутри каждой строки -->
-        <div
+        <!-- Внутренний цикл для ячеек постов внутри каждой строки -
+          v-for="(child, childIndex) in parent.children"
+          :key="`child-${childIndex}`"
+          :id="`child-${parentIndex}-${childIndex}`"-->
+          <!--
+          <div
           v-for="(child, childIndex) in parent.children"
           :key="`child-${childIndex}`"
           :id="`child-${parentIndex}-${childIndex}`"
@@ -59,20 +79,36 @@
           @click.prevent="
           child && child.firstValue ? saveModal(child.firstValue, child.secondValue) : grayOpen()"
           :style="{ width: '14.285%', height: computedHeight + 'px', position: 'relative' }"
+          >-->
+        <div
+          v-for="(day, dayIndex) in week" 
+          :key="dayIndex"
+          class="empty-cell white-cell flex-half border border-gray-d9d9d9"
+          :style="{ 
+            width: '14.285%', 
+            height: computedHeight + 'px', 
+            position: 'relative' 
+          }"
+          :class="{
+            'gray-cell': day && day.state === 5,
+            'green-cell': day && day.state === 3,
+            'red-cell': day && day.state === 4
+          }"
+          @click="modalCellClick(day)"
         >
           <!-- Условное отображение элемента <p> для firstValue, отображается только если child существует -->
-          <p v-if="child" class="day-num" style="position: absolute; top: 10px; right: 20px;">{{ child.firstValue }}</p>
+          <p v-if="day" class="day-num" style="position: absolute; top: 10px; right: 20px;">{{ day.day }}</p>
           <!-- Условное отображение элемента <p> для secondValue и thirdValue, отображается только если child существует -->
-          <p v-if="child" class="posts-nonum" style="position: absolute; bottom: 10px; left: 20px;">
-            <span class="posts-num">{{ child.secondValue }}</span> {{ child.thirdValue }}
+          <p v-if="day" class="posts-nonum" style="position: absolute; bottom: 10px; left: 20px;">
+            <span class="posts-num">{{ day.capacity }}</span> {{ day.formatCount}}
           </p>
         </div>
       </div>
 
-      <div class="flex w-full" style="margin-top: 20px;">
+      <div class="flex w-full" style="margin-top: 20px; margin-bottom: 50px">
         <div class="flex" style="margin-right: 150px;"><div style="width: 30px; height: 30px; background-color: #C2C3C7; margin-right: 20px"></div><p style="align-self: center;">Нет данных по сотрудникам</p></div>
         <div class="flex" style="margin-right: 150px;"><div style="width: 30px; height: 30px; background-color: #87C23E; margin-right: 20px"></div><p style="align-self: center;">Изменено количество постов</p></div>
-        <div v-if="isAnyCellClicked" class="flex"><div style="width: 30px; height: 30px; background-color: #E31E24; margin-right: 20px"></div><p style="align-self: center;">Добавлен выходной день</p></div>
+        <div v-if="isAnyCellRed" class="flex"><div style="width: 30px; height: 30px; background-color: #E31E24; margin-right: 20px"></div><p style="align-self: center;">Добавлен выходной день</p></div>
       </div>
     </TabularSection>
 
@@ -86,7 +122,7 @@ import MainHeaderGap from '@/components/MainHeaderGap.vue';
 
 import TabularSection from '@/components/Tabular/TabularSection.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
-import TabularFilterDate from '@/components/Tabular/TabularFilterDate.vue';
+import TabularFilterMonth from '@/components/Tabular/TabularFilterMonth.vue';
 
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
@@ -103,9 +139,145 @@ import isEnv from '@/utils/isEnv.js';
 import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 const sadminServiceStationsStore = useSadminServiceStationsStore();
 const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+const postLim = ref(4);
+let filterDateStart = ref(1675882800);
+
+function handleSelectedDate(date) {
+	filterDateStart.value = (date + 86400);
+	console.log(filterDateStart.value);
+  applyFilters()
+}
+
+function getGenitiveMonthName(unixTime) {
+    const monthsGenitive = [
+        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+    ];
+
+    const date = new Date(unixTime * 1000); // Умножаем на 1000, так как Unix timestamp в секундах
+
+    const monthIndex = date.getMonth();
+    return monthsGenitive[monthIndex];
+}
+/////////
+///Модальные окна
+/////////
+let modal = ref({});
+const gray = ref({
+  isVisible: false, // Флаг видимости окна gray
+  mainTitle: '', // Основной заголовок окна
+  mainText: '', // Основной текст окна
+  primaryButtonText: 'Закрыть', // Текст кнопки
+});
+
+function grayOpen(title, text){
+gray.value.isVisible = true
+gray.value.mainTitle = title;
+gray.value.mainText = text;
+}
+function grayClose(){
+gray.value.isVisible = false
+}
+// isVisible: Boolean,
+//   mainTitle: String,
+//   mainText: String,
+//   primaryButtonComponent: Object,
+//   primaryCountText: Number,
+//   primaryButtonText: String,
+//   secondaryButtonText: String
+
+/* <ModalBoolean
+    @callback="modal.callback"
+    :is-visible="modal.isVisible"
+    :primary-button-component="modal.buttonComponent"
+    :primary-count-text="modal.primaryCountText"
+    :main-title="modal.mainTitle"
+    :main-text="modal.mainText"
+    :primary-button-text="modal.primaryButtonText"
+    :secondary-button-text="modal.secondaryButtonText"
+  /> */
+  function greenOpen(day) {
+
+  // Установка компонента кнопки в зависимости от выходного дня
+    modal.value.isWeekend = day.isWeekend;
+  
+  // Установка текстовых данных модального окна
+  modal.value.mainText = 'Количество постов';
+  modal.value.primaryCountText = day.capacity;
+  modal.value.secondaryButtonText = 'Применить';
+
+  // Формирование заголовка с учетом даты
+  let dayNumber = day.day;
+  let monthName = getGenitiveMonthName(day.unix);
+  modal.value.day = dayNumber;
+  modal.value.mainTitle = `${dayNumber} ${monthName}`;
+
+  // Отображение модального окна
+  modal.value.isVisible = true;
+    console.log(modal.value);
+  // Обработчик сохранения данных
+}
+  async function handleUpdateData(updatedData){
+    modal.value.isVisible = false;
+    const { postNumber, isWeekend, dayNumber } = updatedData;
+     // Определение нового состояния
+        const newState = isWeekend ? 2 : 1;
+
+      // Формирование объекта запроса
+      const requestBody = {
+        filters: {
+          dateStart: filterDateStart.value,
+          carCenters: [carCenterIds.value]
+        },
+        day: dayNumber,
+        newCapacity: postNumber,
+        newState: newState
+      };
+    
+    const response = await apiCall.post('/manage/shift-calendar', requestBody);
+    const items = response.data.items;
+    isAnyCellRed.value = items.some(item => item.state === 4) ? true : false;
+    Calendar.value = processedData(items, requestBody.filters.dateStart);
+    //postNumber это число newCapacity
+    //isWeekend boolean, "newState": 1 если false и "newState": 2 если true
+    //dayNumber это число day
+    //filterDateStart.value время в unix dateStart
+    //carCenterIds.value это id центра, он изначально не находится в квадратных скобках
+  }
+
+
+// state 1	Обычный день. Изменений директор в этом дне не делал, можно поставить выходной или изменить количество постов.
+// state 2	Нельзя изменять количество постов или ставить выходной в этой ячейке. (По причине того, что там уже есть заказы)
+// state 3	Были изменения в этом дне. Можно ещё раз изменить или поставить выходной.
+// state 4	Выходной день. Можно снять его
+// state 5	Нет расписания на этот день. Никаких действий с этой ячеек сделать нельзя
+
+/////////
+/// обработка модальных окон
+
+
+
+function modalCellClick(day){
+  if(!day.canChange){
+    if(day.state === 5){
+      grayOpen('Нет расписания на этот день', 'Никаких действий с этой ячеек сделать нельзя.');
+    }
+    else{
+      let dayNumber = day.day;
+      let monthName = getGenitiveMonthName(day.unix);
+      grayOpen('Имеется запись', `На ${dayNumber} ${monthName} имеется запись. Изменить численность постов невозможно.`, 'Закрыть');
+    }
+  }
+  else{
+    greenOpen(day);
+  }
+  console.log(day);
+}
+///
+/////////
 
 const carCenterIds = computed(() => {
       // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
@@ -117,63 +289,101 @@ const carCenterIds = computed(() => {
 //
 //////////
 
-let modal = ref({});
-let gray = ref({});
 
-function grayOpen(){
-gray.value.isVisible = true
+
+///
+/// Расчёт пустых дней календаря
+///
+const Calendar = ref([]);
+
+function getFirstDayOfMonth(year, month) {
+  if (month < 0 || month > 11) {
+    throw new Error('Неверное значение месяца');
+  }
+  return new Date(year, month, 1).getDay() === 0 ? 6 : new Date(year, month, 1).getDay() - 1;
 }
-function grayClose(){
-gray.value.isVisible = false
-}
-function saveModal(uno,dos) {
-  let isRed = event.target.classList.contains('clicked-cell');
-  modal.value.callback = save;
-  if(isRed){
-    modal.value.color = BaseButtonFilledRed;
-    modal.value.primaryButtonText = `Отменить выходной`;
+function formatPostCount(count) {
+    const lastTwoDigits = count % 100;
+
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+        return "постов";
+    } else {
+        const lastDigit = count % 10;
+        if (lastDigit === 1) {
+            return "пост";
+        } else if (lastDigit >= 2 && lastDigit <= 4) {
+            return "поста";
+        } else {
+            return "постов";
+        }
     }
-  else{
-    modal.value.color = BaseButtonFilledDark;
-    modal.value.primaryButtonText = `Установить выходной`;
+}
+
+function processedData(response, unixTime) {
+  // Функция для определения первого дня недели месяца
+  const responseDate = new Date(unixTime * 1000);
+  const year = responseDate.getFullYear();
+  const month = responseDate.getMonth();
+
+  // Определение количества элементов для заполнения значением null
+  const nullCount = getFirstDayOfMonth(year, month);
+
+  // Создаем массив из 31 элемента, заполненный значениями null сначала
+  const processedData = Array(nullCount).fill(null);
+
+  for (const item of response) {
+    const { day, capacity, state } = item;
+    const unix = unixTime;
+    const isWeekend = state === 4;
+    const wereChanges = state === 3;
+    const canChange = state === 1 || state === 3 || state === 4;
+    const formatCount = formatPostCount(capacity);
+    processedData.push({ day, capacity, state, wereChanges, canChange, isWeekend, formatCount, unix });
   }
-  modal.value.mainText = 'Количество постов';
-  modal.value.primaryCountText = `${dos}`;
-  modal.value.isVisible = true;
-  modal.value.mainTitle = `${uno} июня`;
-  
-  //modal.value.primaryButtonText = 'Продолжить';
-  modal.value.secondaryButtonText = 'Применить';
-  async function save() {
-    // Sadmin
-    modal.value.isVisible = false;
+  const remainingNulls = (7 - (processedData.length % 7)) % 7;
+
+  // Добавляем пустые дни в конец массива
+  for (let i = 0; i < remainingNulls; i++) {
+    processedData.push(null);
+  }
+  //return processedData;
+  const weeks = [];
+  for (let i = 0; i < processedData.length; i += 7) {
+    weeks.push(processedData.slice(i, i + 7));
+  }
+
+  return weeks;
+}
+///
+///
+///
+const isAnyCellRed = ref(false);
+
+async function applyFilters() {
+  const responseBody = {
+    filters: {
+      interval: 'month',
+      dateStart: filterDateStart.value,
+      works: null,
+      carCenters: [carCenterIds.value], // Предполагается, что carCenterIds.value уже определено где-то в коде
+      page: 1
+    }
+  };
+
+  try {
+    const response = await apiCall.post('/manage/get-shift-calendar', responseBody);
+    postLim.value = response.data.postsLimit;
+    const items = response.data.items;
+    isAnyCellRed.value = items.some(item => item.state === 4) ? true : false;
+    Calendar.value = processedData(items, responseBody.filters.dateStart);
+    console.log(Calendar.value);
+  } catch (error) {
+    console.error('Ошибка при применении фильтров:', error);
+    // В случае ошибки можно добавить дополнительные действия, например, вывод сообщения об ошибке
   }
 }
 
-function closeModal() {
-  modal.value.callback = close;
-  modal.value.isVisible = true;
-  modal.value.mainTitle = 'Закрыть без сохранения?';
-  modal.value.mainText = 'Настройки не будут применены';
-  modal.value.primaryButtonText = 'Сохранить изменения';
-  modal.value.secondaryButtonText = 'Закрыть без сохранения';
-
-  function close() {
-    router.push('/');
-  }
-}
-
-
-const responseBody = {filters: {
-          interval: 'month',
-          dateStart: 1677504000,// дата в unix
-          works: null,
-          carCenters: [carCenterIds.value], // Указаны для примера, измените по необходимости
-          page: 1 // Указано для примера, измените по необходимости
-          }}
-//const response = await apiCall.post('/manage/get-shift-calendar', responseBody);
-//console.log(response);
-
+onMounted(() => {applyFilters()});
 </script>
 <script>
 export default {
@@ -182,79 +392,23 @@ export default {
   data() {
     return {
       computedHeight: 0, // начальное значение
-      selectedMonth: "2023-06",
-      clickedCells: {},
-      parentDivs: [
-  {
-    "children": [
-      null,
-      null,
-      null,
-      {"firstValue": "1", "secondValue": 4, "thirdValue": "Поста"},
-      {"firstValue": "2", "secondValue": 5, "thirdValue": "Постов"},
-      {"firstValue": "3", "secondValue": 3, "thirdValue": "Поста"},
-      {"firstValue": "4", "secondValue": 3, "thirdValue": "Поста"}
-    ]
-  },
-  {
-    "children": [
-      {"firstValue": "5", "secondValue": 6, "thirdValue": "Постов"},
-      {"firstValue": "6", "secondValue": 3, "thirdValue": "Поста"},
-      {"firstValue": "7", "secondValue": 3, "thirdValue": "Поста"},
-      {"firstValue": "8", "secondValue": 4, "thirdValue": "Поста"},
-      {"firstValue": "9", "secondValue": 2, "thirdValue": "Поста"},
-      {"firstValue": "10", "secondValue": 5, "thirdValue": "Постов"},
-      {"firstValue": "11", "secondValue": 3, "thirdValue": "Поста"}
-    ]
-  },
-  {
-    "children": [
-      {"firstValue": "12", "secondValue": 2, "thirdValue": "Поста"},
-      {"firstValue": "13", "secondValue": 6, "thirdValue": "Постов"},
-      {"firstValue": "14", "secondValue": 6, "thirdValue": "Постов"},
-      {"firstValue": "15", "secondValue": 2, "thirdValue": "Поста"},
-      {"firstValue": "16", "secondValue": 4, "thirdValue": "Поста"},
-      {"firstValue": "17", "secondValue": 3, "thirdValue": "Поста"},
-      {"firstValue": "18", "secondValue": 3, "thirdValue": "Поста"}
-    ]
-  },
-  {
-    "children": [
-      {"firstValue": "19", "secondValue": 5, "thirdValue": "Постов"},
-      {"firstValue": "20", "secondValue": 3, "thirdValue": "Поста"},
-      {"firstValue": "21", "secondValue": 4, "thirdValue": "Поста"},
-      {"firstValue": "22", "secondValue": 4, "thirdValue": "Поста"},
-      {"firstValue": "23", "secondValue": 5, "thirdValue": "Постов"},
-      {"firstValue": "24", "secondValue": 3, "thirdValue": "Поста"},
-      {"firstValue": "25", "secondValue": 4, "thirdValue": "Поста"}
-    ]
-  },
-  {
-    "children": [
-      {"firstValue": "26", "secondValue": 2, "thirdValue": "Поста"},
-      {"firstValue": "27", "secondValue": 3, "thirdValue": "Поста"},
-      {"firstValue": "28", "secondValue": 4, "thirdValue": "Поста"},
-      {"firstValue": "29", "secondValue": 6, "thirdValue": "Постов"},
-      {"firstValue": "30", "secondValue": 5, "thirdValue": "Постов"},
-      {"firstValue": "31", "secondValue": 3, "thirdValue": "Поста"},
-      null
-    ]
-  },
-]
+      week: []
     };
   },
   computed: {
     // Вычисляемое свойство, проверяющее, есть ли нажатые ячейки
-    isAnyCellClicked() {
-      return Object.values(this.clickedCells).some(status => status);
-    }
+    
   },
   methods: {
     // Метод обрабатывает клик, изменяет состояние для конкретной ячейки
     handleClick(cellId) {
       this.clickedCells[cellId] = !this.clickedCells[cellId];
       this.$forceUpdate();
-    }
+    },
+    fillWeekWithData(response) {
+    // Заполнение массива week данными из response
+    this.week = response.items;
+  }
   },
   mounted() {
     
@@ -267,7 +421,7 @@ export default {
 };
 </script>
 <style>
-.white-cell#child-1-0{
+/* .white-cell#child-1-0{
 background-color: #C2C3C7;
 box-shadow: inset 0 0 0 2px #fff;
 }
@@ -276,16 +430,14 @@ box-shadow: inset 0 0 0 2px #fff;
 }
 .white-cell#child-1-0 p,.white-cell#child-1-0 span {
 color: #fff;}
-
-.white-cell#child-1-2{
+*/
+.green-cell{
 background-color: #87C23E;
 box-shadow: inset 0 0 0 2px #fff;
 }
-.white-cell#child-1-2:hover{
-  box-shadow: inset 0 0 0 2px #f00;
-}
-.white-cell#child-1-2 p,.white-cell#child-1-2 span {
-color: #fff;}
+.gray-cell{
+background-color: #C2C3C7;
+box-shadow: inset 0 0 0 2px #fff;}
 
 .white-cell:hover{
   box-shadow: inset 0 0 0 2px #f00; /* Внутренний border красного цвета */
@@ -293,6 +445,9 @@ color: #fff;}
 .white-cell{
 padding: 15px 20px;
 }
+.red-cell {
+  background-color: #E31E24; /* Цвет фона для активированных ячеек */
+  box-shadow: inset 0 0 0 2px #fff;}
 
 .day-num{
   font-family: Inter;
@@ -329,7 +484,5 @@ font-weight: 500;
 line-height: 29.05px;
 text-align: center;
 }
-.clicked-cell {
-  background-color: #E31E24; /* Цвет фона для активированных ячеек */
-}
+
 </style>

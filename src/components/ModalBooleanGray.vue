@@ -10,14 +10,19 @@
 					</svg>
         </div>
         <div class="flex flex-col items-center mt-[23px] mb-[40px] pl-10 pr-10 text-center">
-          <span class="font-medium text-3xl text-red-500">Имеется запись</span>
-          <span class="text-lg mt-[25px] leading-7 texttexttext">На 8 июня имеется запись. Изменить численность постов невозможно.</span>
+          <!-- Имеется запись -->
+          <span class="font-medium text-3xl text-red-500">{{ props.mainTitle }}</span>
+
+          <span class="text-lg mt-[25px] leading-7 texttexttext">{{ props.mainText }}</span>
+          <!-- На 8 июня имеется запись. Изменить численность постов невозможно. -->
         </div>
         <div class="flex w-full mt-auto">
           <BaseButtonFilledLight
             @click="emit('callback', false)"
             class="flex-1"
-            >Закрыть
+            >
+            <!-- Закрыть -->
+            {{ props.primaryButtonText }}
           </BaseButtonFilledLight>
         </div>
       </div>
@@ -25,7 +30,7 @@
   </template>
   <script setup>
   import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
-  import { ref } from 'vue';
+  import { defineProps, defineEmits, ref } from 'vue';
   
   let emit = defineEmits(['callback']);
   let props = defineProps({
