@@ -49,6 +49,9 @@
     const unixTime = Math.floor(new Date(year, month).getTime() / 1000);
     emits('updateDate', unixTime);
   }
+  function updateSelectedDate(date) {
+  emits('updateDate', Math.floor(date.getTime() / 1000)); // Отправляем timestamp
+  }
   </script>
   <style>
   .dp__icon.dp__input_icon.dp__input_icons,
