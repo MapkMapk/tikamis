@@ -44,8 +44,9 @@
   const emits = defineEmits(['updateDate']);
   
   function handleSelectedDate(date) {
-    month.value = date;
+    
     const { month, year } = date;
+    month.value = { month, year };
     const unixTime = Math.floor(new Date(year, month).getTime() / 1000);
     emits('updateDate', unixTime);
   }
