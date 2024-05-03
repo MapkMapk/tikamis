@@ -2,7 +2,7 @@
     <div class="report-filter justify-between min-w-min" @click="simulateClickOnDatePicker">
       <div class="flex-col">
         <VueDatePicker :style="{ '.dp__overlay.dp--overlay-relative, .dp__overlay_container.dp__container_flex': { height: 'auto' } }"
-        v-model="month" :format="customFormat" :start-date="startDate" focus-start-date month-picker auto-apply @update:modelValue="handleSelectedDate" locale="ru" :enable-time-picker="false" id="DatePickerPTPRO" />
+        v-model="monthh" :format="customFormat" :start-date="startDate" focus-start-date month-picker auto-apply @update:modelValue="handleSelectedDate" locale="ru" :enable-time-picker="false" id="DatePickerPTPRO" />
       </div>
       <BaseSvgIcon
         class="max-w-[18px] max-h-[18px]"
@@ -18,7 +18,7 @@
   import '@vuepic/vue-datepicker/dist/main.css';
   import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
   
-  const month = ref({
+  const monthh = ref({
     month: new Date(2023, 1, 8).getMonth(),
     year: new Date(2023, 1, 8).getFullYear()
     });
@@ -35,7 +35,7 @@
   }
   
   function toggleDatepicker() {
-    month.value = {
+    monthh.value = {
     month: new Date(2023, 1, 8).getMonth(),
     year: new Date(2023, 1, 8).getFullYear()
     }
@@ -44,9 +44,11 @@
   const emits = defineEmits(['updateDate']);
   
   function handleSelectedDate(date) {
+    console.log(date);
     
     const { month, year } = date;
-    month.value = { month, year };
+    console.log({ month, year });
+    monthh.value = { month, year };
     const unixTime = Math.floor(new Date(year, month).getTime() / 1000);
     emits('updateDate', unixTime);
   }
