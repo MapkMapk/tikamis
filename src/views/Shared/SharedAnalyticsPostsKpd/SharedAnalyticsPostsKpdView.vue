@@ -4,9 +4,10 @@
   <MainHeaderGap />
   <DirectorReportComponent
     :show-filter-or="true"
-    @filtersApplied="fetchCustomerSkipsData"
+    @filtersApplied="fetchData"
     @worksLoaded="handleAllWorksLoaded"
     @optionSelected="changeOrsOption"
+    @dataUpdated="onDataUpdated"
   >
     <template v-slot:tabular-title>
       <TabularPrimeTitle>Кпд постов</TabularPrimeTitle>
@@ -66,17 +67,26 @@ import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
 
-//////////
-//оч важный блок
-//////////
+import { unixToDate } from '@/utils/time/dateUtils.js';
 import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
 import isEnv from '@/utils/isEnv.js';
 import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 
 import { computed } from 'vue';
+//////////
+//Вызов констант
+//////////
 const sadminServiceStationsStore = useSadminServiceStationsStore();
 const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+const url = '/analytics/get-posts-KPD';
+const currentSort = ref({ option: 'itemsByMechanics' });
+
+const items = ref([]);
+const itemsByPosts = ref([]);
+const itemsByMechanics = ref([]);
+
+const columns = ref([]);
 
 const carCenterIds = computed(() => {
       // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
@@ -87,54 +97,55 @@ const carCenterIds = computed(() => {
 //////////
 //
 //////////
-const items = ref([]);
-const itemsByPosts = ref([]);
-const itemsByMechanics = ref([]);
-const currentSort = ref('itemsByMechanics');
-function changeOrsOption(option){
-  currentSort.value = option;
-  console.warn(displayedItems.value.length);
-  if (currentSort.value.option === 'itemsByPosts') {
+const initialFilters = { date: 1675623600, period: 'month', works: null };
+const filtersRef = ref(initialFilters);
+function onDataUpdated(data) {
+  // Обновляем значения filtersRef
+  filtersRef.value = {
+    interval: data.period,
+    dateStart: data.dateStart,
+    works: Array.isArray(data.workId) ? data.workId : null,
+    carCenters: [carCenterIds.value],
+    page: 1
+  };
+}
+
+// Initialize columns
+onMounted(() => {
+    changeOrsOption(currentSort.value.option);
+});
+
+function changeOrsOption(option) {
+    currentSort.value.option = option;
     columns.value = [
-      { header: 'Пост', size: '4fr' },
-      { header: 'Работы', size: '3fr' },
-      { header: 'Потери', size: '1fr' },
+        { header: option === 'itemsByPosts' ? 'Пост' : 'Механик', size: '4fr' },
+        { header: 'Работы', size: '3fr' },
+        { header: 'Потери', size: '1fr' },
     ];
-  } else {
-    // Предполагаемая структура колонок для "mechanics"
-    columns.value = [
-      { header: 'Механик', size: '4fr' },
-      { header: 'Работы', size: '3fr' },
-      { header: 'Потери', size: '1fr' },
-    ];
-  }
 }
 
 
-const initialFilters = { date: 1675623600, period: 'month', works: 'null' };
 
 
+function handleAllWorksLoaded(ids) {
+    console.log("==============");
+    console.log(ids);
+    console.log("==============");
+    const { dateStart, period, workId } = ids;
+    fetchData({ date: dateStart, period, workId });
+  }
 onMounted(() => {
-  // Предположим, что у вас есть начальные значения для фильтров
-  
-  fetchCustomerSkipsData(initialFilters);
-  console.log('ВНИМАНИЕ, ЭТО ТЕСТОВАЯ СТРАНИЦА, ОНА ВЫВОДИТ ИНФОРМАЦИЮ ИЗ report/get-customer-skips');
+  fetchData(initialFilters);
+});
+
+watch(() => currentSort.value.option, (newVal) => {
+    changeOrsOption(newVal);
 });
 
 
-  function handleAllWorksLoaded(ids) {
-    const { dateStart, period, workId } = ids;
-    console.log('!!!!!!!!');
-    console.log(dateStart);
-    console.log(period);
-    console.log(workId);
-    console.log('!!!!!!!!');
-    fetchCustomerSkipsData(dateStart, period, workId);
-  }
+  
 
 // Обновление колонок в зависимости от currentSort
-const columns = ref([]);
-
 const getTotalLossSum = (items) => {
   // Инициализация переменной для хранения суммы
   let totalLossSum = 0;
@@ -152,34 +163,7 @@ function formatTotalLoss (sum) {
   return formattedTotalLoss;
 };
 
-watch(currentSort.value.option, (newVal) => {
-  if (newVal === 'itemsByPosts') {
-    columns.value = [
-      { header: 'Пост', size: '4fr' },
-      { header: 'Работы', size: '3fr' },
-      { header: 'Потери', size: '1fr' },
-    ];
-  } else {
-    // Предполагаемая структура колонок для "mechanics"
-    columns.value = [
-    { header: 'Механик', size: '4fr' },
-      { header: 'Работы', size: '3fr' },
-      { header: 'Потери', size: '1fr' },
-    ];
-  }
-}, { immediate: true });
-function unixToDate(unixTime) {
-  const date = new Date(unixTime * 1000); // Умножаем на 1000, так как в JavaScript время измеряется в миллисекундах, а не в секундах, как в Unix
 
-  const day = String(date.getDate()).padStart(2, '0'); // День месяца с ведущим нулём, если нужно
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяц с ведущим нулём, так как в JavaScript месяцы нумеруются с 0
-  const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, '0'); // Часы с ведущим нулём, если нужно
-  const minutes = String(date.getMinutes()).padStart(2, '0'); // Минуты с ведущим нулём, если нужно
-
-  const formattedDate = `${day}.${month}.${year} ${hours}:${minutes}`;
-  return formattedDate;
-}
 
 ///////  Тут находится код, который убирает баг с раскрытием строк
 //////   при нажатии на тэг summary в некоторых браузерах (возможно во всех)
@@ -254,17 +238,18 @@ function toggleSingleDetail(event) {toggleDetails(event)}
 const displayedItems = computed(() => {
   return currentSort.value.option === 'itemsByPosts' ? itemsByPosts.value : itemsByMechanics.value;
 });
-async function fetchCustomerSkipsData({ date, period, workId }) {
-  const filters = ref({
+async function fetchData({ date, period, workId }) {
+  const works = Array.isArray(workId) ? workId : null;
+  filtersRef.value = ref({
     interval: period,
     dateStart: date,
-    works: [null],
+    works: works,
     carCenters: [carCenterIds.value], // Указаны для примера, измените по необходимости
     page: 1 // Указано для примера, измените по необходимости
   });
 
   try {
-    const response = await apiCall.post('/analytics/get-posts-KPD', { filters: filters.value });
+    const response = await apiCall.post(url, { filters: filtersRef.value });
     //console.log(response.data[currentSort.value][0].works);
     itemsByPosts.value = response.data.itemsByPosts;
     itemsByMechanics.value = response.data.itemsByMechanics;
@@ -273,8 +258,12 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
     //updateColumns(currentSort.value);
   } catch (error) {
     console.error('Ошибка при загрузке данных:', error);
+    return null;
   }
 }
+async function fetchDataAndDoSomething() {
+}
+
 function truncateText(text, maxLength) {
   if (text.length > maxLength) {
     return text.slice(0, maxLength) + '...';

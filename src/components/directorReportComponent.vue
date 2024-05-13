@@ -70,7 +70,7 @@
   }
 });
 
-  const emit = defineEmits(['filtersApplied', 'filtersReset', 'filterChange', 'workLoaded']);
+  const emit = defineEmits(['filtersApplied', 'filtersReset', 'dataUpdated', 'worksLoaded']);
   
   const props = defineProps({
     showFilterPeriod: {
@@ -100,12 +100,40 @@
     items: Array,
     currentView: String
   });
-  
+  /*
+  {
+  "url": "report/get-posts-downtime",
+  "show": "m",
+  "filters": {
+    "interval": "string",
+    "dateStart": 0,
+    "works": [
+      "string"
+    ],
+    "carCenters": [
+      "string"
+    ],
+    "page": 0
+  }
+  }
+ */
   const selectedDate = ref(1675623600);
   const selectedPeriod = ref('month');
   const selectedSort = ref('itemsByPosts');
   const selectedWorkId = ref('');
   
+
+  const emitDataToParent = () => {
+  const data = {
+    dateStart: selectedDate.value,
+    period: selectedPeriod.value,
+    sort: selectedSort.value,
+    workId: selectedWorkId.value
+  };
+  emit('dataUpdated', data);
+};
+
+
   const handleWorksLoaded = (ids) => {
     selectedWorkId.value = ids;
     emit('worksLoaded', {
@@ -113,6 +141,7 @@
       period: selectedPeriod.value,
       workId: selectedWorkId.value
     });
+    emitDataToParent();
   };
   
   onBeforeMount(async () => {
@@ -122,10 +151,12 @@
   
   const handleUpdateDate = (date) => {
     selectedDate.value = date;
+    emitDataToParent();
   };
   
   const handleUpdatePeriod = (period) => {
     selectedPeriod.value = period;
+    emitDataToParent();
   };
   
   const handleOptionSelected = (optionValue) => {
@@ -133,11 +164,12 @@
     emit('optionSelected', {
         option: selectedSort.value,
     });
-    
+    emitDataToParent();
   };
   
   const handleWorkSelected = (workId) => {
     selectedWorkId.value = workId;
+    emitDataToParent();
   };
   
   const applyFilters = () => {
@@ -147,6 +179,7 @@
       sort: selectedSort.value,
       workId: selectedWorkId.value
     });
+    emitDataToParent();
   };
   
   

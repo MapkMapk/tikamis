@@ -369,9 +369,9 @@ async function applyFilters() {
       page: 1
     }
   };
-
+  const url = '/manage/get-shift-calendar';
   try {
-    const response = await apiCall.post('/manage/get-shift-calendar', responseBody);
+    const response = await apiCall.post(url, responseBody);
     postLim.value = response.data.postsLimit;
     const items = response.data.items;
     isAnyCellRed.value = items.some(item => item.state === 4) ? true : false;
