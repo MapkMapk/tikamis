@@ -249,7 +249,7 @@ async function fetchData({ date, period, workId }) {
   });
 
   try {
-    const response = await apiCall.post(url, { filters: filtersRef.value });
+    const response = await apiCall.post(url, { filters: filtersRef.value._value });
     //console.log(response.data[currentSort.value][0].works);
     itemsByPosts.value = response.data.itemsByPosts;
     itemsByMechanics.value = response.data.itemsByMechanics;
