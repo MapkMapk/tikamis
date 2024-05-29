@@ -1,17 +1,10 @@
 <template>
-	<ModalBoolean
-    @callback="modal.callback"
-    :is-visible="modal.isVisible"
-    :primary-button-component="modal.color"
-    :primary-count-text="modal.primaryCountText"
-    :main-title="modal.mainTitle"
-    :main-text="modal.mainText"
-    :primary-button-text="modal.primaryButtonText"
-    :secondary-button-text="modal.secondaryButtonText"
-  />
+	<ModalBoolean @callback="modal.callback" :is-visible="modal.isVisible" :primary-button-component="modal.color"
+		:primary-count-text="modal.primaryCountText" :main-title="modal.mainTitle" :main-text="modal.mainText"
+		:primary-button-text="modal.primaryButtonText" :secondary-button-text="modal.secondaryButtonText" />
 	<div>
 		<!-- Модальное окно для подтверждения действия -->
-		
+
 		<!-- Главный заголовок страницы -->
 		<MainHeader />
 		<!-- Промежуток для главного заголовка -->
@@ -23,11 +16,11 @@
 			<!-- Обертка для фильтров таблицы -->
 			<TabularFiltersWrapper>
 				<!-- Фильтр по периоду -->
-				<TabularFilterPeriod @updatePeriod="handleOptionSelected" style="flex: 184;" />
+				<TabularFilterPeriod @updatePeriod="selectOptionHandler" style="flex: 184;" />
 				<!-- Фильтр по дате -->
-				<TabularFilterDate @updateDate="handleSelectedDate" style="flex: 614;" />
+				<TabularFilterDate @updateDate="selectDateHandler" style="flex: 614;" />
 				<!-- Кнопка сброса фильтров -->
-				<TabularButtonCross style="flex: 60; cursor: pointer;" @click="defaultFilters" />
+				<TabularButtonCross style="flex: 60; cursor: pointer;" @click="resetToDefaultFilters" />
 				<!-- Кнопка применения фильтров -->
 				<TabularButtonApplyFilters style="flex: 217;" @click="applyFilters" />
 			</TabularFiltersWrapper>
@@ -43,28 +36,38 @@
 				<TabularTableCellTop></TabularTableCellTop>
 			</TabularTableRow>
 			<!-- Ряды данных -->
-			<TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2.2fr 1fr 1fr 1fr 0.2fr;">
+			<TabularTableRow v-for="item in items" :key="item.orderId"
+				style="display: grid; grid-template-columns: 2.2fr 1fr 1fr 1fr 0.2fr;">
 				<!-- Ячейка с данными о работах -->
-				<TabularTableRowCell :style="{ height: cellHeight, width: '2.2fr' }" style="padding-left: 10px;">
+				<TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '2.2fr' }" style="padding-left: 10px;">
 					{{ item.works.length === 1 ? item.works[0].name : '' }}
-					<details v-if="item.works.length > 1" class="custom-details" :style="{ width: cellWidth }">
-						<summary class="flex" style="justify-content: space-between;"> {{ item.works[0].name }} <strong >ещё {{ item.works.length - 1 }}</strong> </summary>
+					<details v-if="item.works.length > 1" class="custom-details" :style="{ width: CELL_WIDTH }">
+						<summary class="flex" style="justify-content: space-between;"> {{ item.works[0].name }}
+							<strong>ещё {{ item.works.length - 1 }}</strong> </summary>
 						<ul>
 							<li v-for="work in item.works.slice(1)" :key="work.id">{{ work.name }}</li>
 						</ul>
 					</details>
 				</TabularTableRowCell>
 				<!-- Ячейка с данными о времени записи -->
-				<TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px; align-self: center;">{{ unixToData(item.bookingTime) }}</TabularTableRowCell>
+				<TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '1fr' }"
+					style="padding-left: 10px; align-self: center;">{{ unixToData(item.bookingTime) }}
+				</TabularTableRowCell>
 				<!-- Ячейка с данными о телефоне -->
-				<TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px; align-self: center;">{{ item.phone }}</TabularTableRowCell>
+				<TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '1fr' }"
+					style="padding-left: 10px; align-self: center;">{{ item.phone }}</TabularTableRowCell>
 				<!-- Ячейка с данными об автомобиле -->
-				<TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px; align-self: center;">{{ item.plate }}</TabularTableRowCell>
+				<TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '1fr' }"
+					style="padding-left: 10px; align-self: center;">{{ item.plate }}</TabularTableRowCell>
 				<!-- Ячейка для действий -->
-				<TabularTableRowCell :style="{ height: cellHeight, width: '.2fr' }">
+				<TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '.2fr' }">
 					<!-- Кликабельное изображение крестика для удаления записи deleteItem(item)-->
-					<svg @click="deleteModal()" style="cursor: pointer;" class="delete-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 16 16">
-						<path d="M14.2929 0.292893C14.6834 -0.0976311 15.3166 -0.0976311 15.7071 0.292893C16.0976 0.683417 16.0976 1.31658 15.7071 1.70711L9.41421 8L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L8 9.41421L1.70711 15.7071C1.31658 16.0976 0.683418 16.0976 0.292894 15.7071C-0.0976312 15.3166 -0.0976312 14.6834 0.292894 14.2929L6.58579 8L0.292894 1.70711C-0.0976306 1.31658 -0.0976306 0.683417 0.292894 0.292893C0.683418 -0.0976311 1.31658 -0.0976311 1.70711 0.292893L8 6.58579L14.2929 0.292893Z" fill="#A1A4AD" />
+					<svg @click="deleteModal()" style="cursor: pointer;" class="delete-icon"
+						xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
+						viewBox="0 0 16 16">
+						<path
+							d="M14.2929 0.292893C14.6834 -0.0976311 15.3166 -0.0976311 15.7071 0.292893C16.0976 0.683417 16.0976 1.31658 15.7071 1.70711L9.41421 8L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L8 9.41421L1.70711 15.7071C1.31658 16.0976 0.683418 16.0976 0.292894 15.7071C-0.0976312 15.3166 -0.0976312 14.6834 0.292894 14.2929L6.58579 8L0.292894 1.70711C-0.0976306 1.31658 -0.0976306 0.683417 0.292894 0.292893C0.683418 -0.0976311 1.31658 -0.0976311 1.70711 0.292893L8 6.58579L14.2929 0.292893Z"
+							fill="#A1A4AD" />
 					</svg>
 				</TabularTableRowCell>
 			</TabularTableRow>
@@ -72,7 +75,7 @@
 	</div>
 </template>
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 
 import MainHeader from '@/components/MainHeader.vue';
 import ModalBoolean from '@/components/ModalBoolean.vue';
@@ -101,25 +104,35 @@ import TabularTable from '@/components/Tabular/TabularTable.vue';
 
 import TabularButtonCross from '@/components/Tabular/TabularButtonCross.vue';
 import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFilters.vue';
+import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
+import { directorApiClient } from '@/api/directorApiClient';
+import { sadminApiClient } from '@/api/sadminApiClient';
+const sadminServiceStationsStore = useSadminServiceStationsStore();
+const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 
-
+const selectedCarCenterIds = computed(() => {
+	return isEnv('sadmin')
+		? [sadminServiceStationsStore?.getSelectedServiceStation().id]
+		: 'none';
+});
+console.log(selectedCarCenterIds.value);
 let modal = ref({});
 
 function deleteModal() {
-  
-  modal.value.callback = save;
-    modal.value.color = BaseButtonFilledRed;
-    modal.value.primaryButtonText = `Удалить`;
-  modal.value.isVisible = true;
-  modal.value.mainTitle = 'Удалить запись клиента?';
-  
-  //modal.value.primaryButtonText = 'Продолжить';
-  modal.value.secondaryButtonText = 'Отмена';
 
-  async function save() {
-    // Sadmin
-    modal.value.isVisible = false;
-  }
+	modal.value.callback = save;
+	modal.value.color = BaseButtonFilledRed;
+	modal.value.primaryButtonText = `Удалить`;
+	modal.value.isVisible = true;
+	modal.value.mainTitle = 'Удалить запись клиента?';
+
+	//modal.value.primaryButtonText = 'Продолжить';
+	modal.value.secondaryButtonText = 'Отмена';
+
+	async function save() {
+		// Sadmin
+		modal.value.isVisible = false;
+	}
 }
 
 
@@ -129,8 +142,8 @@ function deleteModal() {
 
 
 
-const cellHeight = '90%';
-const cellWidth = '100%';
+const CELL_HEIGHT = '90%';
+const CELL_WIDTH = '100%';
 
 function toggleDetails(event) {
 	// Проверяем, что клик был не по самому элементу <summary>,
@@ -170,12 +183,11 @@ async function deleteItem(item) {
 }
 
 onMounted(fetchData);
-</script>
-<script>
-let filterDateStart = ref(1675882800);
-let filterDatePeriod = ref('year');
 
-function handleSelectedDate(date) {
+let filterDateStart = ref(1675882800);
+let filterPeriod = ref('year');
+
+function selectDateHandler(date) {
 	console.log(date);
 	filterDateStart.value = (date + 86400);
 	console.log(filterDateStart.value);
@@ -183,34 +195,34 @@ function handleSelectedDate(date) {
 
 const items = ref([]);
 const filters = ref({
-	interval: filterDatePeriod,
+	interval: filterPeriod,
 	dateStart: filterDateStart,
-	works: ['11111', '22222', '33333', '44444', '55555'],
-	carCenters: ['C-1111'],
+	works: ['none'],
+	carCenters: selectedCarCenterIds.value,
 	page: 1
 });
 
-async function defaultFilters() {
+async function resetToDefaultFilters() {
 	try {
 		let __tempDateStart = filterDateStart.value;
-		let __tempPeriod = filterDatePeriod.value;
-		// значения по умолчанию для filterDateStart и filterDatePeriod
+		let __tempPeriod = filterPeriod.value;
+		// значения по умолчанию для filterDateStart и filterPeriod
 		filterDateStart.value = null; // Значение по умолчанию для даты
-		filterDatePeriod.value = null; // Значение по умолчанию для периода
+		filterPeriod.value = null; // Значение по умолчанию для периода
 
 
 		// Применяем фильтры
 		await applyFilters();
 		filterDateStart.value = __tempDateStart;
-		filterDatePeriod.value = __tempPeriod;
+		filterPeriod.value = __tempPeriod;
 	} catch (error) {
 		console.error('Ошибка при применении фильтров по умолчанию:', error);
 	}
 }
 async function applyFilters() {
 	try {
-		const apiCall = isEnv('sadmin') ? sadminApiGetCustomerRecords : directorApiGetCustomerRecords;
-		const response = await apiCall(filters.value);
+		const apiClient = isEnv('sadmin') ? sadminApiGetCustomerRecords : directorApiGetCustomerRecords;
+		const response = await apiClient(filters.value);
 
 		items.value = response.items;
 	} catch (error) {
@@ -220,8 +232,8 @@ async function applyFilters() {
 
 async function fetchData() {
 	try {
-		const apiCall = isEnv('sadmin') ? sadminApiGetCustomerRecords : directorApiGetCustomerRecords;
-		const response = await apiCall(filters.value);
+		const apiClient = isEnv('sadmin') ? sadminApiGetCustomerRecords : directorApiGetCustomerRecords;
+		const response = await apiClient(filters.value);
 		items.value = response.items;
 		console.log(items);
 		console.log(items.value);
@@ -229,7 +241,8 @@ async function fetchData() {
 		console.error('Ошибка при получении данных:', error);
 	}
 }
-
+</script>
+<script>
 export default {
 	components: {
 		MainHeader,
@@ -240,16 +253,16 @@ export default {
 		TabularFilterPeriod
 	},
 	methods: {
-		handleOptionSelected(option) {
-			filterDatePeriod.value = option;
+		selectOptionHandler(option) {
+			filterPeriod.value = option;
 			console.log('Значение опции:', option);
 		},
-		handleDateChange(date) {
+		dateChangeHandler(date) {
 			// Обработка новой выбранной даты
 		}
 	},
 	setup() {
-		function handleDateSelected(selectedDate) {
+		function dateSelectedHandler(selectedDate) {
 			// Обновляем фильтры, передав выбранную дату
 			filters.value.dateStart = selectedDate;
 		}
@@ -257,8 +270,8 @@ export default {
 		return {
 			items,
 			applyFilters,
-			defaultFilters,
-			handleDateSelected
+			resetToDefaultFilters,
+			dateSelectedHandler
 		};
 	}
 };

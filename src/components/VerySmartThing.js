@@ -7,9 +7,9 @@ import { directorApiClient } from '@/api/directorApiClient';
 
 export function VerySmartThing() {
     const isSadmin = isEnv('sadmin');
-    const apiCall = isSadmin ? sadminApiClient : directorApiClient;
+    const apiClient = isSadmin ? sadminApiClient : directorApiClient;
     const sadminServiceStationsStore = isSadmin ? useSadminServiceStationsStore() : null;
 
-    return { isSadmin, apiCall, sadminServiceStationsStore };
+    return { isSadmin, apiClient, sadminServiceStationsStore };
   }
-export const { isSadmin, apiCall, sadminServiceStationsStore } = VerySmartThing();
+export const { isSadmin, apiClient, sadminServiceStationsStore } = VerySmartThing();

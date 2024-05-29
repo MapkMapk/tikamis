@@ -214,7 +214,7 @@ import router from '@/router/index.js';
 import minutesToHHMM from '@/utils/time/minutesToHHMM.js';
 import HHMMtoMinutes from '@/utils/time/HHMMtoMinutes.js';
 import directorApiCenterInfo from '@/api/director/directorApiCenterInfo.js';
-const sadminServiceStationsStore = useSadminServiceStationsStore();
+const sadminStationsStore = useSadminServiceStationsStore();
 const mainStore = useMainStore();
 
 let login = ref();
@@ -319,12 +319,12 @@ onBeforeMount(async () => {
   }
 
   if (isEnv('sadmin')) {
-    const sadminServiceStationsStore = useSadminServiceStationsStore();
-    console.log(sadminServiceStationsStore);
+    const sadminStationsStore = useSadminServiceStationsStore();
+    console.log(sadminStationsStore);
     formattedFullAddress.value =
-      sadminServiceStationsStore.city +
+      sadminStationsStore.city +
       ', ' +
-      sadminServiceStationsStore.addressName;
+      sadminStationsStore.addressName;
 
     const data = await sadminApiManageSettings(router.currentRoute.value.query.id);
     address.value = data.address;

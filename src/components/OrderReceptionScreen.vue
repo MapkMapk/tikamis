@@ -24,7 +24,7 @@
                 <!-- Дата записи -->
                     <div>
                         <p class="mb-[10px]">Дата записи</p>
-                        <TabularFilterDate :isVisible="false" @updateDate="handleSelectedDate"/>
+                        <TabularFilterDate :isVisible="false" @updateDate="selectDateHandler"/>
                     </div>
                 <!-- Время записи -->
                     <div class="ml-[30px]">

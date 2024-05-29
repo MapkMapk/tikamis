@@ -3,11 +3,13 @@
   <MainHeader />
   <MainHeaderGap />
   <DirectorReportComponent
-    :show-filter-or="true"
-    :show-filter-all-works="false"
+    :is-filter-all-works-visible="false"
+    :is-filter-or-visible="true"
     @filtersApplied="fetchCustomerSkipsData"
     @optionSelected="changeOrsOption"
     @worksLoaded="handleAllWorksLoaded"
+    @saveTable="onSaveTable"
+    @sendTable="onSendTable"
   >
     <template v-slot:tabular-title>
       <TabularPrimeTitle>Простои постов</TabularPrimeTitle>
@@ -22,7 +24,9 @@
     v-for="item in displayedItems"
     :key="item.postNumber || item.mechanicName" 
     :item="item" 
-    style="grid-template-columns: 4fr 2fr 1fr;">
+    style="grid-template-columns: 4fr 2fr 1fr;"
+    @click="toggleDetails(item)" 
+    :open="item.detailsOpen">
     <!-- Условное отображение номера поста или имени механика -->
     <TabularTableRowCell v-if="currentSort.option === 'itemsByPosts'">Пост №{{ item.postNumber }}</TabularTableRowCell>
     <TabularTableRowCell v-else>{{ item.mechanicName }}</TabularTableRowCell>
@@ -30,7 +34,7 @@
     <TabularTableRowCell :style="{width: '2fr'}" style="padding-left: 10px;">
       <strong>{{ item.totalDowntime }}</strong>
       <details class="custom-details">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)">
+        <summary class="flex" style="justify-content: space-between;">
           <strong></strong>
         </summary>
         <ul>
@@ -43,12 +47,12 @@
     <TabularTableRowCell><div style="display: flex;justify-content: space-between"><strong>Все простои</strong>
       <div style="display: flex;justify-content: flex-end; padding-right: 10px">
           <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-          <i class="material-icons" @click="toggleDetails(item.orderId)">
+          <i class="material-icons">
             {{ item.detailsOpen ? 'expand_less' : 'expand_more' }}
           </i>
         </div></div>
         <details class="custom-details">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)">
+        <summary class="flex" style="justify-content: space-between;">
           <strong></strong>
         </summary>
         <ul>
@@ -70,7 +74,7 @@
 
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue';
-import DirectorReportComponent from '@/components/directorReportComponent.vue';
+import DirectorReportComponent from '@/components/DirectorReportComponent.vue';
 import TableHeaders from '@/components/Tabular/TableHeaders.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
 import TabularTableCellBottom from '@/components/Tabular/TabularTableCellBottom.vue';
@@ -80,15 +84,22 @@ import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
 import isEnv from '@/utils/isEnv.js';
 
+import { processData } from '@/api/sendFunctions/postsDowntime';
+
 import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
+
+import { toggleDetails, formatTotalDowntime, formatCurrency, selectedCarCenterIds, truncateText, unixToData } from '@/utils/Things.js'; // Импорт функций из файла
 
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
 
+
+const currentSort = ref('itemsByMechanics');
 const totalLoss = ref(0);
 const itemsByPosts = ref([]);
 const itemsByMechanics = ref([]);
-const currentSort = ref('itemsByMechanics');
+const tableData = ref([]);
+
 function changeOrsOption(option){
   currentSort.value = option;
   console.warn(displayedItems.value.length);
@@ -105,10 +116,13 @@ function changeOrsOption(option){
       { header: 'Время простоя, мин', size: '2fr' },
       { header: 'Дата', size: '1fr' },
     ];
+    console.log(currentSort.value.option)
   }
 }
+
 onMounted(async () => {
   const initialFilters = { date: 1675623600, period: 'month', works: null };
+  changeOrsOption(currentSort.value);
   fetchCustomerSkipsData(initialFilters);
 });
 function handleAllWorksLoaded(ids) {
@@ -121,46 +135,7 @@ function handleAllWorksLoaded(ids) {
 // Обновление колонок в зависимости от currentSort
 const columns = ref([]);
 
-// const getTotalLossSum = (items) => {
-//   // Инициализация переменной для хранения суммы
-//   let totalLossSum = 0;
-//   // Перебор всех элементов массива items
-//   items.forEach((item) => {
-//     // Добавление totalLoss каждого элемента к общей сумме
-//     totalLossSum += item.totalLoss;
-//   });
-//   // Возврат общей суммы
-//   return totalLossSum;
-// };
-function formatTotalLoss (sum) {
-  // Добавление отступов
-  let formattedTotalLoss = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(sum);
-  return formattedTotalLoss;
-};
-function formatTotalDowntime (dt){
-  let lastNum = dt%10;
-  let minut = "минут";
-  if (lastNum==1){return `${dt}  минута`;}
-  if (lastNum == 2 || lastNum == 3 || lastNum == 4){return `${dt}  минуты`;}
-  return `${dt}  минут`;
-}
 
-watch(currentSort.value.option, (newVal) => {
-  if (newVal === 'itemsByPosts') {
-    columns.value = [
-      { header: 'Пост', size: '4fr' },
-      { header: 'Время простоя, мин', size: '2fr' },
-      { header: 'Дата', size: '1fr' },
-    ];
-  } else {
-    // Предполагаемая структура колонок для "mechanics"
-    columns.value = [
-      { header: 'Механик', size: '4fr' },
-      { header: 'Время простоя, мин', size: '2fr' },
-      { header: 'Дата', size: '1fr' },
-    ];
-  }
-}, { immediate: true });
 function unixToDate(unixTime) {
   const date = new Date(unixTime * 1000); // Умножаем на 1000, так как в JavaScript время измеряется в миллисекундах, а не в секундах, как в Unix
 
@@ -174,44 +149,6 @@ function unixToDate(unixTime) {
   return formattedDate;
 }
 
-///////  Тут находится код, который убирает баг с раскрытием строк
-//////   при нажатии на тэг summary в некоторых браузерах (возможно во всех)
-/////    Он ужасен и требует доработки или фикса самого бага, но Хот фикс есть Хот фикс
-function toggleAllDetails(event) {
-  console.log('toggleAllDetails вызван');
-
-  // Получаем все элементы `details` внутри текущей TabularTableRow.
-  const detailsElements = event.currentTarget.querySelectorAll('details');
-  console.log(`Найдено ${detailsElements.length} элементов 'details'`);
-
-  // Проверяем, открыты ли все `details`
-  const allOpen = [...detailsElements].every(details => details.open);
-
-  // Если все `details` открыты, закрываем их, иначе открываем
-  if (allOpen) {
-    closeAllDetails(detailsElements);
-  } else {
-    openAllDetails(detailsElements);
-  }
-}
-
-function closeAllDetails(detailsElements) {
-  detailsElements.forEach((details) => {
-    details.removeAttribute('open');
-  });
-}
-
-function openAllDetails(detailsElements) {
-  detailsElements.forEach((details) => {
-    details.setAttribute('open', true);
-  });
-}
-//\\\
-//\\\\
-//\\\\\
-
-//function toggleSingleDetail(event) {toggleDetails(event)}
-
 const displayedItems = computed(() => {
   return currentSort.value.option === 'itemsByPosts' ? itemsByPosts.value : itemsByMechanics.value;
 });
@@ -222,15 +159,15 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
   const filters = {
     interval: period,
     dateStart: date,
-    works: Array.isArray(workId) ? workId : [workId],
-    carCenters: ['C-1111'], // Указаны для примера, измените по необходимости
+    works: workId,
+    carCenters: selectedCarCenterIds.value, // Указаны для примера, измените по необходимости
     page: 1 // Указано для примера, измените по необходимости
   };
 
   try {
 
-    const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
-    const response = await apiCall.post('/report/get-posts-downtime', { filters });
+    const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+    const response = await apiClient.post('/report/get-posts-downtime', { filters });
     //console.log(response.data[currentSort.value][0].works);
     //items.value = response.data[currentSort.value];
     //totalLoss.value = response.data.allLoss;
@@ -241,11 +178,25 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
     console.error('Ошибка при загрузке данных:', error);
   }
 }
-function truncateText(text, maxLength) {
-  if (text.length > maxLength) {
-    return text.slice(0, maxLength) + '...';
-  }
-  return text;
+
+
+async function onSaveTable(){
+ 
+ const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+ tableData.value = processData(columns.value, displayedItems.value, currentSortOption.value.option);
+ const kpdPostsDate = `Кпд постов ${unixToData(filterDate.value.date,false,filterPeriod)}`;
+ const tableDataContent = tableData.value;
+ const mailResponse = await apiClient.post('/report-emails', { title: kpdPostsDate, content: tableDataContent});
+ console.log(mailResponse);
+}
+async function onSendTable(){
+
+const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+tableData.value = processData(columns.value, displayedItems.value, currentSortOption.value.option);
+const kpdPostsDate = `Кпд постов ${unixToData(filterDate.value.date,false,filterPeriod)}`;
+const tableDataContent = tableData.value;
+const mailResponse = await apiClient.post('/report-save', { title: kpdPostsDate, content: tableDataContent});
+console.log(mailResponse);
 }
 </script>
 <style scoped>

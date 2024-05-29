@@ -7,30 +7,30 @@
     <TabularSection>
       <TabularPrimeTitle class="mb-2">Кпд сервиса</TabularPrimeTitle>
       <TabularFiltersWrapper>
-      <TabularFilterPeriod @updatePeriod="handleOptionSelected" style="flex: 184;"/>
-      <TabularFilterDate @updateDate="handleSelectedDateFirst" style="flex: 307;"/>
-      <TabularFilterDateCleared @updateDate="handleSelectedDateSecond" :clear-start-date="true" style="flex: 307;"/>
+      <TabularFilterPeriod @updatePeriod="selectOptionHandler" style="flex: 184;"/>
+      <TabularFilterDate @updateDate="selectFirstDateHandler" style="flex: 307;"/>
+      <TabularFilterDateCleared @updateDate="selectSecondDateHandler" :clear-start-date="true" style="flex: 307;"/>
 
-      <TabularButtonApplyFilters style="flex: 217;" @click="fetchCustomerSkipsData" />
-      <TabularButtonCross style="flex: 60; cursor: pointer;" @click="defaultFilters" />
+      <TabularButtonApplyFilters style="flex: 217;" @click="fetchData" />
+      <TabularButtonCross style="flex: 60; cursor: pointer;" @click="resetToDefaultFilters" />
     </TabularFiltersWrapper>
     <div class="apexxcharts">
     <div id="chart1" class="apexxchart">
       <apexchart
-        :key="chartKey1"
+        :key="firstChartKey"
         type="bar"
         height="500"
-        :options="chartOptions1"
-        :series="series1">
+        :options="firstChartOptions"
+        :series="firstChartSeries">
       </apexchart>
     </div>
-    <div v-if="DateSecond!=null" id="chart2" class="apexxchart">
+    <div v-if="secondDate!=null" id="chart2" class="apexxchart">
       <apexchart
-        :key="chartKey2"
+        :key="secondChartKey"
         type="bar"
         height="500"
-        :options="chartOptions2"
-        :series="series2">
+        :options="secondChartOptions"
+        :series="secondChartSeries">
       </apexchart>
     </div>
     </div>
@@ -64,33 +64,33 @@ import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStat
 import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
 import { computed } from 'vue';
-const sadminServiceStationsStore = useSadminServiceStationsStore();
-const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+const sadminStationsStore = useSadminServiceStationsStore();
+const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 
 const carCenterIds = computed(() => {
-      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
+      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminStationsStore
       return isEnv('sadmin') 
-        ? sadminServiceStationsStore?.getSelectedServiceStation().id
+        ? sadminStationsStore?.getSelectedServiceStation().id
         : "none";
     });
 console.log(carCenterIds.value);
 //////////
 //
 //////////
-const filterDatePeriod = ref('day');
-function handleOptionSelected(option) {filterDatePeriod.value = option; console.log(option)}
-const DateFirst = ref(1675796400);
-const DateSecond = ref();
-function handleSelectedDateFirst(date){
-  DateFirst.value = date;
+const filterPeriod = ref('day');
+function selectOptionHandler(option) {filterPeriod.value = option; console.log(option)}
+const firstDate = ref(1675796400);
+const secondDate = ref();
+function selectFirstDateHandler(date){
+  firstDate.value = date;
 }
-function handleSelectedDateSecond(date){
-  DateSecond.value = date;
+function selectSecondDateHandler(date){
+  secondDate.value = date;
 }
-const maxyaxis = ref(100);
-const chartKey1 = ref(0);
-const chartKey2 = ref(0);
-function getDefaultChartOptions() {
+const maxYAxis = ref(100);
+const firstChartKey = ref(0);
+const secondChartKey = ref(0);
+function getChartDefaultOptions() {
   return {
     chart: {
       type: 'bar',
@@ -115,7 +115,7 @@ function getDefaultChartOptions() {
       categories: []
     },
     yaxis: {
-      max: maxyaxis.value,
+      max: maxYAxis.value,
       labels: {
       formatter: function(value) {
         // Округляем до двух знаков после запятой и преобразуем в строку
@@ -126,43 +126,27 @@ function getDefaultChartOptions() {
   };
 }
 
-const chartOptions1 = ref(getDefaultChartOptions());
+const firstChartOptions = ref(getChartDefaultOptions());
 
-const series1 = ref([]);
-const chartOptions2 = ref(getDefaultChartOptions());
-const series2 = ref([]);
+const firstChartSeries = ref([]);
+const secondChartOptions = ref(getChartDefaultOptions());
+const secondChartSeries = ref([]);
 
 // Обработка и загрузка данных для ApexCharts
-async function fetchCustomerSkipsData() {
+async function fetchData() {
   // Запрос к API для первого набора данных
-  const data1 = await fetchDataAndProcess(DateFirst.value);
-  processDataForChart(data1);
+  const data1 = await fetchAndProcessData(firstDate.value);
+  processChartData(data1);
 
-  // Проверка, нужно ли делать второй запрос
-  if (DateSecond.value) {
-    const data2 = await fetchDataAndProcess(DateSecond.value);
-    processDataForChart(data2);
+  // Проверка, нужно ли делать второй запросs
+  if (secondDate.value) {
+    const data2 = await fetchAndProcessData(secondDate.value);
+    processChartData(data2);
   }
 }
-async function fetchDataAndProcess(date, chartOptions, series) {
+async function fetchAndProcessData(date, chartOptions, series) {
   //const apiUrl = 'http://127.0.0.1:5000/api/new-endpoint'; // Пример URL API
   try {
-    // const response = await fetch(apiUrl, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     filters: {
-    //       interval: 'month',
-    //       dateStart: date,// дата в unix
-    //       works: null,
-    //       carCenters: ['C-1111'], // Указаны для примера, измените по необходимости
-    //       page: 1 // Указано для примера, измените по необходимости
-    //       },
-    //       step: filterDatePeriod.value
-    //   }),
-    // });
     const responseBody = {filters: {
           interval: 'month',
           dateStart: date,// дата в unix
@@ -170,19 +154,19 @@ async function fetchDataAndProcess(date, chartOptions, series) {
           carCenters: [carCenterIds.value], // Указаны для примера, измените по необходимости
           page: 1 // Указано для примера, измените по необходимости
           },
-          step: filterDatePeriod.value}
-    //const response = await apiCall.post('/analytics/get-center-KPD', responseBody);
-    const response = await apiCall.post('/analytics/get-center-KPD', responseBody);
+          step: filterPeriod.value}
+    //const response = await apiClient.post('/analytics/get-center-KPD', responseBody);
+    const response = await apiClient.post('/analytics/get-center-KPD', responseBody);
     if (response.data && response.data.bars) {
-      processDataForChart(response.data, chartOptions, series);
+      processChartData(response.data, chartOptions, series);
     }
   } catch (error) {
     console.error('Ошибка при загрузке данных:', error);
   }
 }
-function processDataForChart(apiResponse, chartOptions, series) {
-  chartKey1.value++;
-  chartKey2.value++;
+function processChartData(apiResponse, chartOptions, series) {
+  firstChartKey.value++;
+  secondChartKey.value++;
 
   chartOptions.value.xaxis.categories = apiResponse.bars.map(bar => bar.label);
   chartOptions.value.yaxis.max = Math.round(apiResponse.totalCapacity);
@@ -221,35 +205,12 @@ function processDataForChart(apiResponse, chartOptions, series) {
 }
 
 watchEffect(() => {
-  fetchDataAndProcess(DateFirst.value, chartOptions1, series1);
-  if (DateSecond.value) {
-    fetchDataAndProcess(DateSecond.value, chartOptions2, series2);
+  fetchAndProcessData(firstDate.value, firstChartOptions, firstChartSeries);
+  if (secondDate.value) {
+    fetchAndProcessData(secondDate.value, secondChartOptions, secondChartSeries);
   }
 });
-onMounted(fetchCustomerSkipsData);
-
-// async function fetchCustomerSkipsDataN() {
-//   const filtersF = {
-//     filters: {
-//     interval: 'month',
-//     dateStart: DateFirst.value,// дата в unix
-//     works: null,
-//     carCenters: ['C-1111'], // Указаны для примера, измените по необходимости
-//     page: 1 // Указано для примера, измените по необходимости
-//     },
-//     step: 'day'
-//   };
-//   const filtersS = {
-//     filters: {
-//     interval: 'month',
-//     dateStart: DateSecond.value,
-//     works: null,
-//     carCenters: ['C-1111'], // Указаны для примера, измените по необходимости
-//     page: 1 // Указано для примера, измените по необходимости
-//     },
-//     step: 'day'
-//   };
-// }
+onMounted(fetchData);
 </script>
 
 <style scoped>

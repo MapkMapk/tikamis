@@ -121,8 +121,8 @@
 }
 
   onMounted(async () => {
-    const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
-    let response = await apiCall.get('/all-works');
+    const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+    let response = await apiClient.get('/all-works');
     const originalWorks = response.data.works;
     console.log(response);
     originalWorks.forEach((work) => {

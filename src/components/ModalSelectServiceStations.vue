@@ -52,8 +52,8 @@ import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseRadioButton from '@/components/BaseRadioButton.vue';
 
-const sadminServiceStationsStore = useSadminServiceStationsStore();
-let localCopyOfServiceStations = ref(JSON.parse(JSON.stringify(sadminServiceStationsStore.serviceStations)));
+const sadminStationsStore = useSadminServiceStationsStore();
+let localCopyOfServiceStations = ref(JSON.parse(JSON.stringify(sadminStationsStore.serviceStations)));
 
 function changeSelectedStation(station) {
   localCopyOfServiceStations.value.forEach((element) => {

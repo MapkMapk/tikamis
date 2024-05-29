@@ -3,8 +3,7 @@
   <MainHeader />
   <MainHeaderGap />
   <DirectorReportComponent
-    :show-filter-or="true"
-    :show-Filter-All-Works="false"
+    :is-filter-all-works-visible="false"
     @filtersApplied="fetchCustomerSkipsData"
     @optionSelected="changeOrsOption"
   >
@@ -21,13 +20,14 @@
       v-for="item in displayedItems"
       :key="item.orderId"
       :item="item"
-      @click="toggleDetails($event)"
+      @click="toggleDetails(item)" 
+      :open="item.detailsOpen"
     >
       <template style="display: grid;;grid-template-columns: 3fr 1fr 1fr 3fr 2fr 2fr;" ><!--v-if="currentSort === 'itemsByMechanics'"-->
         <TabularTableRowCell>{{ truncateText(item.works[0], 33) }} 
         <span v-if="item.works.length > 1" style="float: inline-end;margin-right: 32px;"><strong>ещё {{ item.works.length-1 }}</strong></span>
-        <details  class="custom-details" :style="{ width: cellWidth }">
-        <summary class="flex" style="justify-content: space-between;" @click.stop="toggleSingleDetail($event)"><strong></strong></summary>
+        <details  class="custom-details" :style="{ width: CELL_WIDTH}">
+        <summary class="flex" style="justify-content: space-between;" ><strong></strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.orderId">
           {{ work }}
@@ -58,7 +58,7 @@
 
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue';
-import DirectorReportComponent from '@/components/directorReportComponent.vue';
+import DirectorReportComponent from '@/components/DirectorReportComponent.vue';
 import TableHeaders from '@/components/Tabular/TableHeaders.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
 import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
@@ -71,8 +71,16 @@ import MainHeaderGap from '@/components/MainHeaderGap.vue';
 import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
 import isEnv from '@/utils/isEnv.js';
+import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
+const serviceStationsStore = useSadminServiceStationsStore();
 
-
+const selectedCarCenterIds = computed(() => {
+      // Замените эту логику на реальный вызов функции isEnv и доступ к serviceStationsStore
+      return isEnv('sadmin') 
+        ? [serviceStationsStore?.getSelectedServiceStation().id]
+        : 'none';
+    });
+const CELL_WIDTH = '100%';
 const items = ref([]);
 const itemsByPosts = ref([]);
 const itemsByMechanics = ref([]);
@@ -105,9 +113,11 @@ const displayedItems = computed(() => {
   return currentSort.value.option === 'itemsByPosts' ? itemsByPosts.value : itemsByMechanics.value;
 });
 
+function toggleDetails(item) {
+  item.detailsOpen = !item.detailsOpen;
+}
 
-
-function formatTotalLoss (sum) {
+function formatCurrency (sum) {
   // Добавление отступов
   let formattedTotalLoss = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(sum);
   return formattedTotalLoss;
@@ -158,22 +168,7 @@ function unixToDate(unixTime) {
   return formattedDate;
 }
 
-function toggleDetails(event) {
-  // Проверяем, что клик был не по самому элементу <summary>,
-  // чтобы избежать конфликта с его стандартным поведением.
-  if (event.target.tagName !== 'SUMMARY') {
-    const detailsElements = event.currentTarget.querySelectorAll('details');
-    detailsElements.forEach(details => {
-      // Если details уже открыт, закрываем его, и наоборот.
-      if (details.hasAttribute('open')) {
-        details.removeAttribute('open');
-      } else {
-        details.setAttribute('open', '');
-      }
-    });
-  }
-}
-function toggleSingleDetail(event) {toggleDetails(event)}
+
 
 async function fetchCustomerSkipsData({ date, period, workId }) {
   console.log('*************************');
@@ -184,14 +179,14 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
   const filters = {
     interval: period,
     dateStart: date,
-    works: Array.isArray(workId) ? workId : [workId],
-    carCenters: ['C-1111'], // Указаны для примера, измените по необходимости
+    works: Array.isArray(workId) ? workId : workId,
+    carCenters: selectedCarCenterIds.value, // Указаны для примера, измените по необходимости
     page: 1 // Указано для примера, измените по необходимости
   };
 
   try {
-    const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
-    const response = await apiCall.post('/report/get-plate-fakes', { filters });
+    const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+    const response = await apiClient.post('/report/get-plate-fakes', { filters });
     //console.log(response.data[currentSort.value][0].works);
     itemsByPosts.value = response.data.itemsByPosts;
     itemsByMechanics.value = response.data.itemsByMechanics;

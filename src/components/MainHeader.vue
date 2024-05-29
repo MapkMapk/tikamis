@@ -45,9 +45,9 @@
               <p class="servicesText">сервисы</p>
               <p style="font-family: Inter;font-size: 24px;font-weight: 400;line-height: 29.05px;text-align: left;">
               {{
-                sadminServiceStationsStore?.getSelectedServiceStation().city +
+                sadminStationsStore?.getSelectedServiceStation().city +
                 ', ' +
-                sadminServiceStationsStore?.getSelectedServiceStation().addressName
+                sadminStationsStore?.getSelectedServiceStation().addressName
               }}</p>
             </div>
             <BaseSvgIcon
@@ -73,7 +73,7 @@ import ModalSelectServiceStations from '@/components/ModalSelectServiceStations.
 import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 
 const mainStore = useMainStore();
-const sadminServiceStationsStore = useSadminServiceStationsStore();
+const sadminStationsStore = useSadminServiceStationsStore();
 
 let isVisibleModalSelectServiceStations = ref(false);
 let city = ref('');
@@ -101,7 +101,7 @@ function callbackModalSelectServiceStations(isChanged, id, num) {
   console.log("---------");
   isVisibleModalSelectServiceStations.value = false;
   if (isChanged) {
-    sadminServiceStationsStore.setNewSelectedServiceStation(id);
+    sadminStationsStore.setNewSelectedServiceStation(id);
   }
 }
 </script>

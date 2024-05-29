@@ -39,7 +39,7 @@
         padding: 0 10px;
         margin-left: 10px;
       "
-      @updateDate="handleSelectedDate">
+      @updateDate="selectDateHandler">
       </TabularFilterMonth>
       <!-- <TabularFilterDate @updateDate="handleSelectedDateFirst" style="flex: 307;"/> -->
       </div>
@@ -53,33 +53,12 @@
         </div>
       </div>
 
-      <!-- Рендер каждой строки таблицы  -->
-      <!--
-      v-for="(parent, parentIndex) in parentDivs"  
-        :key="`parent-${parentIndex}`" 
-      -->
       <div  
         v-for="(week, weekIndex) in Calendar" 
         :key="weekIndex"
         class="flex flex-1 relative w-full"
         style="align-items: center;"
       >
-        <!-- Внутренний цикл для ячеек постов внутри каждой строки -
-          v-for="(child, childIndex) in parent.children"
-          :key="`child-${childIndex}`"
-          :id="`child-${parentIndex}-${childIndex}`"-->
-          <!--
-          <div
-          v-for="(child, childIndex) in parent.children"
-          :key="`child-${childIndex}`"
-          :id="`child-${parentIndex}-${childIndex}`"
-          class="empty-cell white-cell flex-half border border-gray-d9d9d9"
-          :class="{'clicked-cell': clickedCells[`child-${parentIndex}-${childIndex}`]}"
-          @click="handleClick(`child-${parentIndex}-${childIndex}`)"
-          @click.prevent="
-          child && child.firstValue ? saveModal(child.firstValue, child.secondValue) : grayOpen()"
-          :style="{ width: '14.285%', height: computedHeight + 'px', position: 'relative' }"
-          >-->
         <div
           v-for="(day, dayIndex) in week" 
           :key="dayIndex"
@@ -140,12 +119,12 @@ import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStat
 import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
 import { computed, onMounted } from 'vue';
-const sadminServiceStationsStore = useSadminServiceStationsStore();
-const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+const sadminStationsStore = useSadminServiceStationsStore();
+const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 const postLim = ref(4);
 let filterDateStart = ref(1675882800);
 
-function handleSelectedDate(date) {
+function selectDateHandler(date) {
 	filterDateStart.value = (date + 86400);
 	console.log(filterDateStart.value);
   applyFilters()
@@ -237,7 +216,7 @@ gray.value.isVisible = false
         newState: newState
       };
     
-    const response = await apiCall.post('/manage/shift-calendar', requestBody);
+    const response = await apiClient.post('/manage/shift-calendar', requestBody);
     const items = response.data.items;
     isAnyCellRed.value = items.some(item => item.state === 4) ? true : false;
     Calendar.value = processedData(items, requestBody.filters.dateStart);
@@ -280,9 +259,9 @@ function modalCellClick(day){
 /////////
 
 const carCenterIds = computed(() => {
-      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
+      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminStationsStore
       return isEnv('sadmin') 
-        ? sadminServiceStationsStore?.getSelectedServiceStation().id
+        ? sadminStationsStore?.getSelectedServiceStation().id
         : "none";
     });
 //////////
@@ -371,7 +350,7 @@ async function applyFilters() {
   };
   const url = '/manage/get-shift-calendar';
   try {
-    const response = await apiCall.post(url, responseBody);
+    const response = await apiClient.post(url, responseBody);
     postLim.value = response.data.postsLimit;
     const items = response.data.items;
     isAnyCellRed.value = items.some(item => item.state === 4) ? true : false;

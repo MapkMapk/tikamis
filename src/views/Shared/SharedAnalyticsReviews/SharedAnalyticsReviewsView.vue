@@ -2,17 +2,19 @@
 <template>
   <MainHeader />
   <MainHeaderGap />
-  
   <DirectorReportComponent
     class=""
-    :show-filter-or="false"
-    :show-Filter-All-Works="false"
-    :show-Buttons="false"
-    @filtersApplied="fetchCustomerSkipsData"
+    @optionSelected="updateSortOption"
+    :is-filter-or-visible="false"
+    :is-filter-all-works-visible="false"
+    :are-buttons-visible="false"
+    @filtersApplied="fetchData"
   >
+    <!-- <template v-slot:tabular-title> -->
     <template v-slot:tabular-title>
       <TabularPrimeTitle>Отзывы</TabularPrimeTitle>
     </template>
+    <!-- <template v-slot:tabular-table-header> -->
     <template v-slot:tabular-table-header>
       <TableHeaders :columns="columns"  class="fat-boy" />
     </template>
@@ -20,12 +22,12 @@
     <template v-slot:tabular-table-table>
       <!--<TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">-->
       <TabularTableRow
-      v-for="item in items"
-      :key="item.orderId"
+      v-for="(item, index) in items"
+      :key="index"
       :item="item"
       @click="toggleDetails($event)"
     >
-      <template style="display: grid;grid-template-columns: 3fr 1fr 2fr 2fr 2fr;" ><!--v-if="currentSort === 'itemsByMechanics'"-->
+      <template style="display: grid;grid-template-columns: 3fr 1fr 2fr 2fr 2fr;" ><!--v-if="sortOption === 'itemsByMechanics'"-->
         <TabularTableRowCell v-if="item.type == '1'">{{ item.smileContent }} </TabularTableRowCell>
         <TabularTableRowCell v-if="item.type == '2'">{{ item.textContent }} </TabularTableRowCell>
         <TabularTableRowCell v-if="item.type == '4'">
@@ -41,6 +43,7 @@
 
             </div>
             <div >0:05</div>
+
           </div>
         </TabularTableRowCell>
       <!-- Пост Работы Потери Время записи Телефон Автомобиль -->
@@ -59,51 +62,21 @@
   <div class="flex flex-col items-center">
             <div id="234" class="w-full flex mt-10 mb-3" style="justify-content: center">
               <div style="width: 400px;margin-right: 20px;">
-              <BaseButtonFilledGreen
-                class="flex justify-between flex-1 mr-5 pt-3 pb-3"
-                style="width: inherit;"
-                >
-                
-                <div class="">
-                  <svg width="48px" height="48px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
-	 viewBox="0 0 13.679 13.679" xml:space="preserve">
-<g>
-	<g>
-		<path style="fill:#ffffff;" d="M13.383,1.361l-0.975-1.229c-0.127-0.158-0.318-0.13-0.318-0.13H0.439
-			c-0.242,0-0.438,0.195-0.438,0.437v12.802c0,0.241,0.196,0.438,0.438,0.438H13.24c0.242,0,0.438-0.196,0.438-0.438V12.72v-0.084
-			V2.07C13.678,2.032,13.68,1.768,13.383,1.361z M2.298,0.895h8.79v5.704h-8.79C2.298,6.599,2.298,0.895,2.298,0.895z M7.181,11.805
-			c-1.17,0-2.12-0.949-2.12-2.119s0.949-2.119,2.12-2.119c1.17,0,2.118,0.949,2.118,2.119S8.351,11.805,7.181,11.805z"/>
-		<path style="fill:#ffffff;" d="M9.866,5.707h-2.25V1.951h2.25V5.707z"/>
-		<path style="fill:#ffffff;" d="M7.195,8.681c-0.555,0-1.003,0.449-1.003,1.003c0,0.555,0.449,1.003,1.003,1.003
-			c0.553,0,1.002-0.448,1.002-1.003C8.197,9.13,7.748,8.681,7.195,8.681z"/>
-	</g>
-</g>
-</svg></div>
-                <div class="flex items-center text-white text-2xl">Сохранить</div>
-                <div class="w-[48px] h-[48px]"></div>
-                </BaseButtonFilledGreen
-              >
+              <AdvButtonFilledGreen></AdvButtonFilledGreen>
             </div>
             <div style="width: 400px;margin-left: 20px">
-              <BaseButtonFilledDark
-                class="flex flex-1 justify-between pt-3 pb-3"
-                style="width: inherit;"
-                >
-                <div class="w-[48px] h-[48px]"></div>
-                <div class="flex items-center text-white text-2xl">Отправить</div>
-                <div><svg class="mt-[8px]" version="1.0" xmlns="http://www.w3.org/2000/svg" width="62px" height="48px" viewBox="0 15 100.000000 75" preserveAspectRatio="xMidYMid meet"> <g transform="translate(0.000000,100.000000) scale(0.100000,-0.100000)" fill="#ffffff" stroke="none"> <path d="M60 540 l0 -320 230 0 c223 0 230 1 230 20 0 19 -7 20 -210 20 -264 0 -263 -2 -84 140 69 55 129 100 133 100 4 0 18 -12 32 -26 13 -15 42 -35 65 -45 66 -30 92 -17 278 146 l166 145 0 -173 c0 -161 1 -175 20 -192 20 -18 20 -17 20 243 l0 262 -440 0 -440 0 0 -320z m840 257 c0 -18 -41 -59 -171 -173 -175 -153 -214 -179 -248 -166 -11 4 -97 75 -192 157 -94 83 -176 152 -180 153 -5 2 -9 15 -9 28 l0 24 400 0 400 0 0 -23z m-672 -181 c51 -44 92 -82 92 -85 0 -7 -206 -171 -214 -171 -3 0 -6 81 -6 181 0 172 1 180 18 167 10 -7 59 -49 110 -92z"/><path d="M764 389 c-3 -6 20 -37 52 -70 l58 -59 -137 0 c-130 0 -137 -1 -137 -20 0 -19 7 -20 137 -20 l137 0 -59 -60 c-47 -47 -57 -62 -47 -72 10 -10 30 5 95 70 l82 82 -80 80 c-44 44 -83 80 -87 80 -4 0 -10 -5 -14 -11z"/></g></svg></div>
-          </BaseButtonFilledDark>
+              <AdvButtonFilledDark></AdvButtonFilledDark>
             </div>
             </div>
           </div>
 </template>
 
 <script setup>
-  import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
-  import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
+  import AdvButtonFilledGreen from '@/components/AdvButtonFilledGreen.vue';
+  import AdvButtonFilledDark from '@/components/AdvButtonFilledDark.vue';
 
 import { onMounted, ref, watch } from 'vue';
-import DirectorReportComponent from '@/components/directorReportComponent.vue';
+import DirectorReportComponent from '@/components/DirectorReportComponent.vue';
 import TableHeaders from '@/components/Tabular/TableHeaders.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
 import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
@@ -120,13 +93,13 @@ import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStat
 import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
 import { computed } from 'vue';
-const sadminServiceStationsStore = useSadminServiceStationsStore();
-const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+const serviceStationsStore = useSadminServiceStationsStore();
+const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 
-const carCenterIds = computed(() => {
-      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
+const selectedCarCenterIds = computed(() => {
+      // Замените эту логику на реальный вызов функции isEnv и доступ к serviceStationsStore
       return isEnv('sadmin') 
-        ? [sadminServiceStationsStore?.getSelectedServiceStation().id]
+        ? [serviceStationsStore?.getSelectedServiceStation().id]
         : ["none"];
     });
 //////////
@@ -134,10 +107,51 @@ const carCenterIds = computed(() => {
 //////////
 
 const isPlaying = ref(false);
-const items = ref([]);
-const currentSort = ref('itemsByMechanics');
+const items = ref([
+    {
+        "type": 1,
+        "voiceContent": null,
+        "textContent": null,
+        "smileContent": "Смайл \"Хорошо\"",
+        "tone": "Хорошо",
+        "date": 1675858200,
+        "phoneNumber": "+79111111112",
+        "plate": "AA111A 186"
+    },
+    {
+        "type": 2,
+        "voiceContent": null,
+        "textContent": "Не было пакетов на кассе.",
+        "smileContent": null,
+        "tone": "Плохо",
+        "date": 1675858200,
+        "phoneNumber": "+79111111112",
+        "plate": "AA222A 86"
+    },
+    {
+        "type": 1,
+        "voiceContent": null,
+        "textContent": null,
+        "smileContent": "Смайл \"Средне\"",
+        "tone": "Средне",
+        "date": 1675858200,
+        "phoneNumber": "Аноним",
+        "plate": "Аноним"
+    },
+    {
+        "type": 2,
+        "voiceContent": null,
+        "textContent": "Мне все понравилось. Дружелюбная и спокойная атмосфера, все чисто и аккуратно",
+        "smileContent": null,
+        "tone": "Не классифицировано",
+        "date": 1675858200,
+        "phoneNumber": "+79111111112",
+        "plate": "AA222A 86"
+    }
+]);
+const sortOption = ref('itemsByMechanics');
 
-function formatTotalLoss (sum) {
+function formatCurrency (sum) {
   // Добавление отступов
   let formattedTotalLoss = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(sum);
   return formattedTotalLoss;
@@ -146,13 +160,25 @@ function formatTotalLoss (sum) {
 onMounted(() => {
   // Предположим, что у вас есть начальные значения для фильтров
   // const initialFilters = { date: 1675623600, period: 'month', works: null };
-  // fetchCustomerSkipsData(initialFilters.date, initialFilters.period, initialFilters.workId);
+  // fetchData(initialFilters.date, initialFilters.period, initialFilters.workId);
   // console.log(initialFilters.date);
 });
-// Обновление колонок в зависимости от currentSort
+// Обновление колонок в зависимости от sortOption
 const columns = ref([]);
 
-watch(currentSort, (newVal) => {
+onMounted(() => {
+    updateSortOption(sortOption.value.option);
+});
+
+function updateSortOption(option) {
+    sortOption.value = option;
+    columns.value = [
+        { header: option === 'itemsByPosts' ? 'Пост' : 'Механик', size: '4fr' },
+        { header: 'Работы', size: '3fr' },
+        { header: 'Потери', size: '1fr' },
+    ];
+}
+watch(sortOption, (newVal) => {
   console.log("Текущая сортировка:", newVal);
   if (newVal === 'itemsByPosts') {
     columns.value = [
@@ -173,6 +199,7 @@ watch(currentSort, (newVal) => {
     ];
   }
 }, { immediate: true });
+
 function unixToDate(unixTime) {
   const date = new Date(unixTime * 1000); // Умножаем на 1000, так как в JavaScript время измеряется в миллисекундах, а не в секундах, как в Unix
 
@@ -203,21 +230,23 @@ function toggleDetails(event) {
 }
 function toggleSingleDetail(event) {toggleDetails(event)}
 
-async function fetchCustomerSkipsData({ date, period }) {
+async function fetchData({ date, period }) {
   const filters = {
     interval: period,
     dateStart: date,
     //works: Array.isArray(workId) ? workId : [workId],
-    works: ['nope'],
-    carCenters: carCenterIds.value,
+    works: ['none'],
+    carCenters: selectedCarCenterIds.value,
     page: 1
   };
 
   try {
-    const response = await apiCall.post('/analytics/get-reviews', { filters });
+    const response = await apiClient.post('/analytics/get-reviews', { filters });
     items.value = response.data.items;
+    console.log('айтемы');
     console.log(items.value);
-    //updateColumns(currentSort.value);
+    console.log('айтемы');
+    //updateColumns(sortOption.value);
   } catch (error) {
     console.error('Ошибка при загрузке данных:', error);
   }

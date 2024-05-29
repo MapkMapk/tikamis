@@ -25,7 +25,7 @@
     >
     <TabularFiltersWrapper>
       <SharedAnalyticsServiceWorkloadFilterFreeWindows @update-time="handleUpdateTime" />
-      <TabularFilterDate @updateDate="handleSelectedDate"/>
+      <TabularFilterDate @updateDate="selectDateHandler"/>
       <TabularButtonApplyFilters @click="applyFilters"/>
     </TabularFiltersWrapper>
     <div class="flex flex-col w-full mt-7">
@@ -101,20 +101,20 @@ import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStat
 import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
 import { computed } from 'vue';
-const sadminServiceStationsStore = useSadminServiceStationsStore();
-const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+const sadminStationsStore = useSadminServiceStationsStore();
+const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 
 const carCenterIds = computed(() => {
-      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminServiceStationsStore
+      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminStationsStore
       return isEnv('sadmin') 
-        ? sadminServiceStationsStore?.getSelectedServiceStation().id
+        ? sadminStationsStore?.getSelectedServiceStation().id
         : "none";
     });
 //////////
 //
 //////////
 
-let baseWidthPerHour = 130;
+let BASE_HOUR_WIDTH = 130;
 
 const freePostsCount = ref(0); // Количество свободных постов
 const totalFreeTime = ref(0); // Суммарное время свободных постов в минутах
@@ -125,7 +125,7 @@ let filterDateStart = ref(1675882800);
 let handleUpdateTime = (minutes) => {
   totalMinutes.value = minutes;
 };
-let handleSelectedDate = (date) => {
+let selectDateHandler = (date) => {
   filterDateStart.value = (Math.floor(date)+86400);
 }
 
@@ -138,12 +138,12 @@ const orderMinutes = computed(() => totalMinutes.value);
 const dateStart = computed(() => filterDateStart.value);
 
 
-//console.log(sadminServiceStationsStore?.getSelectedServiceStation().id);
+//console.log(sadminStationsStore?.getSelectedServiceStation().id);
 const apiCallServiceWorkload = isEnv('sadmin') ? sadminApiGetServiceWorkload : directorApiGetServiceWorkload;
 
 onMounted(() => {
   // const workList = async () => {
-  // console.log(await apiCall.get('/all-works'));}
+  // console.log(await apiClient.get('/all-works'));}
   // workList();
   console.log();
 });

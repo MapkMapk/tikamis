@@ -2,7 +2,7 @@
     <div class="report-filter justify-between min-w-min" @click="simulateClickOnDatePicker">
       <div class="flex-col">
         <VueDatePicker :style="{ '.dp__overlay.dp--overlay-relative, .dp__overlay_container.dp__container_flex': { height: 'auto' } }"
-        v-model="monthh" :format="customFormat" :start-date="startDate" focus-start-date month-picker auto-apply @update:modelValue="handleSelectedDate" locale="ru" :enable-time-picker="false" id="DatePickerPTPRO" />
+        v-model="monthh" :format="customFormat" :start-date="startDate" focus-start-date month-picker auto-apply @update:modelValue="selectDateHandler" locale="ru" :enable-time-picker="false" id="DatePickerPTPRO" />
       </div>
       <BaseSvgIcon
         class="max-w-[18px] max-h-[18px]"
@@ -43,7 +43,7 @@
   
   const emits = defineEmits(['updateDate']);
   
-  function handleSelectedDate(date) {
+  function selectDateHandler(date) {
     console.log(date);
     
     const { month, year } = date;

@@ -3,8 +3,8 @@
   <MainHeader />
   <MainHeaderGap />
   <DirectorReportComponent
-    :show-filter-or="true"
-    :show-filter-all-works="false"
+    :is-filter-all-works-visible="true"
+    :is-filter-or-visible="true"
     @filtersApplied="fetchCustomerSkipsData"
     @optionSelected="changeOrsOption"
   >
@@ -23,12 +23,14 @@
       :key="item.orderId"
       :item="item"
       style="grid-template-columns: 2fr 4fr 1fr 2fr 2fr 2fr;"
+      @click="toggleDetails(item)" 
+      :open="item.detailsOpen"
     >
       <!-- Пост Работы Потери Время записи Телефон Автомобиль -->
       <TabularTableRowCell v-if="currentSort.option === 'itemsByPosts'">Пост №{{ item.postNumber }}</TabularTableRowCell>
       <TabularTableRowCell v-else>{{ item.mechanicName }}</TabularTableRowCell>
       <!-- Перебор и отображение работ для каждой строки -->
-      <TabularTableRowCell :style="{ height: cellHeight, width: '2fr' }" style="padding-left: 10px;" >
+      <TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '2fr' }" style="padding-left: 10px;" >
       <p style="opacity: 0;">dsfdsfdsfsdsfsdfsd</p>
       <details  class="custom-details">
         <summary class="flex" style="justify-content: space-between;">
@@ -39,7 +41,7 @@
         </ul>
       </details>
     </TabularTableRowCell>
-      <TabularTableRowCell>{{ formatTotalLoss(item.totalLoss) }}
+      <TabularTableRowCell>{{ formatCurrency(item.totalLoss) }}
         <details  class="custom-details">
         <summary class="flex" style="justify-content: space-between;"><strong></strong></summary>
         <ul>
@@ -97,7 +99,7 @@
 
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue';
-import DirectorReportComponent from '@/components/directorReportComponent.vue';
+import DirectorReportComponent from '@/components/DirectorReportComponent.vue';
 import TableHeaders from '@/components/Tabular/TableHeaders.vue';
 import TabularPrimeTitle from '@/components/Tabular/TabularPrimeTitle.vue';
 import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
@@ -109,20 +111,23 @@ import MainHeaderGap from '@/components/MainHeaderGap.vue';
 import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
 import isEnv from '@/utils/isEnv.js';
+import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
+
+const serviceStationsStore = useSadminServiceStationsStore();
 
 const items = ref([]);
 const itemsByPosts = ref([]);
 const itemsByMechanics = ref([]);
 const currentSort = ref('itemsByMechanics');
 
-function formatTotalLoss (sum) {
+function formatCurrency (sum) {
   // Добавление отступов
   let formattedTotalLoss = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(sum);
   return formattedTotalLoss;
 };
 
 const columns = ref([]);
-
+const CELL_HEIGHT = '90%';
 
 function changeOrsOption(option){
   currentSort.value = option;
@@ -193,97 +198,33 @@ function unixToDate(unixTime) {
   const formattedDate = `${day}.${month}.${year} ${hours}:${minutes}`;
   return formattedDate;
 }
-///////  Тут находится код, который убирает баг с раскрытием строк
-//////   при нажатии на тэг summary в некоторых браузерах (возможно во всех)
-/////    Он ужасен и требует доработки или фикса самого бага, но Хот фикс есть Хот фикс
-function closeAllDetails(detailsElements) {
-  detailsElements.forEach((details) => {
-    details.removeAttribute('open');
-  });
+
+function toggleDetails(item) {
+  item.detailsOpen = !item.detailsOpen;
 }
-
-// Функция для открытия всех элементов details
-function openAllDetails(detailsElements) {
-  detailsElements.forEach((details) => {
-    details.setAttribute('open', true);
-  });
-}
-function countDetailsStatus(detailsElements) {
-  let openCount = 0;
-  let closedCount = 0;
-
-  detailsElements.forEach((details) => {
-    if (details.open) {
-      openCount++;
-    } else {
-      closedCount++;
-    }
-  });
-
-  return { openCount, closedCount };
-}
-// Основная функция для переключения состояния элементов details
-function toggleDetails(event) {
-  console.log('toggleSingleDetail вызван');
-
-  // Получаем все элементы `details` внутри текущего TabularTableRow.
-  const detailsElements = event.currentTarget.querySelectorAll('details');
-  console.log(`Найдено ${detailsElements.length} элементов 'details'`);
-
-  // Подсчитываем количество открытых и закрытых элементов details
-  const { openCount, closedCount } = countDetailsStatus(detailsElements);
-
-  if (openCount > closedCount) {
-    console.log('Закрываем все элементы `details`');
-    // Закрываем все элементы details через 100 миллисекунд
-    setTimeout(() => {
-      closeAllDetails(detailsElements);
-    }, 10);
-  } else {
-    console.log('Открываем все элементы `details`');
-    // Открываем все элементы details через 100 миллисекунд
-    setTimeout(() => {
-      openAllDetails(detailsElements);
-    }, 10);
-  }
-
-  // Добавляем небольшую задержку перед проверкой состояний, чтобы изменения успели примениться
-  setTimeout(() => {
-    detailsElements.forEach((details, index) => {
-      if (details.open) {
-        console.log(`Элемент details[${index}] остался открытым после обработки`);
-      } else {
-        console.log(`Элемент details[${index}] закрыт после обработки`);
-      }
-    });
-  }, 20); // Увеличил время задержки, чтобы учесть также задержку на закрытие/открытие
-}
-//\\\
-//\\\\
-//\\\\\
-
-
-function toggleSingleDetail(event) {toggleDetails(event)}
-
-
 const displayedItems = computed(() => {
   return currentSort.value.option === 'itemsByPosts' ? itemsByPosts.value : itemsByMechanics.value;
   });
 
-
+  const selectedCarCenterIds = computed(() => {
+      // Замените эту логику на реальный вызов функции isEnv и доступ к serviceStationsStore
+      return isEnv('sadmin') 
+        ? [serviceStationsStore?.getSelectedServiceStation().id]
+        : 'none';
+    });
 async function fetchCustomerSkipsData({ date, period, workId }) {
   const filters = {
     interval: period,
     dateStart: date,
-    works: Array.isArray(workId) ? workId : [workId],
-    carCenters: ['C-1111'], // Указаны для примера, измените по необходимости
+    works: workId,
+    carCenters: selectedCarCenterIds.value, // Указаны для примера, измените по необходимости
     page: 1 // Указано для примера, измените по необходимости
   };
   
   try {
   
-    const apiCall = isEnv('sadmin') ? sadminApiClient : directorApiClient;
-    const response = await apiCall.post('/report/get-customer-skips', { filters });
+    const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+    const response = await apiClient.post('/report/get-customer-skips', { filters });
     //console.log(response.data[currentSort.value][0].works);
     itemsByPosts.value = response.data.itemsByPosts;
     itemsByMechanics.value = response.data.itemsByMechanics;

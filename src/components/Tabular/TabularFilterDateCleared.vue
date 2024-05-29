@@ -65,13 +65,13 @@
       const selectedDate = ref(null); // Инициализирует реактивную переменную для хранения выбранной даты
   
       // Обработчик события 'selected'
-      function handleSelectedDate(date) {
+      function selectDateHandler(date) {
         selectedDate.value = date; // Установливает выбранную дату в реактивную переменную
       }
   
       return {
         selectedDate,
-        handleSelectedDate,
+        selectDateHandler,
       };
     },
   };

@@ -15,11 +15,11 @@
     <TabularSection>
       <TabularPrimeTitle class="mb-2">Сервисная история</TabularPrimeTitle>
       <TabularFiltersWrapper>
-      <TabularFilterPeriod :option-selected="handleOptionSelected" style="flex: 184;"/>
-      <TabularFilterDate @updateDate="handleSelectedDate" style="flex: 614;"/>
+      <TabularFilterPeriod :option-selected="selectOptionHandler" style="flex: 184;"/>
+      <TabularFilterDate @updateDate="selectDateHandler" style="flex: 614;"/>
 
-      <TabularButtonCross style="flex: 60; cursor: pointer;" @click="defaultFilters" />
-      <TabularButtonApplyFilters style="flex: 217;" @click="applyFilters" />
+      <TabularButtonCross style="flex: 60; cursor: pointer;" @click="resetToDefaultFilters" />
+      <TabularButtonApplyFilters style="flex: 217;" @click="fetchData" />
     </TabularFiltersWrapper>
     </TabularSection>
 
@@ -32,9 +32,9 @@
         <TabularTableCellTop></TabularTableCellTop>
       </TabularTableRow>
   <TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">
-    <TabularTableRowCell :style="{ height: cellHeight, width: '2fr' }" style="padding-left: 10px;">
+    <TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '2fr' }" style="padding-left: 10px;">
       {{ item.works.length === 1 ? item.works[0].name : '' }}
-      <details v-if="item.works.length > 1" class="custom-details" :style="{ width: cellWidth }">
+      <details v-if="item.works.length > 1" class="custom-details" :style="{ width: CELL_WIDTH }">
         <summary class="flex" style="justify-content: space-between;">
           {{ item.works[0].name }} <strong>ещё {{ item.works.length - 1 }}</strong>
         </summary>
@@ -43,10 +43,10 @@
         </ul>
       </details>
     </TabularTableRowCell>
-    <TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px; align-self: center;">{{ unixToData(item.bookingTime) }}</TabularTableRowCell>
-    <TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px;    align-self: center;">{{ item.phone }}</TabularTableRowCell>
-    <TabularTableRowCell :style="{ height: cellHeight, width: '1fr' }" style="padding-left: 10px;    align-self: center;">{{ item.plate }}</TabularTableRowCell>
-    <TabularTableRowCell :style="{ height: cellHeight, width: '.2fr' }" >
+    <TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '1fr' }" style="padding-left: 10px; align-self: center;">{{ unixToData(item.bookingTime) }}</TabularTableRowCell>
+    <TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '1fr' }" style="padding-left: 10px;    align-self: center;">{{ item.phone }}</TabularTableRowCell>
+    <TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '1fr' }" style="padding-left: 10px;    align-self: center;">{{ item.plate }}</TabularTableRowCell>
+    <TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '.2fr' }" class="flex">
       <!-- Кликабельное изображение крестика -->
       <svg @click="deleteItem(item)" style="cursor: pointer;" class="delete-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 16 16">
       <path d="M14.2929 0.292893C14.6834 -0.0976311 15.3166 -0.0976311 15.7071 0.292893C16.0976 0.683417 16.0976 1.31658 15.7071 1.70711L9.41421 8L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L8 9.41421L1.70711 15.7071C1.31658 16.0976 0.683418 16.0976 0.292894 15.7071C-0.0976312 15.3166 -0.0976312 14.6834 0.292894 14.2929L6.58579 8L0.292894 1.70711C-0.0976306 1.31658 -0.0976306 0.683417 0.292894 0.292893C0.683418 -0.0976311 1.31658 -0.0976311 1.70711 0.292893L8 6.58579L14.2929 0.292893Z" fill="#A1A4AD"/>
@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import MainHeader from '@/components/MainHeader.vue';
 import ModalBoolean from '@/components/ModalBoolean.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
@@ -86,12 +86,20 @@ import TabularTable from '@/components/Tabular/TabularTable.vue';
 import TabularButtonCross from '@/components/Tabular/TabularButtonCross.vue';
 import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFilters.vue';
 
-
+import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 import isEnv from '@/utils/isEnv.js';
+const apiClient = isEnv('sadmin') ? sadminApiGetCustomerRecords : directorApiGetCustomerRecords ;
+const serviceStationsStore = useSadminServiceStationsStore();
 
+const selectedCarCenterIds = computed(() => {
+      // Замените эту логику на реальный вызов функции isEnv и доступ к serviceStationsStore
+      return isEnv('sadmin') 
+        ? [serviceStationsStore?.getSelectedServiceStation().id]
+        : 'none';
+    });
 
-const cellHeight = '90%';
-const cellWidth = '100%';
+const CELL_HEIGHT = '100%';
+const CELL_WIDTH = '100%';
 
 
 
@@ -114,51 +122,47 @@ onMounted(fetchData);
 
 
 
-</script>
-
-<script>
 
 
+let filterStartDate = ref(1675882800);
+let filterPeriod = ref('year');
 
-let filterDateStart = ref(1675882800);
-let filterDatePeriod = ref('year');
-
-function handleSelectedDate(date) {
+function selectDateHandler(date) {
   console.log(date);
-  filterDateStart.value = (date+86400);
-  console.log(filterDateStart.value);
+  filterStartDate.value = (date+86400);
+  console.log(filterStartDate.value);
 }
 
 const items = ref([]);
 const filters = ref({
-  interval: filterDatePeriod,
-  dateStart: filterDateStart,
-  works: ['11111', '22222', '33333', '44444', '55555'],
-  carCenters: ['C-1111'],
+  interval: filterPeriod,
+  dateStart: filterStartDate,
+  works: ['none'],
+  carCenters: selectedCarCenterIds.value,
   page: 1
 });
 
-async function defaultFilters() {
+async function resetToDefaultFilters() {
   try {
-    let __tempDateStart = filterDateStart.value;
-    let __tempPeriod = filterDatePeriod.value;
-    // значения по умолчанию для filterDateStart и filterDatePeriod
-    filterDateStart.value = null; // Значение по умолчанию для даты
-    filterDatePeriod.value = null; // Значение по умолчанию для периода
+    let __tempDateStart = filterStartDate.value;
+    let __tempPeriod = filterPeriod.value;
+    // значения по умолчанию для filterStartDate и filterPeriod
+    filterStartDate.value = null; // Значение по умолчанию для даты
+    filterPeriod.value = null; // Значение по умолчанию для периода
     
 
     // Применяем фильтры
-    await applyFilters();
-    filterDateStart.value = __tempDateStart;
-    filterDatePeriod.value = __tempPeriod;
+    await fetchData();
+    filterStartDate.value = __tempDateStart;
+    filterPeriod.value = __tempPeriod;
   } catch (error) {
     console.error('Error applying default filters:', error);
   }
 }
-async function applyFilters() {
-  const apiCall = isEnv('sadmin') ? sadminApiGetCustomerRecords : directorApiGetCustomerRecords ;
+async function fetchData() {
+  
   try {
-    const response = await apiCall(filters.value);
+    const response = await apiClient(filters.value);
     
     items.value = response.items;
   } catch (error) {
@@ -166,17 +170,10 @@ async function applyFilters() {
   }
 }
 
-async function fetchData() {
-  const apiCall = isEnv('sadmin') ? sadminApiGetCustomerRecords : directorApiGetCustomerRecords ;
-  try {
-    const response = await apiCall(filters.value);
-    items.value = response.items;
-    console.log(items);
-    console.log(items.value);
-  } catch (error) {
-    console.error('Error fetching data:', error);
-  }
-}
+//d
+</script>
+
+<script>
 
 
 
@@ -190,25 +187,25 @@ export default {
     TabularFilterPeriod
   },
   methods:{
-    handleOptionSelected(option){
-      filterDatePeriod.value = option.value;
-      console.log('Значение опции:', filterDatePeriod.value);
+    selectOptionHandler(option){
+      filterPeriod.value = option.value;
+      console.log('Значение опции:', filterPeriod.value);
     },
-    handleDateChange(date) {
+    dateChangeHandler(date) {
       // Обработка новой выбранной даты
     }
   },
   setup() {
-    function handleDateSelected(selectedDate) {
+    function dateSelectedHandler(selectedDate) {
       // Обновите фильтры, передав выбранную дату
       filters.value.dateStart = selectedDate;
     }
 
     return {
       items,
-      applyFilters,
-      defaultFilters,
-      handleDateSelected
+      fetchData,
+      resetToDefaultFilters,
+      dateSelectedHandler
     };
   }
 };
