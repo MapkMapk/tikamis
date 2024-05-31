@@ -23,7 +23,7 @@ export const useMechanicOrderStore = defineStore(
         if (Number(time[0]) !== 0) {
           hoursString = `${time[0]} ч `;
         }
-        minutesString = `${60 * (time[1] / (10 + '0'.repeat(time[1].length - 1)))} мин`;
+        minutesString = `${Math.floor(60 * (time[1] / (10 + '0'.repeat(time[1].length - 1))))} мин`;
         return hoursString + minutesString;
       }
       return null;
