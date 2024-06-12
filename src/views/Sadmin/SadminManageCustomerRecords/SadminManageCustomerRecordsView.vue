@@ -1,5 +1,5 @@
 <template>
-	<ModalBoolean @callback="handleModalCallback" :is-visible="modal.isVisible" :primary-button-component="modal.color"
+	<ModalBoolean @callback="modal.callback" :is-visible="modal.isVisible" :primary-button-component="modal.color"
 		:primary-count-text="modal.primaryCountText" :main-title="modal.mainTitle" :main-text="modal.mainText"
 		:primary-button-text="modal.primaryButtonText" :secondary-button-text="modal.secondaryButtonText" />
 	<div>
@@ -12,7 +12,7 @@
 		<!-- Секция с табличными данными -->
 		<TabularSection>
 			<!-- Заголовок для таблицы -->
-			<TabularPrimeTitle class="mb-2">Записи клиентов {{ unixToDatePeriodHeader(filterDateStart, filterPeriod) }}</TabularPrimeTitle>
+			<TabularPrimeTitle class="mb-2">Записи клиентов</TabularPrimeTitle>
 			<!-- Обертка для фильтров таблицы -->
 			<TabularFiltersWrapper>
 				<!-- Фильтр по периоду -->
@@ -36,7 +36,7 @@
 				<TabularTableCellTop></TabularTableCellTop>
 			</TabularTableRow>
 			<!-- Ряды данных -->
-			<TabularTableRow v-for="item in items" :key="item.orderId" v-if="items.length"
+			<TabularTableRow v-for="item in items" :key="item.orderId"
 				style="display: grid; grid-template-columns: 2.2fr 1fr 1fr 1fr 0.2fr;">
 				<!-- Ячейка с данными о работах -->
 				<TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '2.2fr' }" style="padding-left: 10px;">
@@ -62,7 +62,7 @@
 				<!-- Ячейка для действий -->
 				<TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '.2fr' }">
 					<!-- Кликабельное изображение крестика для удаления записи deleteItem(item)-->
-					<svg @click="deleteItem(item)" style="cursor: pointer;" class="delete-icon"
+					<svg @click="deleteModal()" style="cursor: pointer;" class="delete-icon"
 						xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"
 						viewBox="0 0 16 16">
 						<path
@@ -70,9 +70,6 @@
 							fill="#A1A4AD" />
 					</svg>
 				</TabularTableRowCell>
-			</TabularTableRow>
-			<TabularTableRow v-else class="h-[50vh]">
-				<FiltersNoData></FiltersNoData>
 			</TabularTableRow>
 		</TabularTable>
 	</div>
@@ -105,17 +102,11 @@ import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
 import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 import TabularTable from '@/components/Tabular/TabularTable.vue';
 
-import FiltersNoData from '@/components/Tabular/FiltersNoData.vue';
-
 import TabularButtonCross from '@/components/Tabular/TabularButtonCross.vue';
 import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFilters.vue';
 import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 import { directorApiClient } from '@/api/directorApiClient';
 import { sadminApiClient } from '@/api/sadminApiClient';
-
-import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
-
-
 const sadminServiceStationsStore = useSadminServiceStationsStore();
 const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 
@@ -127,33 +118,25 @@ const selectedCarCenterIds = computed(() => {
 console.log(selectedCarCenterIds.value);
 let modal = ref({});
 
-async function deleteItem(item) {
-  modal.value.callback = async (isConfirmed) => {
-    if (isConfirmed) {
-      try {
-		let orderId = item.orderId;
-        await apiClient.delete('/manage/order', {data: { orderId } });
-        items.value = items.value.filter(i => i.orderId !== item.orderId);
-      } catch (error) {
-        console.error('Ошибка при удалении элемента:', error);
-      }
-    }
-    modal.value.isVisible = false;
-  };
+function deleteModal() {
 
-  modal.value.color = BaseButtonFilledRed;
-  modal.value.primaryButtonText = 'Удалить';
-  modal.value.isVisible = true;
-  modal.value.mainTitle = 'Удалить запись клиента?';
-  modal.value.mainText = 'Вы уверены, что хотите удалить эту запись клиента?';
-  modal.value.secondaryButtonText = 'Отмена';
+	modal.value.callback = save;
+	modal.value.color = BaseButtonFilledRed;
+	modal.value.primaryButtonText = `Удалить`;
+	modal.value.isVisible = true;
+	modal.value.mainTitle = 'Удалить запись клиента?';
+
+	//modal.value.primaryButtonText = 'Продолжить';
+	modal.value.secondaryButtonText = 'Отмена';
+
+	async function save() {
+		// Sadmin
+		modal.value.isVisible = false;
+	}
 }
 
-function handleModalCallback(isConfirmed) {
-  if (modal.value.callback) {
-    modal.value.callback(isConfirmed);
-  }
-}
+
+
 
 
 
@@ -183,17 +166,30 @@ function toggleSingleDetail(event) {
 	console.log(event)
 }
 
+async function deleteItem(item) {
+	const isConfirmed = confirm('Вы уверены, что хотите удалить этот элемент?');
+	if (!isConfirmed) {
+		return; // Если пользователь отказался, прерываем выполнение функции
+	}
 
+	try {
+		// Вызываем функцию удаления и передаём orderId
+		await deleteCustomerRecord(item.orderId);
+		// Удаляем элемент из списка
+		items.value = items.value.filter(i => i.orderId !== item.orderId);
+	} catch (error) {
+		console.error('Ошибка при удалении элемента:', error);
+	}
+}
 
 onMounted(fetchData);
 
-let filterDateStart = ref(getUnixToday());
-let filterPeriod = ref('month');
+let filterDateStart = ref(1675882800);
+let filterPeriod = ref('year');
 
 function selectDateHandler(date) {
 	console.log(date);
-	//filterDateStart.value = (date + 86400);
-	filterDateStart.value = date;
+	filterDateStart.value = (date + 86400);
 	console.log(filterDateStart.value);
 }
 
@@ -201,8 +197,8 @@ const items = ref([]);
 const filters = ref({
 	interval: filterPeriod,
 	dateStart: filterDateStart,
-	works: null,
-	carCenters: selectedCarCenterIds,
+	works: ['none'],
+	carCenters: selectedCarCenterIds.value,
 	page: 1
 });
 
@@ -211,12 +207,14 @@ async function resetToDefaultFilters() {
 		let __tempDateStart = filterDateStart.value;
 		let __tempPeriod = filterPeriod.value;
 		// значения по умолчанию для filterDateStart и filterPeriod
-		filterDateStart.value = getUnixToday(); // Значение по умолчанию для даты
-		filterPeriod.value = 'month'; // Значение по умолчанию для периода
+		filterDateStart.value = null; // Значение по умолчанию для даты
+		filterPeriod.value = null; // Значение по умолчанию для периода
 
 
 		// Применяем фильтры
 		await applyFilters();
+		filterDateStart.value = __tempDateStart;
+		filterPeriod.value = __tempPeriod;
 	} catch (error) {
 		console.error('Ошибка при применении фильтров по умолчанию:', error);
 	}
@@ -243,10 +241,6 @@ async function fetchData() {
 		console.error('Ошибка при получении данных:', error);
 	}
 }
-	function selectOptionHandler(option) {
-			filterPeriod.value = option;
-			console.log('Значение опции:', option);
-		}
 </script>
 <script>
 export default {
@@ -259,7 +253,10 @@ export default {
 		TabularFilterPeriod
 	},
 	methods: {
-		
+		selectOptionHandler(option) {
+			filterPeriod.value = option;
+			console.log('Значение опции:', option);
+		},
 		dateChangeHandler(date) {
 			// Обработка новой выбранной даты
 		}

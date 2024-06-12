@@ -5,11 +5,14 @@
   <DirectorReportComponent
     :is-filter-all-works-visible="true"
     :is-filter-or-visible="true"
+    :are-buttons-visible="displayedItems.length"
     @filtersApplied="fetchCustomerSkipsData"
     @optionSelected="changeOrsOption"
+    @saveTable="onSave"
+    @sendTable="onSend"
   >
     <template v-slot:tabular-title>
-      <TabularPrimeTitle>Дополнительные работы</TabularPrimeTitle>
+      <TabularPrimeTitle>Дополнительные работы {{ unixToDatePeriodHeader(filterDateStart, filterPeriod) }}</TabularPrimeTitle>
     </template>
 
     <template v-slot:tabular-table-header>
@@ -20,6 +23,7 @@
       <!--<TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">-->
       <TabularTableRow
       v-for="item in displayedItems"
+      v-if="displayedItems.length"
       :key="item.orderId"
       :item="item"
       style="grid-template-columns: 4fr 3fr 1fr;"
@@ -43,7 +47,7 @@
       </details>
     </TabularTableRowCell>
       <TabularTableRowCell>
-        <div style="display: flex;justify-content: space-between">{{ formatCurrency(item.totalLoss) }}
+        <div style="display: flex;justify-content: space-between">{{ formatCurrency(item.totalProfit) }}
       <div style="display: flex;justify-content: flex-end; padding-right: 10px">
           <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
           <i class="material-icons" @click="toggleDetails(item.orderId)">
@@ -54,14 +58,17 @@
         <summary class="flex" style="justify-content: space-between;"><strong></strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.id">
-          {{ formatCurrency(work.loss) }}
+          {{ formatCurrency(work.profit) }}
         </li>
         </ul>
       </details></TabularTableRowCell>
     </TabularTableRow>
+    <TabularTableRow v-else class="h-[50vh]">
+				<FiltersNoData></FiltersNoData>
+			</TabularTableRow>
     <TabularTableCellBottom style="display: grid; grid-template-columns: 7fr 1fr;">
       <p style="color: white;padding-left: 10px;">Итого потерь:</p>
-      <p style="color: white;padding-left: 10px;">{{ formatCurrency(totalLossSum) }}</p>
+      <p style="color: white;padding-left: 10px;">{{ formatCurrency(totalProfitSum) }}</p>
     </TabularTableCellBottom>
     </template>
     
@@ -77,24 +84,25 @@ import TabularTableCellBottom from '@/components/Tabular/TabularTableCellBottom.
 import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
 import { directorApiClient } from '@/api/directorApiClient';
 import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
-
+import FiltersNoData from '@/components/Tabular/FiltersNoData.vue';
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
 import { sadminApiClient } from '@/api/sadminApiClient';
 import isEnv from '@/utils/isEnv.js';
 import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
-
+import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
 const serviceStationsStore = useSadminServiceStationsStore();
 
 const items = ref([]);
 const itemsByPosts = ref([]);
 const itemsByMechanics = ref([]);
-const totalLoss = ref(0);
+const totalProfit = ref(0);
 
 const CELL_WIDTH = '100%';
 const CELL_HEIGHT = '90%';
 
-const date = ref({})
+const filterDateStart = ref(getUnixToday())//
+const filterPeriod = ref('month');
 const currentSort = ref('itemsByMechanics');
 function changeOrsOption(option){
   currentSort.value = option;
@@ -103,14 +111,14 @@ function changeOrsOption(option){
     columns.value = [
       { header: 'Пост', size: '4fr' },
       { header: 'Работы', size: '3fr' },
-      { header: 'Потери', size: '1fr' },
+      { header: 'Прибыль', size: '1fr' },
     ];
   } else {
     // Предполагаемая структура колонок для "mechanics"
     columns.value = [
       { header: 'Механик', size: '4fr' },
       { header: 'Работы', size: '3fr' },
-      { header: 'Потери', size: '1fr' },
+      { header: 'Прибыль', size: '1fr' },
     ];
   }
 }
@@ -120,7 +128,7 @@ function toggleDetails(item) {
 
 onMounted(() => {
   // Предположим, что у вас есть начальные значения для фильтров
-  const initialFilters = { date: 1675623600, period: 'month', works: null };
+  const initialFilters = { date: getUnixToday(), period: 'month', works: null };
   fetchCustomerSkipsData(initialFilters);
   console.log('ВНИМАНИЕ, ЭТО ТЕСТОВАЯ СТРАНИЦА, ОНА ВЫВОДИТ ИНФОРМАЦИЮ ИЗ report/get-customer-skips');
 });
@@ -139,13 +147,13 @@ const columns = ref([]);
 //   // Возврат общей суммы
 //   return totalLossSum;
 // };
-const totalLossSum = computed(() => {
-  return displayedItems.value.reduce((sum, item) => sum + (item.totalLoss || 0), 0);
+const totalProfitSum = computed(() => {
+  return displayedItems.value.reduce((sum, item) => sum + (item.totalProfit || 0), 0);
 });
 function formatCurrency (sum) {
   // Добавление отступов
-  let formattedTotalLoss = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(sum);
-  return formattedTotalLoss;
+  let formattedTotalProfit = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(sum);
+  return formattedTotalProfit;
 };
 
 watch(currentSort.value.option, (newVal) => {
@@ -153,14 +161,14 @@ watch(currentSort.value.option, (newVal) => {
     columns.value = [
       { header: 'Пост', size: '4fr' },
       { header: 'Работы', size: '3fr' },
-      { header: 'Потери', size: '1fr' },
+      { header: 'Прибыль', size: '1fr' },
     ];
   } else {
     // Предполагаемая структура колонок для "mechanics"
     columns.value = [
     { header: 'Механик', size: '4fr' },
       { header: 'Работы', size: '3fr' },
-      { header: 'Потери', size: '1fr' },
+      { header: 'Прибыль', size: '1fr' },
     ];
   }
 }, { immediate: true });
@@ -181,30 +189,45 @@ function unixToDate(unixTime) {
 const displayedItems = computed(() => {
   return currentSort.value.option === 'itemsByPosts' ? itemsByPosts.value : itemsByMechanics.value;
 });
-
+function processWorkId(workId) {
+  if (workId === null) {
+    return null;
+  } else if (Array.isArray(workId)) {
+    return workId;
+  } else if (typeof workId === 'string') {
+    return workId.includes(',') ? workId.split(',') : [workId];
+  } else {
+    return [workId];
+  }
+}
 const selectedCarCenterIds = computed(() => {
       // Замените эту логику на реальный вызов функции isEnv и доступ к serviceStationsStore
       return isEnv('sadmin') 
         ? [serviceStationsStore?.getSelectedServiceStation().id]
-        : 'none';
+        : null;
     });
 
 async function fetchCustomerSkipsData({ date, period, workId }) {
+  filterDateStart.value = {date}.date;
+  filterPeriod.value = {period}.period;
+  console.log(filterDateStart.value);
+  console.log(filterPeriod.value);
+  const works = processWorkId(workId);
   const filters = {
     interval: period,
     dateStart: date,
-    works: workId,
+    works: works,
     carCenters: selectedCarCenterIds.value, // Указаны для примера, измените по необходимости
     page: 1 // Указано для примера, измените по необходимости
   };
 
   try {
     const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
-    const response = await apiClient.post('/report/get-customer-skips', { filters });
+    const response = await apiClient.post('/report/get-added-works', { filters });//get-customer-skips
     //console.log(response.data[currentSort.value][0].works);
     itemsByPosts.value = response.data.itemsByPosts;
     itemsByMechanics.value = response.data.itemsByMechanics;
-    totalLoss.value = response.data.itemsByMechanics.totalLoss;
+    totalProfit.value = response.data.itemsByMechanics.totalProfit;
     //updateColumns(currentSort.value);
   } catch (error) {
     console.error('Ошибка при загрузке данных:', error);

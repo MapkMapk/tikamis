@@ -21,7 +21,7 @@
   const selectedDate = ref();
   const emits = defineEmits(['updateDate']);
   
-  const customFormat = date => `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  const customFormat = date => `${date.getUTCDate()}/${date.getUTCMonth() + 1}/${date.getUTCFullYear()}`;
   const startDate = ref();
   
   

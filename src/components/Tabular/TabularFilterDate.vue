@@ -2,7 +2,7 @@
   <div class="report-filter justify-between min-w-min flex-1" @click="simulateClickOnDatePicker">
     <div class="flex-col">
       <div v-if="isVisible" class="report-input-header-text-gray">Начало отсчета</div>
-      <VueDatePicker v-model="selectedDate" :format="customFormat" :start-date="startDate" focus-start-date auto-apply @update:modelValue="updateSelectedDate" locale="ru" :enable-time-picker="false" id="DatePickerPTPRO" />
+      <VueDatePicker v-model="selectedDate" :format="customFormat" :start-date="startDate.value" focus-start-date auto-apply @update:modelValue="updateSelectedDate" locale="ru" :enable-time-picker="false" id="DatePickerPTPRO" />
     </div>
     <BaseSvgIcon
       class="max-w-[18px] max-h-[18px]"
@@ -18,11 +18,14 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
 
-const selectedDate = ref(new Date(2023, 1, 8));
+//const selectedDate = ref(new Date().setHours(0, 0, 0, 0));
+const selectedDate = ref(new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate())));
+
 const emits = defineEmits(['updateDate']);
 
-const customFormat = date => `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
-const startDate = ref(new Date(2023, 1, 8));
+const customFormat = date => `${date.getUTCDate()}/${date.getUTCMonth() + 1}/${date.getUTCFullYear()}`;
+const startDate = ref(new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate())));
+
 
 
 

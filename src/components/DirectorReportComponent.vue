@@ -9,7 +9,7 @@
         <TabularFilterOr v-if="isFilterOrVisible" @optionSelected="onOptionSelected" />
         <TabularFilterDate v-if="!isFilterDateVisible" @updateDate="onDateUpdate" />
         <TabularFilterAllWorks v-if="isFilterAllWorksVisible" @optionSelected="onWorkSelected" @worksLoaded="onWorksLoaded" />
-        <TabularButtonCross v-if="isButtonCrossVisible" @click="resetFiltersToDefault" />
+        <TabularButtonCross v-if="isButtonCrossVisible" class="cursor-pointer" @click="resetSelectedFilters" />
         <TabularButtonApplyFilters v-if="isButtonApplyFiltersVisible" @click="applySelectedFilters" />
       </TabularFiltersWrapper>
     </TabularSection>
@@ -51,6 +51,14 @@ import TabularButtonCross from '@/components/Tabular/TabularButtonCross.vue';
 import TabularButtonApplyFilters from '@/components/Tabular/TabularButtonApplyFilters.vue';
 import TabularTable from '@/components/Tabular/TabularTable.vue';
 import isEnv from '@/utils/isSpecEnv.js';
+import { useStore } from '@/stores/main.js';
+import { getUnixToday } from '@/utils/time/dateUtils.js'
+const store = useStore();
+
+const DEFAULT_DATE = getUnixToday();
+const DEFAULT_PERIOD = store.mainPeriod;
+const DEFAULT_SORT = store.mainSort;
+const DEFAULT_WORK_ID = null;
 
 onMounted(() => {
   if (isEnv('reviews')) {
@@ -136,6 +144,16 @@ const applySelectedFilters = () => {
     period: currentSelectedPeriod.value,
     sort: currentSelectedSort.value,
     workId: currentSelectedWorkId.value
+  });
+  emitFiltersUpdate();
+};
+
+const resetSelectedFilters = () => {
+  emit('filtersReset', {
+    date: DEFAULT_DATE,
+    period: DEFAULT_PERIOD,
+    sort: DEFAULT_SORT,
+    workId: DEFAULT_WORK_ID
   });
   emitFiltersUpdate();
 };

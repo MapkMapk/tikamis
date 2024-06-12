@@ -1,6 +1,6 @@
 import { sadminApiClient } from '@/api/sadminApiClient.js'
 
-export default async function (
+export default async function ({
   carCenterId,
   login,
   password,
@@ -9,10 +9,10 @@ export default async function (
   mapLink,
   shiftsStart,
   shiftsFinish,
-  timezoneOffsetHours,
+  timeZoneOffsetHours,
   clearanceMinutes,
   orderDepthDays
-) {
+}) {
   const response = await sadminApiClient.post('manage/settings', {
     carCenterId,
     login,
@@ -22,9 +22,15 @@ export default async function (
     mapLink,
     shiftsStart,
     shiftsFinish,
-    timezoneOffsetHours,
+    timeZoneOffsetHours,
     clearanceMinutes,
     orderDepthDays
   });
   return response;
 }
+
+
+
+
+
+

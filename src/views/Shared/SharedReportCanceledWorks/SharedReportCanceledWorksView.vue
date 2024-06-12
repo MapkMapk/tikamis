@@ -129,7 +129,7 @@ function displayLog(){
 const selectedCarCenterIds = computed(() => {
   return isEnv('sadmin')
     ? [sadminServiceStationsStore?.getSelectedServiceStation().id]
-    : ["none"];
+    : null;
 });
 
 async function fetchCustomerSkipsData({ date, period, workId }) {

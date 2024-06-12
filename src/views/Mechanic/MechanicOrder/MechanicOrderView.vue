@@ -138,10 +138,10 @@
     </div>
   </section>
 </template>
+
 <script setup>
 import TheHeader from '@/components/TheMechanicHeader.vue';
 import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
-
 import MechanicOrderWork from '@/views/Mechanic/MechanicOrder/MechanicOrderWork.vue';
 import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
 import { ref, computed, onBeforeUnmount, onMounted } from 'vue';
@@ -149,13 +149,16 @@ import ModalBoolean from '@/components/ModalBoolean.vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
 import router from '@/router/index.js'
-
+import { useRoute } from 'vue-router';
+const route = useRoute();
 const mechanicOrderStore = useMechanicOrderStore();
 let updateOrderInfoInterval = '';
 
-let odometer = ref('');
 let isModalVisible = ref(false);
 let isLowTime = computed(() => mechanicOrderStore.completionTimeHours < 0);
+
+const odometer = ref(route.query.odometer || '');
+console.log(odometer.value);
 
 async function orderCancel(isConfirmed) {
   if (isConfirmed) {
@@ -163,14 +166,17 @@ async function orderCancel(isConfirmed) {
   }
   isModalVisible.value = false;
 }
-function  unixToTime(unixTimestamp) {
-      const date = new Date(unixTimestamp * 1000);
-      return date.toUTCString().slice(-12, -7);
+
+function unixToTime(unixTimestamp) {
+  const date = new Date(unixTimestamp * 1000);
+  return date.toUTCString().slice(-12, -7);
 }
+
 function unixToDate(unixTimestamp) {
-      const date = new Date(unixTimestamp * 1000);
-      return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', weekday: 'long' });
+  const date = new Date(unixTimestamp * 1000);
+  return date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', weekday: 'long' });
 }
+
 async function orderComplete() {
   if (odometer.value > 0) {
     clearInterval(updateOrderInfoInterval);
@@ -185,34 +191,28 @@ function navigateToOrderWorKAddView() {
     alert('Для добавления работ в заказ необходимо указать пробег автомобиля');
     return;
   }
-  router.push('/mechanic/order/work-add');
+  router.push({
+    path: '/mechanic/order/work-add',
+    query: { odometer: odometer.value }
+  });
 }
-
-// Интервал необходим, чтобы поддерживать данные заказа в актуальном состоянии
-// Чтобы например если клиент откажется от заказа механик тоже смог это увидеть
 
 onMounted(async () => {
   try {
     const response = await mechanicOrderStore.orderGetNext();
-    // Успешный ответ
     console.log(response);
   } catch (error) {
     if (error.response) {
-      // Сервер вернул ответ с кодом состояния, который вышел из диапазона 2xx
       console.log(error.response.status);
     } else if (error.request) {
-      // Запрос был сделан, но ответ не был получен (error.request — экземпляр XMLHttpRequest в браузерах)
       alert("Ошибка сервера");
     } else {
-      // Что-то пошло не так при настройке запроса
       console.log('Error', error.message);
     }
   }
   updateOrderInfoInterval = setInterval(() => mechanicOrderStore.orderGetNext(), 30000);
 });
 
-// Удаление интервала обновления заказа в момент ухода с страницы, чтобы он не оставался в памяти
-// При повторном посещении страницы сработает вызов getNext в хуке onMount / onBeforeMount
 onBeforeUnmount(() => {
   clearInterval(updateOrderInfoInterval);
 });

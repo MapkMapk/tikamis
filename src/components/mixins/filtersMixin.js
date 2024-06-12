@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 import isEnv from '@/utils/isEnv.js';
+import { getUnixToday } from '@/utils/time/dateUtils.js';
 
 export function useFilters(emit) {
   const serviceStationsStore = useSadminServiceStationsStore();
@@ -9,7 +10,7 @@ export function useFilters(emit) {
     isEnv('sadmin') ? [serviceStationsStore?.getSelectedServiceStation().id] : 'none'
   );
 
-  const currentSelectedDate = ref(1675623600);
+  const currentSelectedDate = ref(getUnixToday());
   const currentSelectedPeriod = ref('month');
   const currentSelectedSort = ref('itemsByPosts');
   const currentSelectedWorkId = ref('');
@@ -35,7 +36,7 @@ export function useFilters(emit) {
   };
 
   const resetFiltersToDefault = () => {
-    currentSelectedDate.value = 1675623600;
+    currentSelectedDate.value = getUnixToday();
     currentSelectedPeriod.value = 'month';
     currentSelectedSort.value = 'itemsByPosts';
     currentSelectedWorkId.value = null;

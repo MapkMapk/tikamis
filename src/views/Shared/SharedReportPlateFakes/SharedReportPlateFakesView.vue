@@ -78,7 +78,7 @@ const selectedCarCenterIds = computed(() => {
       // Замените эту логику на реальный вызов функции isEnv и доступ к serviceStationsStore
       return isEnv('sadmin') 
         ? [serviceStationsStore?.getSelectedServiceStation().id]
-        : 'none';
+        : null;
     });
 const CELL_WIDTH = '100%';
 const items = ref([]);

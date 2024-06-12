@@ -24,23 +24,20 @@
                 <p>с {{ formatTime(blockData.blockStart) }} по {{ formatTime(blockData.blockEnd) }}</p>
             </div>
             <div class="window-duration flex modal-timeContainer">
-                <svg width="25" height="25" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" 
-                    style="
-                        margin-top: -2px;
-                        margin-right: 10px;">
-                <path d="M11 6C11 5.44772 10.5523 5 10 5C9.44771 5 9 5.44772 9 6V10C9 10.2652 9.10536 10.5196 9.29289 10.7071L11.2929 12.7071C11.6834 13.0976 12.3166 13.0976 12.7071 12.7071C13.0976 12.3166 13.0976 11.6834 12.7071 11.2929L11 9.58579V6Z" fill="rgb(135 194 62)"/>
-                <path fill-rule="evenodd" clip-rule="evenodd" d="M10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0ZM2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10Z" fill="rgb(135 194 62)"/>
-                </svg>
+              <BaseSvgIcon name="clock" class="w-6 h-6 mr-[10px]" />
             <span class="modal-time">{{ calculateDuration(blockData.blockStart, blockData.blockEnd) }}</span>
             </div>
             
         </div>
         <div>
             <BaseButtonFilledGreen
-            v-if="blockData.type === 'free'"
+            v-if="blockData.type !== 'busy'"
             @click="handleButtonClick"
             class="apply-button"
             style="height: 60px; width: 240px;"
+            :style="{
+             backgroundColor: blockData.type === 'short' ? '#cccccc' : ''
+            }"
             >
             Записать
             </BaseButtonFilledGreen>
@@ -51,16 +48,18 @@
 <script setup>
 import { defineProps, defineEmits } from 'vue';
   import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue'
-
+  import BaseSvgIcon from '@/components/BaseSvgIcon.vue';
   const emit = defineEmits(['close', 'submit', 'close-modal']);
-  const { isVisible, blockData } = defineProps({
-    isVisible: Boolean,
-    blockData: Object
-  });
-  
+  const { isVisible, blockData, orderMinutes, freeBlocks } = defineProps({
+  isVisible: Boolean,
+  blockData: Object,
+  orderMinutes: Number,
+  freeBlocks: Array,
+});
   function formatTime(minutes) {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
+    console.log(blockData)
     return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
   }
   
@@ -72,7 +71,9 @@ import { defineProps, defineEmits } from 'vue';
   }
   
   function handleButtonClick() {
-    emit('submit', blockData); // Вы можете передать весь объект blockData или только конкретные данные
+    if (blockData.type === 'free'){
+      emit('submit', {blockData, orderMinutes, freeBlocks}); // Вы можете передать весь объект blockData или только конкретные данные
+    }
   }
 
 

@@ -8,9 +8,15 @@ export const useMainStore = defineStore('main', () => {
   function $reset() {
     isHeaderMenuOpen.value = false;
   }
+  const mainDate = 1675882800;
+  const mainPeriod ='month';
+  const mainSort = 'itemsByMechanics'
+  const mainPage = 1;
+  const mainStep = 'day';
+  
   async function workList() {
     const { data } = await directorApiClient.get('/all-works');
     return data;
   }
-  return { isHeaderMenuOpen, $reset, workList };
+  return { isHeaderMenuOpen, mainDate, mainStep, mainPage, mainPeriod, mainSort, $reset, workList };
 });

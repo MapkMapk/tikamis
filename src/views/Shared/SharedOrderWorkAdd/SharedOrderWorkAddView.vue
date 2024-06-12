@@ -63,8 +63,7 @@
     </div>
   </section>
   <div :class="{'!left-[calc(50%-320px)]': amountOfSelectedWorks > 0}" class="fixed flex justify-center bottom-5 left-[calc(50%-160px)]">
-    <BaseButtonFilledLight @click="router.push({ path: '/mechanic/order', query: { odometer: odometer } })" class="w-[300px] mr-5">Вернуться к заказу</BaseButtonFilledLight>
-
+    <BaseButtonFilledLight @click="router.push('/mechanic/order')" class="w-[300px] mr-5">Вернуться к заказу</BaseButtonFilledLight>
     <BaseButtonFilledGreen
       @click="addWorksToOrder"
       v-if="amountOfSelectedWorks > 0"
@@ -93,14 +92,9 @@ import { onMounted, ref, computed } from 'vue';
 import { useMechanicOrderStore } from '@/stores/mechanic/mechanicOrder.js';
 import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
 
-import { useRoute } from 'vue-router';
-const route = useRoute();
 const mechanicOrderStore = useMechanicOrderStore();
 let searchInputText = ref('');
 let works = ref([]);
-
-const odometer = ref(route.query.odometer || '');
-console.log(odometer.value);
 
 let amountOfSelectedWorks = computed(() => {
   let counter = 0;
@@ -137,10 +131,7 @@ async function addWorksToOrder() {
     }
   });
   await mechanicOrderStore.workAdd(allSelectedWorkIds);
-  await router.push({
-    path: '/mechanic/order',
-    query: { odometer: odometer.value }
-  });
+  await router.push('/mechanic/order');
 }
 
 </script>

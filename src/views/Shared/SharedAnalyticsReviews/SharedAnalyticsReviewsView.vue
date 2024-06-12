@@ -9,10 +9,11 @@
     :is-filter-all-works-visible="false"
     :are-buttons-visible="false"
     @filtersApplied="fetchData"
+    @filtersReset="fetchData"
   >
     <!-- <template v-slot:tabular-title> -->
     <template v-slot:tabular-title>
-      <TabularPrimeTitle>Отзывы</TabularPrimeTitle>
+      <TabularPrimeTitle>Отзывы {{ unixToDatePeriodHeader(filterDateStart, filterPeriod) }}</TabularPrimeTitle>
     </template>
     <!-- <template v-slot:tabular-table-header> -->
     <template v-slot:tabular-table-header>
@@ -23,6 +24,7 @@
       <!--<TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">-->
       <TabularTableRow
       v-for="(item, index) in items"
+      v-if="items.length"
       :key="index"
       :item="item"
       @click="toggleDetails($event)"
@@ -31,20 +33,7 @@
         <TabularTableRowCell v-if="item.type == '1'">{{ item.smileContent }} </TabularTableRowCell>
         <TabularTableRowCell v-if="item.type == '2'">{{ item.textContent }} </TabularTableRowCell>
         <TabularTableRowCell v-if="item.type == '4'">
-          <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-          <div class="voice-message">
-            <button class="play-button" @click="togglePlay">
-              <span class="material-icons" v-if="!isPlaying">play_arrow</span>
-              <span class="material-icons" v-if="isPlaying">pause</span>
-            </button>
-            <div class="audio-waves">
-              <span v-for="n in 24" :key="`high-${n}`" class="wave" :style="{ animationDelay: `${Math.random() * -2}s` }"></span>
-              <span v-for="n in 8" :key="`low-${n}`" class="wave-low" :style="{ animationDelay: `${Math.random() * -1}s` }"></span>
-
-            </div>
-            <div >0:05</div>
-
-          </div>
+          <audio controls="" :src="`data:audio/mp3;base64,${item.voiceContent}`"></audio>
         </TabularTableRowCell>
       <!-- Пост Работы Потери Время записи Телефон Автомобиль -->
       <TabularTableRowCell>{{ item.tone }}</TabularTableRowCell>
@@ -56,16 +45,19 @@
         
       </template>
     </TabularTableRow>
+    <TabularTableRow v-else class="h-[50vh]">
+				<FiltersNoData></FiltersNoData>
+			</TabularTableRow>
     </template>
 
   </DirectorReportComponent>
-  <div class="flex flex-col items-center">
+  <div class="flex flex-col items-center" v-if="items.length">
             <div id="234" class="w-full flex mt-10 mb-3" style="justify-content: center">
-              <div style="width: 400px;margin-right: 20px;">
-              <AdvButtonFilledGreen></AdvButtonFilledGreen>
+              <div style="width: 400px;margin-right: 20px;"  @click="saveData">
+              <AdvButtonFilledGreen ></AdvButtonFilledGreen>
             </div>
-            <div style="width: 400px;margin-left: 20px">
-              <AdvButtonFilledDark></AdvButtonFilledDark>
+            <div style="width: 400px;margin-left: 20px" @click="sendData">
+              <AdvButtonFilledDark  style="padding-bottom: 0.75rem !important"></AdvButtonFilledDark>
             </div>
             </div>
           </div>
@@ -73,8 +65,9 @@
 
 <script setup>
   import AdvButtonFilledGreen from '@/components/AdvButtonFilledGreen.vue';
+  import FiltersNoData from '@/components/Tabular/FiltersNoData.vue';
   import AdvButtonFilledDark from '@/components/AdvButtonFilledDark.vue';
-
+  import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
 import { onMounted, ref, watch } from 'vue';
 import DirectorReportComponent from '@/components/DirectorReportComponent.vue';
 import TableHeaders from '@/components/Tabular/TableHeaders.vue';
@@ -84,7 +77,7 @@ import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
-
+import { convertToTableFormat }  from '@/api/sendFunctions/reviews.js'
 //////////
 //оч важный блок
 //////////
@@ -100,55 +93,15 @@ const selectedCarCenterIds = computed(() => {
       // Замените эту логику на реальный вызов функции isEnv и доступ к serviceStationsStore
       return isEnv('sadmin') 
         ? [serviceStationsStore?.getSelectedServiceStation().id]
-        : ["none"];
+        : null;
     });
 //////////
 //
 //////////
-
+const filterDateStart = ref(getUnixToday());
+const filterPeriod = ref('month');
 const isPlaying = ref(false);
-const items = ref([
-    {
-        "type": 1,
-        "voiceContent": null,
-        "textContent": null,
-        "smileContent": "Смайл \"Хорошо\"",
-        "tone": "Хорошо",
-        "date": 1675858200,
-        "phoneNumber": "+79111111112",
-        "plate": "AA111A 186"
-    },
-    {
-        "type": 2,
-        "voiceContent": null,
-        "textContent": "Не было пакетов на кассе.",
-        "smileContent": null,
-        "tone": "Плохо",
-        "date": 1675858200,
-        "phoneNumber": "+79111111112",
-        "plate": "AA222A 86"
-    },
-    {
-        "type": 1,
-        "voiceContent": null,
-        "textContent": null,
-        "smileContent": "Смайл \"Средне\"",
-        "tone": "Средне",
-        "date": 1675858200,
-        "phoneNumber": "Аноним",
-        "plate": "Аноним"
-    },
-    {
-        "type": 2,
-        "voiceContent": null,
-        "textContent": "Мне все понравилось. Дружелюбная и спокойная атмосфера, все чисто и аккуратно",
-        "smileContent": null,
-        "tone": "Не классифицировано",
-        "date": 1675858200,
-        "phoneNumber": "+79111111112",
-        "plate": "AA222A 86"
-    }
-]);
+const items = ref([]);
 const sortOption = ref('itemsByMechanics');
 
 function formatCurrency (sum) {
@@ -228,14 +181,14 @@ function toggleDetails(event) {
     });
   }
 }
-function toggleSingleDetail(event) {toggleDetails(event)}
-
 async function fetchData({ date, period }) {
+  filterDateStart.value = {date}.date;
+  filterPeriod.value = {period}.period;
   const filters = {
     interval: period,
     dateStart: date,
     //works: Array.isArray(workId) ? workId : [workId],
-    works: ['none'],
+    works: null,
     carCenters: selectedCarCenterIds.value,
     page: 1
   };
@@ -257,6 +210,24 @@ function truncateText(text, maxLength) {
     return text.slice(0, maxLength) + '...';
   }
   return text;
+}
+async function saveData(){
+  const tableData = convertToTableFormat(
+    `Отзывы ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value)}`,
+    columns.value,
+    items.value
+  );
+  const saveResponse = await apiClient.post('/report-save',tableData);
+  console.log(saveResponse);
+}
+async function sendData(){
+  const tableData = convertToTableFormat(
+    `Отзывы ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value)}`,
+    columns.value,
+    items.value
+  );
+  const mailResponse = await apiClient.post('/report-emails',tableData);
+  console.log(mailResponse);
 }
 </script>
 <script>

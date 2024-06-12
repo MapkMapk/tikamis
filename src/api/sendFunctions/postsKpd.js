@@ -1,27 +1,36 @@
-export function processData(headersArray, dataArray, sort) {
-    const keyName = sort === 'itemsByPosts' ? 'postNumber' : 'mechanicName';
-    // Обработка массивов для формирования выходного JSON
-    let result = [];
-  
-    // Добавляем заголовки в выходной JSON
-    result.push(headersArray.map(header => header.header));
-  
-    // Обрабатываем данные
-    dataArray.forEach(item => {
-      // Проверяем, что все нужные поля определены
-      const key = item[keyName] != null ? item[keyName] : '';
-      const total = item.totalDeviationMinutes != null ? item.totalDeviationMinutes.toString() : '';
-  
-      // Добавляем основную информацию
-      result.push([key, "Все работы", total]);
-  
-      // Добавляем информацию о каждой работе
-      item.works.forEach(work => {
-        const workName = work.workName || '';
-        const loss = work.deviationMinutes != null ? work.deviationMinutes.toString() : '';
-        result.push([null, workName, loss]);
-      });
-    });
-  
-    return result;
+function formatDeviationMinutes(minutes) {
+  if (minutes != null) {
+    if (minutes > 0) {
+      return '+' + minutes.toString();
+    } else {
+      return minutes.toString();
+    }
+  } else {
+    return '';
   }
+}
+export function processData(headersArray, dataArray, sort) {
+  const keyName = sort === 'itemsByPosts' ? 'postNumber' : 'mechanicName';
+  let result = [];
+
+  // Добавление заголовков в выходной JSON
+  result.push(headersArray.map(header => header.header));
+
+  // Обработка данных
+  dataArray.forEach(item => {
+    const key = item[keyName] != null ? item[keyName] : '';
+    const total = formatDeviationMinutes(item.totalDeviationMinutes);
+
+    // Добавление основной информации
+    result.push([key, "Все работы", total]);
+
+    // Добавление информации о каждой работе
+    item.works.forEach(work => {
+      const workName = work.workName || '';
+      const loss = formatDeviationMinutes(work.deviationMinutes);
+      result.push([null, workName, loss]);
+    });
+  });
+
+  return result;
+}

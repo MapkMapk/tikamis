@@ -3,23 +3,30 @@
   
   <OrderReceptionScreen 
     v-if="order.isVisible"
+    :block-data="order.blockData"
+    :order-minutes="order.orderMinutes"
+    :free-blocks="order.freeBlocks"
+    :selected-works="order.selectedWorks"
+    :order-time="orderMinutes"
+    :unix-date="order.dateStart"
+    :is-sadmin="apiClientIsSadmin"
     @callback="FakeOpen"
     @close="orderClose"/>
   <ModalServiceLoadClient
       v-if="showModal"
       :is-visible="showModal"
       :block-data="selectedBlock"
+      :order-minutes="orderMinutes"
+      :free-blocks="freeBlocks"
       @close-modal="closeModal"
       @submit="orderOpen"
     />
   <MainHeader />
   <MainHeaderGap />
-  <FakeWorkAdd 
-  v-if="Fake.isVisible"
-  @close="FakeClose"/>
+  
   <!-- <TabularSection> -->
     <TabularSection>
-    <TabularPrimeTitle class="mb-2">22 сентября 2023, 11:25</TabularPrimeTitle>
+    <TabularPrimeTitle class="mb-2">Загруженность сервиса {{ unixToDatePeriodHeader(filterDateStart)}}</TabularPrimeTitle>
     <TabularPrimeDescription class="mb-5"
       >Свободно для записи  постов: {{ freePostsCount }}, на {{ formattedTotalFreeTime }}</TabularPrimeDescription
     >
@@ -101,39 +108,52 @@ import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStat
 import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
 import { computed } from 'vue';
-const sadminStationsStore = useSadminServiceStationsStore();
-const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 
-const carCenterIds = computed(() => {
-      // Замените эту логику на реальный вызов функции isEnv и доступ к sadminStationsStore
-      return isEnv('sadmin') 
-        ? sadminStationsStore?.getSelectedServiceStation().id
-        : "none";
-    });
+import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
+
+const sadminStationsStore = useSadminServiceStationsStore();
+//const apiClient = ref(isEnv('sadmin') ? sadminApiClient : directorApiClient);
+const apiClientIsSadmin = ref(isEnv('sadmin'));
+import { useStore } from '@/stores/main.js';
+
+const Store = useStore();
+
+
+const carCenterId = computed(() => {
+    return isEnv('sadmin') 
+      ? [useSadminServiceStationsStore()?.getSelectedServiceStation().id]
+      : null;
+  });
+
 //////////
 //
 //////////
 
 let BASE_HOUR_WIDTH = 130;
 
-const freePostsCount = ref(0); // Количество свободных постов
+const freeBlocks = ref([]);
+const freePostsCount = computed(() => freeBlocks.value.length);
 const totalFreeTime = ref(0); // Суммарное время свободных постов в минутах
 
 let totalMinutes = ref(0);
-let filterDateStart = ref(1675882800);
+let filterDateStart = ref(getUnixToday());
 
 let handleUpdateTime = (minutes) => {
   totalMinutes.value = minutes;
 };
 let selectDateHandler = (date) => {
-  filterDateStart.value = (Math.floor(date)+86400);
+  filterDateStart.value = (Math.floor(date)+0);
 }
 
+const mainDate = ref(0);
+const mainPage = ref(1);
 
-let posts = [1, 2, 3, 4, 5, 6];
+
 //let carCenter = ref('ИБ-29388');
 const items = ref([]); // Используем для хранения данных о постах
 
+const works = ref([]);
+const selectedWorks = ref([]);
 const orderMinutes = computed(() => totalMinutes.value);
 const dateStart = computed(() => filterDateStart.value);
 
@@ -142,20 +162,32 @@ const dateStart = computed(() => filterDateStart.value);
 const apiCallServiceWorkload = isEnv('sadmin') ? sadminApiGetServiceWorkload : directorApiGetServiceWorkload;
 
 onMounted(() => {
+  mainPage.value = Store.mainPage;
+  applyFilters();
+});
+
+onMounted(async () => {
   // const workList = async () => {
   // console.log(await apiClient.get('/all-works'));}
   // workList();
-  console.log();
+  //
+  // works.value.forEach((work) => {console.log(work.id)})
+  // console.log(works.value);
+ 
+  // console.log(works.value[0]);
+  
+  works.value = await Store.workList();
+  
 });
 
 const request = computed(() => ({
   orderMinutes: orderMinutes.value,  
-  posts: [1, 2, 3, 4, 5, 6], // список постов
+  posts: null, // список постов
   filters: {
     interval: null,
     dateStart: dateStart.value, 
-    works: ['11111', '22222', '33333', '44444', '55555'], //список работ
-    carCenters: [carCenterIds.value], //центр
+    works: null, //список работ
+    carCenters: carCenterId.value, //центр
     page: 1
   }
 }));
@@ -166,18 +198,22 @@ const applyFilters = async () => {
     const response = await apiCallServiceWorkload(request.value);
     items.value = response.items;
     // Обнуляем значения перед пересчетом
-    freePostsCount.value = 0;
+    freeBlocks.value = [];
     totalFreeTime.value = 0;
+
     // Пересчитываем значения
     response.items.forEach((item) => {
       if (item.isActive) {
-        freePostsCount.value += 1; // Увеличиваем количество свободных постов
+        
         const freeTimeBlocks = item.blocks.filter(block => block.type === 'free');
         freeTimeBlocks.forEach((block) => {
+          block.postNumber = item.post;
           totalFreeTime.value += (block.blockEnd - block.blockStart); // Добавляем время свободных блоков
+          freeBlocks.value.push(block);
         });
       }
     });
+    
   } catch (error) {
     console.error('Error applying filters:', error);
   }
@@ -284,24 +320,22 @@ function closeModal() {
 
 let order = ref({});
 
-function orderOpen(){
-  showModal.value = false;
+function orderOpen(data){
+  closeModal();
+  console.log(data);
   order.value.isVisible = true;
+  order.value.blockData = data.blockData;
+  order.value.orderMinutes = data.orderMinutes;
+  order.value.freeBlocks = data.freeBlocks;
+  order.value.dateStart = dateStart.value;
 }
 function orderClose(){
   order.value.isVisible = false;
+  alert('Запись успешно создана');
+  //Fake.value.isVisible = false;
 }
 
-let Fake = ref({});
 
-function FakeOpen(){
-  Fake.value.isVisible = true;
-  order.value.isVisible = false;
-}
-function FakeClose(){
-  Fake.value.isVisible = false;
-}
-applyFilters();
 </script>
 
 <style>

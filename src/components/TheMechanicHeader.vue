@@ -32,7 +32,11 @@
         <span class="pl-[10px] font-semibold text-lg">Механик</span>
         <span class="pl-[30px] text-lg">{{ mechanicUserStore.activeMechanicName }}</span>
       </div>
-      <div class="pr-[30px]">{{ formattedFullAddress}}</div>
+      <div class="pr-[30px]">
+        <p style="font-family: Inter;font-size: 24px;font-weight: 400;line-height: 29.05px;text-align: left;">
+          {{ formattedFullAddress}}
+        </p>
+      </div>
     </div>
   </header>
 </template>

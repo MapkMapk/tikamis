@@ -33,7 +33,7 @@
           v-if="isEnv('director')"
           class="pr-[30px]"
         >
-          {{ formattedFullAddress }}
+        <p style="font-family: Inter;font-size: 24px;font-weight: 400;line-height: 29.05px;text-align: left;">{{ formattedFullAddress }}</p>
         </div>
         <div
           @click="isVisibleModalSelectServiceStations = true"

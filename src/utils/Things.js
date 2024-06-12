@@ -25,7 +25,7 @@ export function selectedCarCenterIds() {
   return computed(() => {
     return isEnv('sadmin') 
       ? [serviceStationsStore?.getSelectedServiceStation().id]
-      : 'none';
+      : null;
   });
 }
 

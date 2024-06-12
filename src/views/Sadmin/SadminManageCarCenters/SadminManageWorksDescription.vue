@@ -48,7 +48,7 @@ function truncateText(text) {
 }
 
 function getQueuingModeText(saleText) {
-  return saleText == null ? 'Акции не предусмотрены' : truncateText(saleText);
+  return saleText == null || saleText == "" ? 'Акции не предусмотрены' : truncateText(saleText);
 }
 
 function routeToTextEdit(work) {

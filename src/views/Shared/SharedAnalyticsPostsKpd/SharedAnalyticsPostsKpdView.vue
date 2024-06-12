@@ -4,15 +4,17 @@
   <MainHeaderGap />
   <DirectorReportComponent
     :is-filter-all-works-visible="true"
+    :are-buttons-visible="displayedItems.length"
     @filtersApplied="fetchData"
     @worksLoaded="handleAllWorksLoaded"
     @optionSelected="updateSortOption"
     @updateFilters="onUpdateFilters"
     @saveTable="onSaveTable"
     @sendTable="onSendTable"
+    @filtersReset="fetchData"
   >
     <template v-slot:tabular-title>
-      <TabularPrimeTitle @click="displayLog">Кпд постов</TabularPrimeTitle>
+      <TabularPrimeTitle @click="displayLog">Кпд постов {{ unixToDatePeriodHeader(filterDate.date, filterPeriod.period) }}</TabularPrimeTitle>
     </template>
 
     <template v-slot:tabular-table-header>
@@ -22,6 +24,7 @@
     <template v-slot:tabular-table-table>
       <TabularTableRow
         v-for="item in displayedItems"
+        v-if="displayedItems.length"
         :key="item.orderId"
         :item="item"
         style="grid-template-columns: 4fr 3fr 1fr;"
@@ -51,6 +54,9 @@
           </details>
         </TabularTableRowCell>
       </TabularTableRow>
+      <TabularTableRow v-else class="h-[50vh]">
+				<FiltersNoData></FiltersNoData>
+			</TabularTableRow>
     </template>
   </DirectorReportComponent>
 </template>
@@ -70,7 +76,8 @@ import isEnv from '@/utils/isEnv.js';
 import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 import { processData } from '@/api/sendFunctions/postsKpd';
 import unixToData from '@/utils/time/unixToData';
-
+import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
+import FiltersNoData from '@/components/Tabular/FiltersNoData.vue';
 const serviceStationsStore = useSadminServiceStationsStore();
 const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 const apiUrl = '/analytics/get-posts-KPD';
@@ -80,9 +87,9 @@ const itemsByMechanics = ref([]);
 const columns = ref([]);
 const CELL_WIDTH = '100%';
 const CELL_HEIGHT = '90%';
-const filterDate = ref(1675623600);
+const filterDate = ref(getUnixToday());
 const filterPeriod = ref('month');
-const selectedCarCenterId = computed(() => isEnv('sadmin') ? serviceStationsStore?.getSelectedServiceStation().id : "none");
+const selectedCarCenterId = computed(() => isEnv('sadmin') ? [serviceStationsStore?.getSelectedServiceStation().id] : null);
 const tableData = ref([]);
 
 const initialFilters = { date: filterDate.value, period: filterPeriod.value, works: null };
@@ -93,43 +100,63 @@ function onUpdateFilters(data) {
     interval: data.period,
     dateStart: data.dateStart,
     works: data.workId,
-    carCenters: [selectedCarCenterId.value],
+    carCenters: selectedCarCenterId.value,
     page: 1
   };
 }
 
 onMounted(() => {
-  updateSortOption(currentSortOption.value.option);
+  updateSortOption(currentSortOption.value); // Передаем весь объект
   fetchData(initialFilters);
 });
 
-watch(() => currentSortOption.value.option, (newVal) => {
-  updateSortOption(newVal);
-});
-
 function updateSortOption(option) {
-  currentSortOption.value.option = option;
+  if (!option) {
+    console.error('Option is undefined');
+    return;
+  }
+
+  const actualOption = typeof option === 'object' ? option.option : option;
+  console.log(actualOption);
+
+  currentSortOption.value.option = actualOption;
   columns.value = [
-    { header: option === 'itemsByPosts' ? 'Пост' : 'Механик', size: '4fr' },
+    { header: actualOption === 'itemsByPosts' ? 'Пост' : 'Механик', size: '4fr' },
     { header: 'Работы', size: '3fr' },
     { header: 'Потери', size: '1fr' },
   ];
 }
-watch(currentSortOption.value.option, (newVal) => {
-  columns.value = [
-    { header: newVal === 'itemsByPosts' ? 'Пост' : 'Механик', size: '4fr' },
-    { header: 'Работы', size: '3fr' },
-    { header: 'Потери', size: '1fr' },
-  ];
-}, { immediate: true });
+
+watch(
+  () => currentSortOption.value.option,
+  (newVal) => {
+    console.log(newVal);
+    updateSortOption(newVal);
+  }
+);
+function processWorkId(workId) {
+  if (workId === null) {
+    return null;
+  } else if (Array.isArray(workId)) {
+    return workId;
+  } else if (typeof workId === 'string') {
+    return workId.includes(',') ? workId.split(',') : [workId];
+  } else {
+    return [workId];
+  }
+}
 async function fetchData({ date, period, workId }) {
-  const works = workId;
-  filterDate.value = { date }
+  console.log({ date });
+  console.log({period});
+  console.log({workId});
+  const works = processWorkId(workId);
+  filterDate.value = { date };
+  filterPeriod.value = { period };
   activeFilters.value = {
     interval: period,
     dateStart: date,
     works: works,
-    carCenters: [selectedCarCenterId.value],
+    carCenters: selectedCarCenterId.value,
     page: 1
   };
 
@@ -163,23 +190,21 @@ function getDeviationClass(value) {
 function formatDeviation(value) {
   return value > 0 ? `+${value}` : value.toString();
 }
-async function onSaveTable(){
- 
-  
+
+async function onSaveTable() {
   tableData.value = processData(columns.value, displayedItems.value, currentSortOption.value.option);
-  const kpdPostsDate = `Кпд постов ${unixToData(filterDate.value.date,false,filterPeriod)}`;
+  const kpdPostsDate = `Кпд постов ${unixToData(filterDate.value.date, false, filterPeriod)}`;
   const tableDataContent = tableData.value;
-  const mailResponse = await apiClient.post('/report-emails', { title: kpdPostsDate, content: tableDataContent});
+  const mailResponse = await apiClient.post('/report-emails', { title: kpdPostsDate, content: tableDataContent });
   console.log(mailResponse);
 }
-async function onSendTable(){
- 
-  
- tableData.value = processData(columns.value, displayedItems.value, currentSortOption.value.option);
- const kpdPostsDate = `Кпд постов ${unixToData(filterDate.value.date,false,filterPeriod)}`;
- const tableDataContent = tableData.value;
- const mailResponse = await apiClient.post('/report-save', { title: kpdPostsDate, content: tableDataContent});
- console.log(mailResponse);
+
+async function onSendTable() {
+  tableData.value = processData(columns.value, displayedItems.value, currentSortOption.value.option);
+  const kpdPostsDate = `Кпд постов ${unixToData(filterDate.value.date, false, filterPeriod)}`;
+  const tableDataContent = tableData.value;
+  const mailResponse = await apiClient.post('/report-save', { title: kpdPostsDate, content: tableDataContent });
+  console.log(mailResponse);
 }
 </script>
 

@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-use-v-if-with-v-for -->
 <template>
   <div>
     <ModalBoolean
@@ -13,9 +14,9 @@
     <MainHeaderGap />
 
     <TabularSection>
-      <TabularPrimeTitle class="mb-2">Сервисная история</TabularPrimeTitle>
+      <TabularPrimeTitle class="mb-2">Сервисная история {{ unixToDatePeriodHeader(filterStartDate, filterPeriod) }}</TabularPrimeTitle>
       <TabularFiltersWrapper>
-      <TabularFilterPeriod :option-selected="selectOptionHandler" style="flex: 184;"/>
+      <TabularFilterPeriod @updatePeriod="selectOptionHandler" style="flex: 184;"/>
       <TabularFilterDate @updateDate="selectDateHandler" style="flex: 614;"/>
 
       <TabularButtonCross style="flex: 60; cursor: pointer;" @click="resetToDefaultFilters" />
@@ -31,7 +32,7 @@
         <TabularTableCellTop style="padding-left: 10px;">Автомобиль</TabularTableCellTop>
         <TabularTableCellTop></TabularTableCellTop>
       </TabularTableRow>
-  <TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">
+  <TabularTableRow v-for="item in items" :key="item.orderId" v-if="items.length" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">
     <TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '2fr' }" style="padding-left: 10px;">
       {{ item.works.length === 1 ? item.works[0].name : '' }}
       <details v-if="item.works.length > 1" class="custom-details" :style="{ width: CELL_WIDTH }">
@@ -48,12 +49,11 @@
     <TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '1fr' }" style="padding-left: 10px;    align-self: center;">{{ item.plate }}</TabularTableRowCell>
     <TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '.2fr' }" class="flex">
       <!-- Кликабельное изображение крестика -->
-      <svg @click="deleteItem(item)" style="cursor: pointer;" class="delete-icon" xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" viewBox="0 0 16 16">
-      <path d="M14.2929 0.292893C14.6834 -0.0976311 15.3166 -0.0976311 15.7071 0.292893C16.0976 0.683417 16.0976 1.31658 15.7071 1.70711L9.41421 8L15.7071 14.2929C16.0976 14.6834 16.0976 15.3166 15.7071 15.7071C15.3166 16.0976 14.6834 16.0976 14.2929 15.7071L8 9.41421L1.70711 15.7071C1.31658 16.0976 0.683418 16.0976 0.292894 15.7071C-0.0976312 15.3166 -0.0976312 14.6834 0.292894 14.2929L6.58579 8L0.292894 1.70711C-0.0976306 1.31658 -0.0976306 0.683417 0.292894 0.292893C0.683418 -0.0976311 1.31658 -0.0976311 1.70711 0.292893L8 6.58579L14.2929 0.292893Z" fill="#A1A4AD"/>
-      </svg>
     </TabularTableRowCell>
   </TabularTableRow>
-  
+  <TabularTableRow v-else class="h-[50vh]">
+				<FiltersNoData></FiltersNoData>
+			</TabularTableRow>
 </TabularTable>
 
   </div>
@@ -77,6 +77,8 @@ import TabularFilterDate from '@/components/Tabular/TabularFilterDate.vue';
 //import deleteCustomerRecord from '@/api/director/directorApiDeleteCustomerRecord';
 
 import '@vuepic/vue-datepicker/dist/main.css';
+import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
+import FiltersNoData from '@/components/Tabular/FiltersNoData.vue';
 
 import TabularTableCellTop from '@/components/Tabular/TabularTableCellTop.vue';
 import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
@@ -95,7 +97,7 @@ const selectedCarCenterIds = computed(() => {
       // Замените эту логику на реальный вызов функции isEnv и доступ к serviceStationsStore
       return isEnv('sadmin') 
         ? [serviceStationsStore?.getSelectedServiceStation().id]
-        : 'none';
+        : null;
     });
 
 const CELL_HEIGHT = '100%';
@@ -124,12 +126,12 @@ onMounted(fetchData);
 
 
 
-let filterStartDate = ref(1675882800);
-let filterPeriod = ref('year');
+let filterStartDate = ref(getUnixToday());
+let filterPeriod = ref('month');
 
 function selectDateHandler(date) {
   console.log(date);
-  filterStartDate.value = (date+86400);
+  filterStartDate.value = (date);
   console.log(filterStartDate.value);
 }
 
@@ -137,7 +139,7 @@ const items = ref([]);
 const filters = ref({
   interval: filterPeriod,
   dateStart: filterStartDate,
-  works: ['none'],
+  works: null,
   carCenters: selectedCarCenterIds.value,
   page: 1
 });
@@ -147,14 +149,12 @@ async function resetToDefaultFilters() {
     let __tempDateStart = filterStartDate.value;
     let __tempPeriod = filterPeriod.value;
     // значения по умолчанию для filterStartDate и filterPeriod
-    filterStartDate.value = null; // Значение по умолчанию для даты
-    filterPeriod.value = null; // Значение по умолчанию для периода
+    filterStartDate.value = getUnixToday(); // Значение по умолчанию для даты
+    filterPeriod.value = 'month'; // Значение по умолчанию для периода
     
 
     // Применяем фильтры
     await fetchData();
-    filterStartDate.value = __tempDateStart;
-    filterPeriod.value = __tempPeriod;
   } catch (error) {
     console.error('Error applying default filters:', error);
   }
@@ -169,7 +169,10 @@ async function fetchData() {
     console.error('Error applying filters:', error);
   }
 }
-
+function selectOptionHandler(option){
+      filterPeriod.value = option;
+      console.log('Значение опции:', option);
+    }
 //d
 </script>
 
@@ -187,10 +190,6 @@ export default {
     TabularFilterPeriod
   },
   methods:{
-    selectOptionHandler(option){
-      filterPeriod.value = option.value;
-      console.log('Значение опции:', filterPeriod.value);
-    },
     dateChangeHandler(date) {
       // Обработка новой выбранной даты
     }

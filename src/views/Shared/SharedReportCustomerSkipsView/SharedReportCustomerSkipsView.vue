@@ -210,7 +210,7 @@ const displayedItems = computed(() => {
       // Замените эту логику на реальный вызов функции isEnv и доступ к serviceStationsStore
       return isEnv('sadmin') 
         ? [serviceStationsStore?.getSelectedServiceStation().id]
-        : 'none';
+        : null;
     });
 async function fetchCustomerSkipsData({ date, period, workId }) {
   const filters = {
