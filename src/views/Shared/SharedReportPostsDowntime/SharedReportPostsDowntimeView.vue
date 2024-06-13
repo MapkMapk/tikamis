@@ -5,14 +5,17 @@
   <DirectorReportComponent
     :is-filter-all-works-visible="false"
     :is-filter-or-visible="true"
+    :are-buttons-visible="displayedItems.length>0"
     @filtersApplied="fetchCustomerSkipsData"
     @optionSelected="changeOrsOption"
     @worksLoaded="handleAllWorksLoaded"
+    @filtersReset="filtersReset"
+    @updateFilters="updateFilters"
     @saveTable="onSaveTable"
     @sendTable="onSendTable"
   >
     <template v-slot:tabular-title>
-      <TabularPrimeTitle>Простои постов</TabularPrimeTitle>
+      <TabularPrimeTitle>Простои постов {{unixToDatePeriodHeader(filterDateStart, filterPeriod.option)}}</TabularPrimeTitle>
     </template>
 
     <template v-slot:tabular-table-header>
@@ -22,6 +25,7 @@
     <template v-slot:tabular-table-table>
   <TabularTableRow 
     v-for="item in displayedItems"
+    v-if="displayedItems.length"
     :key="item.postNumber || item.mechanicName" 
     :item="item" 
     style="grid-template-columns: 4fr 2fr 1fr;"
@@ -63,6 +67,9 @@
       </details>
     </TabularTableRowCell>
   </TabularTableRow>
+  <TabularTableRow v-else class="h-[50vh]">
+				<FiltersNoData></FiltersNoData>
+			</TabularTableRow>
   <TabularTableCellBottom style="display: grid; grid-template-columns: 4fr 3fr;">
     <p style="color: white;padding-left: 10px;">Итого простоя:</p>
     <p style="color: white;padding-left: 10px">{{ formatTotalDowntime(totalLoss) }}</p>
@@ -83,8 +90,8 @@ import TabularTableRowCell from '@/components/Tabular/TabularTableRowCell.vue';
 import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
 import isEnv from '@/utils/isEnv.js';
-
-import { processData } from '@/api/sendFunctions/postsDowntime';
+import FiltersNoData from '@/components/Tabular/FiltersNoData.vue';
+import { convertToDowntimeTableFormat } from '@/api/sendFunctions/postsDowntime';
 
 import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 
@@ -92,13 +99,17 @@ import { toggleDetails, formatTotalDowntime, formatCurrency, selectedCarCenterId
 
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
-
+import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
 
 const currentSort = ref('itemsByMechanics');
 const totalLoss = ref(0);
 const itemsByPosts = ref([]);
 const itemsByMechanics = ref([]);
 const tableData = ref([]);
+
+const filterDateStart = ref(getUnixToday())//
+const filterPeriod = ref({option: 'month'});
+
 
 function changeOrsOption(option){
   currentSort.value = option;
@@ -121,7 +132,7 @@ function changeOrsOption(option){
 }
 
 onMounted(async () => {
-  const initialFilters = { date: 1675623600, period: 'month', works: null };
+  const initialFilters = { date: getUnixToday(), period: 'month', works: null };
   changeOrsOption(currentSort.value);
   fetchCustomerSkipsData(initialFilters);
 });
@@ -153,13 +164,35 @@ const displayedItems = computed(() => {
   return currentSort.value.option === 'itemsByPosts' ? itemsByPosts.value : itemsByMechanics.value;
 });
 
-
+function updateFilters(data){
+  filterDateStart.value = data.dateStart//
+  filterPeriod.value.option = data.period;
+console.log(data);
+}
+function filtersReset(data){
+  const { sort, ...params } = data; // Исключаем параметр sort из объекта data
+  currentSort.value = sort;
+  console.log(currentSort.value);
+  fetchCustomerSkipsData(params);
+}
+function processWorkId(workId) {
+  if (workId === null) {
+    return null;
+  } else if (Array.isArray(workId)) {
+    return workId;
+  } else if (typeof workId === 'string') {
+    return workId.includes(',') ? workId.split(',') : [workId];
+  } else {
+    return [workId];
+  }
+}
 
 async function fetchCustomerSkipsData({ date, period, workId }) {
+  //const works = processWorkId(workId);
   const filters = {
     interval: period,
     dateStart: date,
-    works: workId,
+    works: null,
     carCenters: selectedCarCenterIds.value, // Указаны для примера, измените по необходимости
     page: 1 // Указано для примера, измените по необходимости
   };
@@ -183,20 +216,27 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
 async function onSaveTable(){
  
  const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
- tableData.value = processData(columns.value, displayedItems.value, currentSortOption.value.option);
- const kpdPostsDate = `Кпд постов ${unixToData(filterDate.value.date,false,filterPeriod)}`;
- const tableDataContent = tableData.value;
- const mailResponse = await apiClient.post('/report-emails', { title: kpdPostsDate, content: tableDataContent});
- console.log(mailResponse);
+ 
+ let title = `Простои постов ${unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value.option)}`;
+
+//простои постов обеспечить функционал tabularTitle, tableHeaders, data, filter
+let tableData = convertToDowntimeTableFormat(title,columns.value,displayedItems.value,currentSort.value.option)
+
+  console.log(tableData)
+  const saveResponse = await apiClient.post('/report-save',tableData);
+  console.log(saveResponse);
 }
 async function onSendTable(){
+  const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+ 
+ let title = `Простои постов ${unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value.option)}`;
 
-const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
-tableData.value = processData(columns.value, displayedItems.value, currentSortOption.value.option);
-const kpdPostsDate = `Кпд постов ${unixToData(filterDate.value.date,false,filterPeriod)}`;
-const tableDataContent = tableData.value;
-const mailResponse = await apiClient.post('/report-save', { title: kpdPostsDate, content: tableDataContent});
-console.log(mailResponse);
+//простои постов обеспечить функционал tabularTitle, tableHeaders, data, filter
+let tableData = convertToDowntimeTableFormat(title,columns.value,displayedItems.value,currentSort.value.option)
+
+  console.log(tableData)
+  const saveResponse = await apiClient.post('/report-emails',tableData);
+  console.log(saveResponse);
 }
 </script>
 <style scoped>

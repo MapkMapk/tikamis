@@ -1,42 +1,38 @@
-import { formatTotalDowntime, unixToData } from '@/utils/Things.js'; 
-export function processData(dataArray, sort) {
-    const keyName = sort === 'itemsByPosts' ? 'postNumber' : 'mechanicName';
-    // Получаем заголовки в зависимости от сортировки
-    const headersArray = sort === 'itemsByPosts' ? [
-      { header: 'Пост' },
-      { header: 'Все работы' },
-      { header: 'Простой' }
-    ] : [
-      { header: 'Механик' },
-      { header: 'Все работы' },
-      { header: 'Простой' }
-    ];
-  
-    let result = [];
-  
-    // Добавляем заголовки в выходной JSON
-    result.push(headersArray.map(header => header.header));
-  
-    // Обрабатываем данные
-    dataArray.forEach(item => {
-      // Проверяем, что все нужные поля определены
-      const key = item[keyName] || '';
-      const total = item.totalDowntime != null ? item.totalDowntime.toString() : '';
-  
-      // Добавляем основную информацию
-      result.push([key, 'Все простои', total]);
-  
-      // Добавляем информацию о каждом простое
-      item.downtimes.forEach(downtime => {
-        const formattedDate = unixToData(downtime.unixTime);
-        const downtimeMinutes = formatTotalDowntime(downtime.downtimeMinutes);
-        result.push([null, formattedDate, downtimeMinutes]);
+import { unixToDate } from '@/utils/time/dateUtils.js';
+
+export function convertToDowntimeTableFormat(tabularTitle, tableHeaders, data, filter) {
+  const result = [];
+  const headerArray = tableHeaders.map(column => column.header);
+  result.push(headerArray); // tableHeaders это массив
+
+  if (filter === 'itemsByPosts') {
+    // Заголовок таблицы для постов
+
+    data.forEach(post => {
+      // Добавляем строку с общими данными по посту
+      result.push([post.postNumber, post.totalDowntime, "Все простои"]);
+
+      post.downtimes.forEach(downtime => {
+        // Добавляем строки с данными по каждому времени простоя
+        result.push([null, downtime.downtimeMinutes, unixToDate(downtime.unixTime)]);
       });
     });
-  
-    // Добавляем итоговую строку
-    const totalDowntime = dataArray.reduce((acc, item) => acc + (item.totalDowntime || 0), 0);
-    result.push(['Итого простоя:', formatTotalDowntime(totalDowntime), null]);
-  
-    return result;
+  } else {
+    // Заголовок таблицы для механиков
+
+    data.forEach(mechanic => {
+      // Добавляем строку с общими данными по механику
+      result.push([mechanic.mechanicName, mechanic.totalDowntime, "Все простои"]);
+
+      mechanic.downtimes.forEach(downtime => {
+        // Добавляем строки с данными по каждому времени простоя
+        result.push([null, downtime.downtimeMinutes, unixToDate(downtime.unixTime)]);
+      });
+    });
   }
+
+  return {
+    title: tabularTitle,
+    content: result
+  };
+}

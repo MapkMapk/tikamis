@@ -1,10 +1,20 @@
+<!-- eslint-disable vue/no-use-v-if-with-v-for -->
 <template>
   <MainHeader />
   <MainHeaderGap />
-  <DirectorReportComponent :is-filter-all-works-visible="true" @filtersApplied="fetchCustomerSkipsData"
-    @OptionSelected="changeOrsOption" @worksLoaded="handleAllWorksLoaded">
+  <DirectorReportComponent 
+    :is-filter-all-works-visible="true" 
+    @filtersApplied="fetchCustomerSkipsData"
+    @OptionSelected="changeOrsOption" 
+    @worksLoaded="handleAllWorksLoaded"
+    :are-buttons-visible="displayedItems.length"
+    @filtersReset="filtersReset"
+    @updateFilters="updateFilters"
+    @saveTable="onSave"
+    @sendTable="onSend"
+>
     <template v-slot:tabular-title>
-      <TabularPrimeTitle @click="displayLog">Заказанные, но не выполненные работы</TabularPrimeTitle>
+      <TabularPrimeTitle @click="displayLog">Заказанные, но не выполненные работы {{ unixToDatePeriodHeader(filterDateStart, filterPeriod) }}</TabularPrimeTitle>
     </template>
     <template v-slot:tabular-table-header>
       <TableHeaders :columns="columns" />
@@ -12,6 +22,7 @@
     <template v-slot:tabular-table-table>
       <TabularTableRow 
         v-for="item in displayedItems" 
+        v-if="displayedItems.length>0"
         :key="item.postNumber || item.mechanicName" 
         :item="item"
         :style="{ gridTemplateColumns: '4fr 3fr 1fr' }"
@@ -51,6 +62,9 @@
           </details>
         </TabularTableRowCell>
       </TabularTableRow>
+      <TabularTableRow v-else class="h-[50vh]">
+				<FiltersNoData></FiltersNoData>
+			</TabularTableRow>
       <TabularTableCellBottom class="grid grid-cols-8">
         <p class="text-white pl-2 col-span-7">Итого потерь:</p>
         <p class="text-white pl-2 col-span-1">{{ formatCurrency(totalLoss) }}</p>
@@ -76,6 +90,11 @@ import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
 import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 
+import FiltersNoData from '@/components/Tabular/FiltersNoData.vue';
+//import { convertToTableFormat }  from '@/api/sendFunctions/reviews.js'
+import { convertToLossTableFormatV2 } from '@/api/sendFunctions/skips.js'
+import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
+
 const sadminServiceStationsStore = useSadminServiceStationsStore();
 const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 
@@ -83,12 +102,16 @@ const CELL_WIDTH = '100%';
 const totalLoss = ref(0);
 
 
-const date = ref(1675623600);
-const period = ref('month')
+const filterDateStart = ref(getUnixToday());
+const filterPeriod = ref('month')
 const currentSort = ref('itemsByMechanics');
 const itemsByPosts = ref([]);
 const itemsByMechanics = ref([]);
 const columns = ref([]);
+function updateFilters(data) {
+  filterDateStart.value = data.dateStart;
+  filterPeriod.value = data.period
+}
 
 function formatCurrency(sum) {
   return new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(sum);
@@ -131,9 +154,27 @@ const selectedCarCenterIds = computed(() => {
     ? [sadminServiceStationsStore?.getSelectedServiceStation().id]
     : null;
 });
+function filtersReset(data){
+  const { sort, ...params } = data; // Исключаем параметр sort из объекта data
+  currentSort.value = sort;
+  console.log(currentSort.value);
+  fetchCustomerSkipsData(params);
+}
+function processWorkId(workId) {
+  if (workId === null) {
+    return null;
+  } else if (Array.isArray(workId)) {
+    return workId;
+  } else if (typeof workId === 'string') {
+    return workId.includes(',') ? workId.split(',') : [workId];
+  } else {
+    return [workId];
+  }
+}
 
 async function fetchCustomerSkipsData({ date, period, workId }) {
-  const params = { date, period, workId };
+  const works = processWorkId(workId);
+  const params = { date, period, workId: works };
   console.log(params);
   try {
     const data = await fetchCustomerData(apiClient, '/report/get-cancelled-works', selectedCarCenterIds, { date, period, workId });
@@ -151,9 +192,25 @@ function handleAllWorksLoaded(ids) {
 }
 
 onMounted(async () => {
-  const initialFilters = { date: date.value, period: period.value, works: null };
+  const initialFilters = { date: filterDateStart.value, period: filterPeriod.value, works: null };
   await fetchCustomerSkipsData(initialFilters);
 });
+async function onSave(){
+  const apiClientic = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+  let title = `Заказанные, но не выполненные работы ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value) }`;
+  let tableData = convertToLossTableFormatV2(title,displayedItems.value,currentSort.value);
+  console.log(tableData)
+  const saveResponse = await apiClientic.post('/report-save',tableData);
+  console.log(saveResponse);
+}
+async function onSend(){
+  const apiClientic = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+  let title = `Заказанные, но не выполненные работы ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value) }`;
+  let tableData = convertToLossTableFormatV2(title,displayedItems.value,currentSort.value);
+  console.log(tableData)
+  const saveResponse = await apiClientic.post('/report-emails',tableData);
+  console.log(saveResponse);
+}
 </script>
 <style scoped>
 .custom-details summary {

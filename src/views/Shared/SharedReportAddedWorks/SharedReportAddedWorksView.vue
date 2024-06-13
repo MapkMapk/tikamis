@@ -8,6 +8,7 @@
     :are-buttons-visible="displayedItems.length"
     @filtersApplied="fetchCustomerSkipsData"
     @optionSelected="changeOrsOption"
+    @filtersReset="filtersReset"
     @saveTable="onSave"
     @sendTable="onSend"
   >
@@ -29,6 +30,8 @@
       style="grid-template-columns: 4fr 3fr 1fr;"
       @click="toggleDetails(item)" 
       :open="item.detailsOpen"
+      @saveTable="onSave"
+      @sendTable="onSend"
     >
       
       <!-- Пост Работы Потери Время записи Телефон Автомобиль -->
@@ -91,6 +94,9 @@ import { sadminApiClient } from '@/api/sadminApiClient';
 import isEnv from '@/utils/isEnv.js';
 import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
+
+import { convertToTableFormat }  from '@/api/sendFunctions/added-works.js'
+
 const serviceStationsStore = useSadminServiceStationsStore();
 
 const items = ref([]);
@@ -103,8 +109,9 @@ const CELL_HEIGHT = '90%';
 
 const filterDateStart = ref(getUnixToday())//
 const filterPeriod = ref('month');
-const currentSort = ref('itemsByMechanics');
+const currentSort = ref({option: 'itemsByMechanics'});
 function changeOrsOption(option){
+  console.log(currentSort.value);
   currentSort.value = option;
   console.warn(displayedItems.value.length);
   if (currentSort.value.option === 'itemsByPosts') {
@@ -121,6 +128,7 @@ function changeOrsOption(option){
       { header: 'Прибыль', size: '1fr' },
     ];
   }
+  console.log(currentSort.value);
 }
 function toggleDetails(item) {
   item.detailsOpen = !item.detailsOpen;
@@ -131,6 +139,7 @@ onMounted(() => {
   const initialFilters = { date: getUnixToday(), period: 'month', works: null };
   fetchCustomerSkipsData(initialFilters);
   console.log('ВНИМАНИЕ, ЭТО ТЕСТОВАЯ СТРАНИЦА, ОНА ВЫВОДИТ ИНФОРМАЦИЮ ИЗ report/get-customer-skips');
+  console.log(currentSort.value);
 });
 // Обновление колонок в зависимости от currentSort
 const columns = ref([]);
@@ -155,7 +164,12 @@ function formatCurrency (sum) {
   let formattedTotalProfit = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(sum);
   return formattedTotalProfit;
 };
-
+function filtersReset(data){
+  const { sort, ...params } = data; // Исключаем параметр sort из объекта data
+  currentSort.value.option = sort;
+  console.log(currentSort.value);
+  fetchCustomerSkipsData(params);
+}
 watch(currentSort.value.option, (newVal) => {
   if (newVal === 'itemsByPosts') {
     columns.value = [
@@ -172,6 +186,7 @@ watch(currentSort.value.option, (newVal) => {
     ];
   }
 }, { immediate: true });
+
 function unixToDate(unixTime) {
   const date = new Date(unixTime * 1000); // Умножаем на 1000, так как в JavaScript время измеряется в миллисекундах, а не в секундах, как в Unix
 
@@ -238,6 +253,25 @@ function truncateText(text, maxLength) {
     return text.slice(0, maxLength) + '...';
   }
   return text;
+}
+
+async function onSave(){
+  const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+  let title = `Дополнительные работы ${unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value)}`;
+  let tableData = convertToTableFormat(title,columns.value,displayedItems.value,currentSort.value.option);
+
+  console.log(tableData)
+  const saveResponse = await apiClient.post('/report-save',tableData);
+  console.log(saveResponse);
+}
+async function onSend(){
+  const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+  let title = `Дополнительные работы ${unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value)}`;
+  let tableData = convertToTableFormat(title,columns.value,displayedItems.value,currentSort.value.option);
+
+  console.log(tableData)
+  const saveResponse = await apiClient.post('/report-emails',tableData);
+  console.log(saveResponse);
 }
 </script>
 <style scoped>

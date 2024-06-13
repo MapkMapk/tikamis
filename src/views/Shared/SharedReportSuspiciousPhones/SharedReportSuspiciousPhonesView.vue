@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-use-v-if-with-v-for -->
 <template>
     <ModalBoolean
       v-if="modal && modal.callback"
@@ -13,10 +14,15 @@
     <DirectorReportComponent
     :is-filter-all-works-visible="false"
     @filtersApplied="applyFilters"
+    @filtersReset="resetToDefaultFilters"
+    @updateFilters="updateFilters"
     :is-filter-or-visible="false"
+    :are-buttons-visible="displayedItems.length>0"
+    @saveTable="onSave"
+    @sendTable="onSend"
   >
     <template v-slot:tabular-title>
-      <TabularPrimeTitle>Подозрительная привязка телефонов и автомобилей</TabularPrimeTitle>
+      <TabularPrimeTitle>Подозрительная привязка телефонов и автомобилей {{ unixToDatePeriodHeader(filterDateStart, filterPeriod) }}</TabularPrimeTitle>
     </template>
     <template v-slot:tabular-table-header>
       <TableHeaders :columns="columns"  class="fat-boy" />
@@ -25,7 +31,8 @@
     <template v-slot:tabular-table-table>
       
       <TabularTableRow
-    v-for="(item, index) in displayedItemss"
+    v-for="(item, index) in displayedItems"
+    v-if="displayedItems.length"
     :key="index"
     :item="item"
     style="grid-template-columns: 3fr 7fr 30px;"
@@ -68,6 +75,9 @@
   </div>
 </TabularTableRowCell>
   </TabularTableRow>
+  <TabularTableRow v-else class="h-[50vh]">
+				<FiltersNoData></FiltersNoData>
+			</TabularTableRow>
     </template>
 
   </DirectorReportComponent>
@@ -81,8 +91,8 @@ import MainHeaderGap from '@/components/MainHeaderGap.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
 import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
-
-
+import FiltersNoData from '@/components/Tabular/FiltersNoData.vue';
+import { convertToPhoneCarTableFormat }  from '@/api/sendFunctions/phones.js'
 
 //import TabularSection from '@/components/Tabular/TabularSection.vue';
 //import TabularFiltersWrapper from '@/components/Tabular/TabularFiltersWrapper.vue';
@@ -100,6 +110,8 @@ import TabularTable from '@/components/Tabular/TabularTable.vue';
 
 import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 import isEnv from '@/utils/isEnv.js';
+
+import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
 // const ApiCall = isEnv('sadmin') ? sadminApiGetCustomerRecords : directorApiGetCustomerRecords
 const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 const serviceStationsStore = useSadminServiceStationsStore();
@@ -143,19 +155,18 @@ onMounted(applyFilters);
 
 
 
-let filterDateStart = ref(1675882800);
-let filterPeriod = ref('year');
+let filterDateStart = ref(getUnixToday());
+let filterPeriod = ref('month');
 
-function selectDateHandler(date) {
-  console.log(date);
-  filterDateStart.value = (date+86400);
-  console.log(filterDateStart.value);
+function updateFilters(data) {
+  filterDateStart.value = data.dateStart;
+  filterPeriod.value = data.period
 }
 
 const items = ref([]);
 const filters = ref({
-  interval: filterPeriod,
-  dateStart: filterDateStart,
+  interval: filterPeriod.value,
+  dateStart: filterDateStart.value,
   works: null,
   carCenters: selectedCarCenterIds.value,
   page: 1
@@ -166,8 +177,8 @@ async function resetToDefaultFilters() {
     let __tempDateStart = filterDateStart.value;
     let __tempPeriod = filterPeriod.value;
     // значения по умолчанию для filterDateStart и filterPeriod
-    filterDateStart.value = null; // Значение по умолчанию для даты
-    filterPeriod.value = null; // Значение по умолчанию для периода
+    filterDateStart.value = getUnixToday(); // Значение по умолчанию для даты
+    filterPeriod.value = 'month'; // Значение по умолчанию для периода
     
 
     // Применяем фильтры
@@ -180,7 +191,8 @@ async function resetToDefaultFilters() {
 }
 async function applyFilters() {
   try {
-    const response = await apiClient.post('/report/get-suspicious-phones', { filters });
+    console.log(filters.value);
+    const response = await apiClient.post('/report/get-suspicious-phones', {filters: filters.value} );
     
     displayedItems.value = response.data.items;
     //console.log(response);
@@ -189,7 +201,21 @@ async function applyFilters() {
     console.error('Error applying filters:', error);
   }
 }
+async function onSave(){
+  let title = `Подозрительная привязка телефонов и автомобилей ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value) }`
+  let tableData = convertToPhoneCarTableFormat(title,displayedItems.value)
+  console.log(tableData);
+  const saveResponse = await apiClient.post('/report-save',tableData);
+  console.log(saveResponse);
+}
+async function onSend(){
 
+  let title = `Подозрительная привязка телефонов и автомобилей ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value) }`
+  let tableData = convertToPhoneCarTableFormat(title,displayedItems.value)
+  console.log(tableData);
+  const saveResponse = await apiClient.post('/report-emails',tableData);
+  console.log(saveResponse);
+}
 </script>
 <script>
 export default {

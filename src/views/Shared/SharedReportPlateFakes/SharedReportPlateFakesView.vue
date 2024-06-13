@@ -6,9 +6,14 @@
     :is-filter-all-works-visible="false"
     @filtersApplied="fetchCustomerSkipsData"
     @optionSelected="changeOrsOption"
+    :are-buttons-visible="displayedItems.length"
+    @filtersReset="filtersReset"
+    @updateFilters="updateFilters"
+    @saveTable="onSave"
+    @sendTable="onSend"
   >
     <template v-slot:tabular-title>
-      <TabularPrimeTitle>Фальшивые гос.номера</TabularPrimeTitle>
+      <TabularPrimeTitle>Фальшивые гос.номера  {{ unixToDatePeriodHeader(filterDateStart, filterPeriod.option) }}</TabularPrimeTitle>
     </template>
     <template v-slot:tabular-table-header>
       <TableHeaders :columns="columns"  class="fat-boy" />
@@ -18,6 +23,7 @@
       <!--<TabularTableRow v-for="item in items" :key="item.orderId" style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr .2fr;">-->
       <TabularTableRow
       v-for="item in displayedItems"
+      v-if="displayedItems.length>0"
       :key="item.orderId"
       :item="item"
       @click="toggleDetails(item)" 
@@ -51,6 +57,9 @@
         
       </template>
     </TabularTableRow>
+    <TabularTableRow v-else class="h-[50vh]">
+				<FiltersNoData></FiltersNoData>
+			</TabularTableRow>
     </template>
 
   </DirectorReportComponent>
@@ -72,6 +81,11 @@ import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
 import isEnv from '@/utils/isEnv.js';
 import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
+import FiltersNoData from '@/components/Tabular/FiltersNoData.vue';
+import { convertToWorkDetailsTable } from '@/api/sendFunctions/skips.js'
+
+import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
+
 const serviceStationsStore = useSadminServiceStationsStore();
 
 const selectedCarCenterIds = computed(() => {
@@ -85,6 +99,9 @@ const items = ref([]);
 const itemsByPosts = ref([]);
 const itemsByMechanics = ref([]);
 const currentSort = ref('itemsByMechanics');
+
+
+
 function changeOrsOption(option){
   currentSort.value = option;
   console.warn(displayedItems.value.length);
@@ -122,6 +139,19 @@ function formatCurrency (sum) {
   let formattedTotalLoss = new Intl.NumberFormat('ru-RU', { style: 'currency', currency: 'RUB' }).format(sum);
   return formattedTotalLoss;
 };
+const filterDateStart = ref(getUnixToday);
+const filterPeriod = ref({option: 'month'});
+function updateFilters(data){
+  filterDateStart.value = data.dateStart//
+  filterPeriod.value.option = data.period;
+console.log(data);
+}
+function filtersReset(data){
+  const { sort, ...params } = data; // Исключаем параметр sort из объекта data
+  currentSort.value = sort;
+  console.log(currentSort.value);
+  fetchCustomerSkipsData(params);
+}
 
 onMounted(() => {
   // Предположим, что у вас есть начальные значения для фильтров
@@ -194,6 +224,21 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
   } catch (error) {
     console.error('Ошибка при загрузке данных:', error);
   }
+}
+async function onSave(){
+  let title = `Фальшивые гос.номера  ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value.option) }`
+  const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+  let tableData = convertToWorkDetailsTable(title,displayedItems.value,currentSort.value.option);
+const saveResponse = await apiClient.post('/report-save',tableData);
+  console.log(saveResponse);
+}
+async function onSend(){
+  let title = `Фальшивые гос.номера  ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value.option) }`
+  const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+  console.log(displayedItems.value);
+  let tableData = convertToWorkDetailsTable(title,displayedItems.value,currentSort.value.option);
+const saveResponse = await apiClient.post('/report-emails',tableData);
+  console.log(saveResponse);
 }
 function truncateText(text, maxLength) {
   if (text.length > maxLength) {
