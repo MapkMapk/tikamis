@@ -22,6 +22,13 @@
       >
         Выход
       </div>
+      <div
+        v-if="isMenuActive"
+        @click="mechanicFullLogout"
+        class="absolute pl-[30px] text-white w-[276px] flex items-center bg-gray-2c2d2f -bottom-[80px] left-0 h-[80px]"
+      >
+        Полный выход
+      </div>
     </div>
     <div class="flex justify-between items-center w-full">
       <div class="flex items-center ml-7">
@@ -46,6 +53,7 @@ import BaseSvgIcon from '@/components/BaseSvgIcon.vue'
 import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser.js'
 import { computed, onMounted, ref } from 'vue'
 import mechanicApiMechanicLogout from '@/api/mechanic/mechanicApiMechanicLogout.js'
+import mechanicApiFullLogout from '@/api/mechanic/mechanicApiFullLogout.js'
 import mechanicApiCenterInfo from '@/api/mechanic/mechanicApiCenterInfo.js'
 import router from '@/router/index.js'
 
@@ -72,5 +80,9 @@ async function mechanicLogout() {
   mechanicUserStore.activeMechanicName = ''
   await mechanicApiMechanicLogout()
   await router.push('/mechanic/human-select')
+}
+async function mechanicFullLogout(){
+  await mechanicApiFullLogout()
+  await router.push('/mechanic/auth');
 }
 </script>
