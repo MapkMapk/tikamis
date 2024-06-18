@@ -25,7 +25,7 @@
       <div
         v-if="isMenuActive"
         @click="mechanicFullLogout"
-        class="absolute pl-[30px] text-white w-[276px] flex items-center bg-gray-2c2d2f -bottom-[80px] left-0 h-[80px]"
+        class="absolute pl-[30px] text-white w-[276px] flex items-center bg-gray-2c2d2f -bottom-[160px] left-0 h-[80px]"
       >
         Полный выход
       </div>

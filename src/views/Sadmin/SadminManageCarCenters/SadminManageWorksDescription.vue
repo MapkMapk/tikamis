@@ -9,7 +9,7 @@
         <TabularTableCell v-for="work in works" :key="work.id">{{ work.name }}</TabularTableCell>
       </TabularTableColumn>
       <TabularTableColumn class="flex-[2]">
-        <TabularTableCellTop>Режим записи</TabularTableCellTop>
+        <TabularTableCellTop>Описание</TabularTableCellTop>
         <TabularTableCell v-for="work in works" :key="work.id" :class="{ 'text-gray-400': work.saleText == null }">{{ getQueuingModeText(work.saleText) }}</TabularTableCell>
       </TabularTableColumn>
       <TabularTableColumn class="">
