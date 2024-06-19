@@ -4,19 +4,19 @@
       to="/sadmin/auth"
       class="bg-green font-semibold text-white w-[300px] flex justify-center items-center rounded mb-4 py-5"
     >
-      Sadmin
+      Администратор
     </router-link>
     <router-link
       to="/director/auth"
       class="bg-green font-semibold text-white w-[300px] flex justify-center items-center rounded mb-4 py-5"
     >
-      Director
+      Директор
     </router-link>
     <router-link
       to="/mechanic/auth"
       class="bg-green font-semibold text-white w-[300px] flex justify-center items-center rounded mb-4 py-5"
     >
-      Mechanic
+      Механик
     </router-link>
   </section>
 </template>
