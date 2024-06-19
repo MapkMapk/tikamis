@@ -62,7 +62,7 @@
             <span
               :class="{ '!text-red': isLowTime }"
               class="text-black text-5xl mb-[20px]"
-              >-{{ mechanicOrderStore.formattedCompletionTime }}</span
+              ><p v-if="isLowTime">-</p>{{ mechanicOrderStore.formattedCompletionTime }}</span
             >
           </div>
         </div>
