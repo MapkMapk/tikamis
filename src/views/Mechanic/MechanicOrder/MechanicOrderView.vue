@@ -70,7 +70,7 @@
       <div class="w-full border border-gray-a1a4ad mt-10">
         <div class="bg-gray-f5f5f5">
           <div class="text-gray-a1a4ad px-[30px] py-4">Список услуг в заказе</div>
-        </div>
+        </div><!---->
         <MechanicOrderWork :odometer="odometer" />
       </div>
       <div class="flex mt-auto pt-10 pb-6">
