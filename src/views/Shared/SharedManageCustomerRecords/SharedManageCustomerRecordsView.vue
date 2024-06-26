@@ -37,13 +37,17 @@
 			</TabularTableRow>
 			<!-- Ряды данных -->
 			<TabularTableRow v-for="item in items" :key="item.orderId" v-if="items.length"
-				style="display: grid; grid-template-columns: 2.2fr 1fr 1fr 1fr 0.2fr;">
+				style="display: grid; grid-template-columns: 2.2fr 1fr 1fr 1fr 0.2fr; align-items: center;">
 				<!-- Ячейка с данными о работах -->
-				<TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '2.2fr' }" style="padding-left: 10px;">
-					{{ item.works.length === 1 ? item.works[0].name : '' }}
-					<details v-if="item.works.length > 1" class="custom-details" :style="{ width: CELL_WIDTH }">
-						<summary class="flex" style="justify-content: space-between;"> {{ item.works[0].name }}
-							<strong>ещё {{ item.works.length - 1 }}</strong> </summary>
+				<TabularTableRowCell
+					v-if="item.works.length <= 1" :style="{ height: CELL_HEIGHT, width: '2.2fr' }" style="padding-left: 10px;">
+					<p style="font-weight: normal;height: 34.3px;">{{ item.works.length === 1 ? item.works[0].name : '' }}</p>
+				</TabularTableRowCell>
+				<TabularTableRowCell v-else :style="{ height: CELL_HEIGHT, width: '2.2fr' }" style="padding-left: 10px;">
+					{{ item.works[0].name }}
+							<strong>ещё {{ item.works.length - 1 }}</strong>
+					<details class="custom-details" :style="{ width: CELL_WIDTH }">
+						<summary class="flex" style="justify-content: space-between;">  </summary>
 						<ul>
 							<li v-for="work in item.works.slice(1)" :key="work.id">{{ work.name }}</li>
 						</ul>
@@ -60,7 +64,7 @@
 				<TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '1fr' }"
 					style="padding-left: 10px; align-self: center;">{{ item.plate }}</TabularTableRowCell>
 				<!-- Ячейка для действий -->
-				<TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '.2fr' }">
+				<TabularTableRowCell :style="{ height: CELL_HEIGHT, width: '.2fr' }" style="display: flex;">
 					<!-- Кликабельное изображение крестика для удаления записи deleteItem(item)-->
 					<svg @click="deleteItem(item)" style="cursor: pointer;" class="delete-icon"
 						xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"

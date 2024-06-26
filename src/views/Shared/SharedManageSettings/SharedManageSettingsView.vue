@@ -1,7 +1,18 @@
 <template>
-  <ModalBoolean @callback="modal.callback" :is-visible="modal.isVisible"
-    :primary-button-component="BaseButtonFilledDark" :main-title="modal.mainTitle"
-    :primary-button-text="modal.primaryButtonText" :secondary-button-text="modal.secondaryButtonText" />
+  <ModalBoolean 
+    @callback="pageSave" 
+    :is-visible="saveModal.isVisible && !isLoading"
+    :primary-button-component="BaseButtonFilledDark" 
+    :main-title="saveModal.mainTitle"
+    :primary-button-text="saveModal.primaryButtonText" 
+    :secondary-button-text="saveModal.secondaryButtonText" />
+    <ModalBoolean 
+    @callback="pageClose" 
+    :is-visible="closeModal.isVisible"
+    :primary-button-component="BaseButtonFilledDark" 
+    :main-title="closeModal.mainTitle"
+    :primary-button-text="closeModal.primaryButtonText" 
+    :secondary-button-text="closeModal.secondaryButtonText" />
   <MainHeader />
   <MainHeaderGap />
   <div class="w-full flex overflow-x-hidden">
@@ -97,9 +108,9 @@
           </div>
           <div class="flex flex-col items-center">
             <div class="w-full flex mt-10 mb-3">
-              <BaseButtonFilledGreen @click.prevent="saveModal" class="flex flex-1 mr-5">Сохранить
+              <BaseButtonFilledGreen @click.prevent="saveModalShow" class="flex flex-1 mr-5">Сохранить
               </BaseButtonFilledGreen>
-              <BaseButtonFilledLight v-if="isEnv('sadmin')" @click.prevent="closeModal" class="flex flex-1">Закрыть
+              <BaseButtonFilledLight v-if="isEnv('sadmin')" @click.prevent="closeModalShow" class="flex flex-1">Закрыть
               </BaseButtonFilledLight>
             </div>
             <BaseErrorText v-if="isRequestSuccess !== undefined && !isRequestSuccess">Ошибка! Один или несколько полей
@@ -133,9 +144,12 @@ import BaseErrorText from '@/components/BaseErrorText.vue';
 import ModalBoolean from '@/components/ModalBoolean.vue';
 import BaseButtonFilledDark from '@/components/BaseButtonFilledDark.vue';
 import router from '@/router/index.js';
-import minutesToHHMM from '@/utils/time/minutesToHHMM.js';
-import HHMMtoMinutes from '@/utils/time/HHMMtoMinutes.js';
+import {unixToShortDate, minutesToHHMM,HHMMtoMinutes} from '@/utils/time/dateUtils.js';
 import directorApiCenterInfo from '@/api/director/directorApiCenterInfo.js';
+import { directorApiClient } from '@/api/directorApiClient';
+import { sadminApiClient } from '@/api/sadminApiClient';
+const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+
 const sadminStationsStore = useSadminServiceStationsStore();
 const mainStore = useMainStore();
 
@@ -145,7 +159,7 @@ let city = ref();
 let password = ref();
 let changesSince = ref();
 let changesSinceFormatted = computed(
-  () => new Date(changesSince.value * 1000).getDate() + ' февраля'
+  () => unixToShortDate(changesSince.value)
 );
 let bookingAvailable = ref(false);
 let postsEquipment = ref();
@@ -162,20 +176,11 @@ let passwordInputType = computed(() => (isPasswordVisible.value ? 'text' : 'pass
 
 
 
-let modal = ref({});
-
-function saveModal() {
-  modal.value.callback = save;
-  modal.value.isVisible = true;
-  modal.value.mainTitle = 'Настройки будут применены 25 июня. Продолжить?';
-  modal.value.primaryButtonText = 'Продолжить';
-  modal.value.secondaryButtonText = 'Отмена';
-
-  async function save() {
-    let response;
-    // Sadmin
-    if (isEnv('sadmin')) {
-      let responeBody = {
+const saveModal = ref({});
+async function predictChanges() {
+  let response;
+  if (isEnv('sadmin')) {
+    let responeBody = {
       carCenterId: router.currentRoute.value.query.id,
       login: login.value,
       password: password.value,
@@ -187,43 +192,101 @@ function saveModal() {
       clearanceMinutes: clearanceMinutes.value,
       orderDepthDays: orderDepthDays.value,
       mapLink: mapLink.value
-      }
-      response = await sadminApiManageSettingsPost(responeBody)
-    }
-    // Director
-    if (isEnv('director')) {
-      let responeBody = {
+    };
+    response = await apiClient.post('/manage/get-change-predict', responeBody);
+  } else if (isEnv('director')) {
+    let responeBody = {
+      bookingAvailable: bookingAvailable.value,
+      postsEquipment: postsEquipment.value,
+      shiftsStart: HHMMtoMinutes(shiftsStart.value),
+      shiftsFinish: HHMMtoMinutes(shiftsFinish.value),
+      timeZoneOffsetHours: timezoneOffsetHours.value,
+      mapLink: mapLink.value
+    };
+    response = await apiClient.post('/manage/get-change-predict', responeBody);
+  }
+
+  if (!response.data.since) {
+    return "сразу";
+  }
+
+  return unixToShortDate(response.data.since);
+}
+
+
+let isLoading = ref(false);
+
+async function saveModalShow() {
+  isLoading.value = true;
+  const predictChangesDate = await predictChanges();
+  isLoading.value = false;
+
+  saveModal.value.isVisible = true;
+  saveModal.value.mainTitle = `Настройки будут применены ${predictChangesDate}. Продолжить?`;
+  saveModal.value.primaryButtonText = 'Продолжить';
+  saveModal.value.secondaryButtonText = 'Отмена';
+}
+
+  async function pageSave(data) {
+    if(data){
+      let response;
+      // Sadmin
+      if (isEnv('sadmin')) {
+        let responeBody = {
+        carCenterId: router.currentRoute.value.query.id,
+        login: login.value,
+        password: password.value,
         bookingAvailable: bookingAvailable.value,
         postsEquipment: postsEquipment.value,
         shiftsStart: HHMMtoMinutes(shiftsStart.value),
         shiftsFinish: HHMMtoMinutes(shiftsFinish.value),
         timeZoneOffsetHours: timezoneOffsetHours.value,
+        clearanceMinutes: clearanceMinutes.value,
+        orderDepthDays: orderDepthDays.value,
         mapLink: mapLink.value
+        }
+        response = await sadminApiManageSettingsPost(responeBody)
       }
-      response = await directorApiManageSettingsPost({ newSettings: responeBody });
+      // Director
+      if (isEnv('director')) {
+        let responeBody = {
+          bookingAvailable: bookingAvailable.value,
+          postsEquipment: postsEquipment.value,
+          shiftsStart: HHMMtoMinutes(shiftsStart.value),
+          shiftsFinish: HHMMtoMinutes(shiftsFinish.value),
+          timeZoneOffsetHours: timezoneOffsetHours.value,
+          mapLink: mapLink.value
+        }
+        response = await directorApiManageSettingsPost(responeBody);
+      }
+      if (response.status === 200) {
+        isRequestSuccess.value = true;
+      }
+      if (response.status === 400) {
+        isRequestSuccess.value = false;
+      }
     }
-    if (response.status === 200) {
-      isRequestSuccess.value = true;
-    }
-    if (response.status === 400) {
-      isRequestSuccess.value = false;
-    }
-    modal.value.isVisible = false;
+    saveModal.value.isVisible = false;
   }
+
+const closeModal = ref({});
+function closeModalShow() {
+  closeModal.value.callback = close;
+  closeModal.value.isVisible = true;
+  closeModal.value.mainTitle = 'Закрыть без сохранения?';
+  closeModal.value.mainText = 'Настройки не будут применены';
+  closeModal.value.primaryButtonText = 'Сохранить изменения';
+  closeModal.value.secondaryButtonText = 'Закрыть без сохранения';
+}
+function pageClose(data) {
+  closeModal.value.isVisible = false;
+  if (!data){
+    router.back();
+  } 
 }
 
-function closeModal() {
-  modal.value.callback = close;
-  modal.value.isVisible = true;
-  modal.value.mainTitle = 'Закрыть без сохранения?';
-  modal.value.mainText = 'Настройки не будут применены';
-  modal.value.primaryButtonText = 'Сохранить изменения';
-  modal.value.secondaryButtonText = 'Закрыть без сохранения';
 
-  function close() {
-    router.push('/');
-  }
-}
+
 
 function emitSetTimezone(value) {
   timezoneOffsetHours.value = value;

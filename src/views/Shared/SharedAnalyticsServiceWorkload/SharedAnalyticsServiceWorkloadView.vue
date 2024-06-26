@@ -331,7 +331,6 @@ function orderOpen(data){
 }
 function orderClose(){
   order.value.isVisible = false;
-  alert('Запись успешно создана');
   //Fake.value.isVisible = false;
 }
 

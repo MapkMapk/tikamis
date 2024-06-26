@@ -19,7 +19,7 @@
           <p class="title">{{ workName }}</p>
           <p class="sellText mt-[24px] mb-[16px]">Условия акции</p>
           <div class="w-[343px] h-[579px] rounded-[12px] flex content-center justify-center items-center" style="box-shadow: 0px 4px 20px 0px #00000026;">
-            <p class="sellPrev w-[307px]">{{ fullSaleLore }}</p>
+            <p class="sellPrev w-[307px]">{{ saleText }}<strong style="font-weight: 900;font-size: 29px;line-height: 7px;">{{ dot }}</strong>{{ saleNote }}</p>
           </div>
         </div>
       </div>
@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits, watch } from 'vue';
+import { ref, defineProps, defineEmits, watch, computed } from 'vue';
 import BaseButtonFilledGreen from '@/components/BaseButtonFilledGreen.vue';
 import BaseButtonFilledLight from '@/components/BaseButtonFilledLight.vue';
 
@@ -51,10 +51,18 @@ const props = defineProps({
     default: ''
   }
 });
-const fullSaleLore = ref(`${props.saleText}\n${props.saleNote}`);
-watch(() => [props.saleText, props.saleNote], ([newSaleText, newSaleNote]) => {
-  fullSaleLore.value = `${newSaleText}\n${newSaleNote}`;
+const saleText = ref(props.saleText);
+const saleNote = ref(props.saleNote);
+const dot = ref('\n\n.\n\n');
+watch(() => props.saleText, (newSaleText) => {
+  saleText.value = newSaleText;
 });
+
+watch(() => props.saleNote, (newSaleNote) => {
+  saleNote.value = newSaleNote;
+});
+
+const fullSaleLore = computed(() => `${saleText.value}\n \n\n \n${saleNote.value}`);
 
 function close() {
   emit('close', false);
@@ -100,4 +108,5 @@ section {
   /*white-space: normal | nowrap | pre | pre-line | pre-wrap */
   white-space: break-spaces; /* Перенос строк и пробелов */
 }
+
 </style>

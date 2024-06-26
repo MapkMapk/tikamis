@@ -11,6 +11,9 @@ export function convertMinutesToTime(minutes) {
   return `${formattedHours}:${formattedMinutes}`;
 }
 
+export function minutesToHHMM(value) {
+  return convertMinutesToTime(value);
+}
 /**
  * Конвертирует время в минуты.
  * @param {string} time - Время в формате "HH:MM".
@@ -19,6 +22,22 @@ export function convertMinutesToTime(minutes) {
 export function convertTimeToMinutes(time) {
   const [hours, minutes] = time.split(':').map(Number);
   return hours * 60 + minutes;
+}
+export function HHMMtoMinutes(value) {
+  return convertTimeToMinutes(value);
+}
+
+export function unixToShortDate(unixTime) {
+  const date = new Date(unixTime * 1000);
+  
+  const day = date.getUTCDate();  // getUTCDate возвращает день месяца от 1 до 31
+  const months = [
+    'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+    'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+  ];
+  const month = months[date.getUTCMonth()];  // getUTCMonth возвращает месяц от 0 до 11
+
+  return `${day} ${month}`;
 }
 
 /**
@@ -163,5 +182,6 @@ export function unixToDatePeriodHeader(unixTime, period = null) {
 export function getUnixToday() {
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0); // Устанавливаем время на полночь (00:00:00) по UTC
+  console.log(`getUnixToday: ${today.getTime() / 1000}`)
   return Math.floor(today.getTime() / 1000); // Возвращаем Unix время
 }

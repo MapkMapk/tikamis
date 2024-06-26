@@ -28,7 +28,7 @@
       v-if="displayedItems.length>0"
       :key="item.orderId"
       :item="item"
-      style="grid-template-columns: 2fr 4fr 1fr 2fr 2fr 2fr;"
+      style="grid-template-columns: 3fr 4fr 1fr 2fr 2fr 2fr;"
       @click="toggleDetails(item)" 
       :open="item.detailsOpen"
     >
@@ -52,7 +52,7 @@
         <summary class="flex" style="justify-content: space-between;"><strong></strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.id">
-          {{ work.loss }}
+          {{ formatCurrency(work.loss) }}
         </li>
         </ul>
       </details></TabularTableRowCell>
@@ -145,7 +145,7 @@ function changeOrsOption(option){
   console.warn(displayedItems.value.length);
   if (currentSort.value.option === 'itemsByPosts') {
     columns.value = [
-      { header: 'Пост', size: '2fr' },
+      { header: 'Пост', size: '3fr' },
       { header: 'Работы', size: '4fr' },
       { header: 'Потери', size: '1fr' },
       { header: 'Время записи', size: '2fr' },
@@ -155,7 +155,7 @@ function changeOrsOption(option){
   } else {
     // Предполагаемая структура колонок для "mechanics"
     columns.value = [
-      { header: 'Механик', size: '2fr' },
+      { header: 'Механик', size: '3fr' },
       { header: 'Работы', size: '4fr' },
       { header: 'Потери', size: '1fr' },
       { header: 'Время записи', size: '2fr' },
@@ -179,7 +179,7 @@ onMounted(() => {
 watch(currentSort.value.option, (newVal) => {
   if (newVal === 'itemsByPosts') {
     columns.value = [
-      { header: 'Пост', size: '2fr' },
+      { header: 'Пост', size: '3fr' },
       { header: 'Работы', size: '4fr' },
       { header: 'Потери', size: '1fr' },
       { header: 'Время записи', size: '2fr' },
@@ -189,7 +189,7 @@ watch(currentSort.value.option, (newVal) => {
   } else {
     // Предполагаемая структура колонок для "mechanics"
     columns.value = [
-      { header: 'Механик', size: '2fr' },
+      { header: 'Механик', size: '3fr' },
       { header: 'Работы', size: '4fr' },
       { header: 'Потери', size: '1fr' },
       { header: 'Время записи', size: '2fr' },

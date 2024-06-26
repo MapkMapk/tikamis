@@ -213,15 +213,16 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
     carCenters: selectedCarCenterIds.value, // Указаны для примера, измените по необходимости
     page: 1 // Указано для примера, измените по необходимости
   };
-
+  const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
   try {
-    const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
+    
     const response = await apiClient.post('/report/get-plate-fakes', { filters });
     //console.log(response.data[currentSort.value][0].works);
     itemsByPosts.value = response.data.itemsByPosts;
     itemsByMechanics.value = response.data.itemsByMechanics;
     //updateColumns(currentSort.value);
   } catch (error) {
+    console.log('error');
     console.error('Ошибка при загрузке данных:', error);
   }
 }

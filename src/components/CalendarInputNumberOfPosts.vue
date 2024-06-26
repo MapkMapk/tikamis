@@ -8,15 +8,26 @@
     </div>
 </template>
 <script setup>
-import { ref, defineProps, defineEmits } from 'vue';
+import { ref, defineProps, defineEmits, watch } from 'vue';
 
 const props = defineProps({
     PNumber: Number,
     MaxNumber: Number
 });
 
-const emit = defineEmits(['updateCount']);
+const emit = defineEmits(['updateCount','updatePNumber']);
 const numberValue = ref(props.PNumber);
+emit('updatePNumber', numberValue.value);
+watch(
+  () => numberValue,
+  (newValue) => {
+    console.log("&&&==========CINOP=========&&&");
+    console.log(`props.PNumber: ${props.PNumber} ==> numberValue: ${numberValue.value} ==> newValue: ${newValue}`);
+    console.log("&&&==========CINOP=========&&&");
+    numberValue.value = newValue;
+    
+  }
+);
 const postLim = ref(props.MaxNumber);
 function plus() {
   if(numberValue.value<postLim.value){ 
@@ -26,7 +37,7 @@ function plus() {
   numberValue.value++;}
   else{
     console.log("//+++++++++++++++++CINOP+++++++++++++++++++++\\");
-    console.log(`fun plus: ${numberValue.value} => ${numberValue.value+1}`);
+    console.log(`fun plus: ${numberValue.value} => ${numberValue.value}`);
     console.log("\\+++++++++++++++++CINOP+++++++++++++++++++++//");}
   emit('updatePNumber', numberValue.value);
    // Emit new event to update PNumber in higher-level parent

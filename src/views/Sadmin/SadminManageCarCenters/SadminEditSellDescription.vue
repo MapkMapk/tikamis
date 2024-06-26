@@ -88,6 +88,7 @@ async function SaveSell({ saleText, saleNote }) {
   try {
     const response = await sadminApiClient.post('manage/work-sale-text', filter);
     console.log('Данные успешно сохранены:', response);
+    router.push({ path: '/sadmin/manage/works-description'});
     // Дополнительные действия при успешном сохранении
   } catch (error) {
     console.error('Ошибка при сохранении данных:', error);
