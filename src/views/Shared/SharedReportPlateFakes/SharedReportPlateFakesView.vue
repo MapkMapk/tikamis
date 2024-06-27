@@ -216,7 +216,8 @@ async function fetchCustomerSkipsData({ date, period, workId }) {
   const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
   try {
     
-    const response = await apiClient.post('/report/get-plate-fakes', { filters });
+    //const response = await apiClient.post('/report/get-plate-fakes', { filters });
+    const response = null
     //console.log(response.data[currentSort.value][0].works);
     itemsByPosts.value = response.data.itemsByPosts;
     itemsByMechanics.value = response.data.itemsByMechanics;
