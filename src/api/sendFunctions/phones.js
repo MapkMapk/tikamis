@@ -3,7 +3,7 @@ export function convertToPhoneCarTableFormat(tabularTitle, data) {
     const result = [];
     result.push(tableHeaders); // Добавляем заголовки таблицы
   
-    data.items.forEach(item => {
+    data.forEach(item => {
       // Создаем строки для каждого телефона и автомобиля
       item.phones.forEach(phone => {
         item.plates.forEach(plate => {

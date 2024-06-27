@@ -85,7 +85,8 @@ import FiltersNoData from '@/components/Tabular/FiltersNoData.vue';
 import { convertToWorkDetailsTable } from '@/api/sendFunctions/skips.js'
 
 import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
-
+import { unixToDate } from '@/utils/time/dateUtils.js';
+import handleFileDownload from '@/utils/fileDownload.js';
 const serviceStationsStore = useSadminServiceStationsStore();
 
 const selectedCarCenterIds = computed(() => {
@@ -185,18 +186,7 @@ watch(currentSort.value.option, (newVal) => {
     ];
   }
 }, { immediate: true });
-function unixToDate(unixTime) {
-  const date = new Date(unixTime * 1000); // Умножаем на 1000, так как в JavaScript время измеряется в миллисекундах, а не в секундах, как в Unix
 
-  const day = String(date.getDate()).padStart(2, '0'); // День месяца с ведущим нулём, если нужно
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяц с ведущим нулём, так как в JavaScript месяцы нумеруются с 0
-  const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, '0'); // Часы с ведущим нулём, если нужно
-  const minutes = String(date.getMinutes()).padStart(2, '0'); // Минуты с ведущим нулём, если нужно
-
-  const formattedDate = `${day}.${month}.${year} ${hours}:${minutes}`;
-  return formattedDate;
-}
 
 
 
@@ -231,8 +221,14 @@ async function onSave(){
   let title = `Фальшивые гос.номера  ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value.option) }`
   const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
   let tableData = convertToWorkDetailsTable(title,displayedItems.value,currentSort.value.option);
-const saveResponse = await apiClient.post('/report-save',tableData);
-  console.log(saveResponse);
+const saveResponse = await apiClient.post('/report-save',tableData,
+  { responseType: 'arraybuffer' });
+  try{
+    handleFileDownload(saveResponse.data, `${title}.xlsx`);
+  }
+  catch (error) {
+    console.error('Error saving the table and downloading the file', error);
+  }
 }
 async function onSend(){
   let title = `Фальшивые гос.номера  ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value.option) }`

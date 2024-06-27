@@ -61,6 +61,18 @@ const DEFAULT_SORT = store.mainSort;
 const DEFAULT_WORK_ID = null;
 
 onMounted(() => {
+  if (isEnv('customer-skips')) {
+    console.log('customer-skips');
+    const tableElement = document.querySelector('.tabletabletabletable');
+    if (tableElement) {
+      tableElement.style.width = '2400px';
+    }
+
+    const jjjjElement = document.querySelector('.jjjj');
+    if (jjjjElement) {
+      jjjjElement.style.overflowY = 'hidden';
+    }
+  }
   if (isEnv('reviews')) {
     console.log('reviews');
     const tableElement = document.querySelector('.tabletabletabletable');

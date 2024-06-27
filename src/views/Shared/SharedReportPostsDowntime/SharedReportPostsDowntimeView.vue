@@ -100,7 +100,8 @@ import { toggleDetails, formatTotalDowntime, formatCurrency, selectedCarCenterId
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
 import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
-
+import { unixToDate } from '@/utils/time/dateUtils.js';
+import handleFileDownload from '@/utils/fileDownload.js';
 const currentSort = ref('itemsByMechanics');
 const totalLoss = ref(0);
 const itemsByPosts = ref([]);
@@ -147,25 +148,14 @@ function handleAllWorksLoaded(ids) {
 const columns = ref([]);
 
 
-function unixToDate(unixTime) {
-  const date = new Date(unixTime * 1000); // Умножаем на 1000, так как в JavaScript время измеряется в миллисекундах, а не в секундах, как в Unix
 
-  const day = String(date.getDate()).padStart(2, '0'); // День месяца с ведущим нулём, если нужно
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяц с ведущим нулём, так как в JavaScript месяцы нумеруются с 0
-  const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, '0'); // Часы с ведущим нулём, если нужно
-  const minutes = String(date.getMinutes()).padStart(2, '0'); // Минуты с ведущим нулём, если нужно
-
-  const formattedDate = `${day}.${month}.${year} ${hours}:${minutes}`;
-  return formattedDate;
-}
 
 const displayedItems = computed(() => {
   return currentSort.value.option === 'itemsByPosts' ? itemsByPosts.value : itemsByMechanics.value;
 });
 
 function updateFilters(data){
-  filterDateStart.value = data.dateStart//
+  filterDateStart.value = data.dateStart;
   filterPeriod.value.option = data.period;
 console.log(data);
 }
@@ -222,10 +212,17 @@ async function onSaveTable(){
 //простои постов обеспечить функционал tabularTitle, tableHeaders, data, filter
 let tableData = convertToDowntimeTableFormat(title,columns.value,displayedItems.value,currentSort.value.option)
 
-  console.log(tableData)
-  const saveResponse = await apiClient.post('/report-save',tableData);
-  console.log(saveResponse);
+const saveResponse = await apiClient.post('/report-save',tableData,{ responseType: 'arraybuffer' });
+try{
+    handleFileDownload(saveResponse.data, `${title}.xlsx`);
+  }
+  catch (error) {
+    console.error('Error saving the table and downloading the file', error);
+  }
 }
+
+
+
 async function onSendTable(){
   const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
  

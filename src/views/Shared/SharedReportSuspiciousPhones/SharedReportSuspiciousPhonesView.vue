@@ -110,7 +110,7 @@ import TabularTable from '@/components/Tabular/TabularTable.vue';
 
 import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStations.js';
 import isEnv from '@/utils/isEnv.js';
-
+import handleFileDownload from '@/utils/fileDownload.js';
 import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
 // const ApiCall = isEnv('sadmin') ? sadminApiGetCustomerRecords : directorApiGetCustomerRecords
 const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
@@ -159,18 +159,20 @@ let filterDateStart = ref(getUnixToday());
 let filterPeriod = ref('month');
 
 function updateFilters(data) {
+  console.log('data.dateStart');
+  console.log(data.dateStart);
+  console.log('data.period');
+  console.log(data.period);
+  console.log('filterDateStart.value');
+  console.log(filterDateStart.value);
+  console.log('filterPeriod.value');
+  console.log(filterPeriod.value);
   filterDateStart.value = data.dateStart;
   filterPeriod.value = data.period
 }
 
 const items = ref([]);
-const filters = ref({
-  interval: filterPeriod.value,
-  dateStart: filterDateStart.value,
-  works: null,
-  carCenters: selectedCarCenterIds.value,
-  page: 1
-});
+
 
 async function resetToDefaultFilters() {
   try {
@@ -190,7 +192,14 @@ async function resetToDefaultFilters() {
   }
 }
 async function applyFilters() {
-  try {
+  const filters = ref({
+  interval: filterPeriod.value,
+  dateStart: filterDateStart.value,
+  works: null,
+  carCenters: selectedCarCenterIds.value,
+  page: 1
+});
+  try { 
     console.log(filters.value);
     const response = await apiClient.post('/report/get-suspicious-phones', {filters: filters.value} );
     
@@ -205,8 +214,14 @@ async function onSave(){
   let title = `Подозрительная привязка телефонов и автомобилей ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value) }`
   let tableData = convertToPhoneCarTableFormat(title,displayedItems.value)
   console.log(tableData);
-  const saveResponse = await apiClient.post('/report-save',tableData);
-  console.log(saveResponse);
+  const saveResponse = await apiClient.post('/report-save',tableData,
+  { responseType: 'arraybuffer' });
+  try{
+    handleFileDownload(saveResponse.data, `${title}.xlsx`);
+  }
+  catch (error) {
+    console.error('Error saving the table and downloading the file', error);
+  }
 }
 async function onSend(){
 

@@ -78,6 +78,7 @@ import TabularTableRow from '@/components/Tabular/TabularTableRow.vue';
 import MainHeader from '@/components/MainHeader.vue';
 import MainHeaderGap from '@/components/MainHeaderGap.vue';
 import { convertToTableFormat }  from '@/api/sendFunctions/reviews.js'
+import handleFileDownload from '@/utils/fileDownload.js';
 //////////
 //оч важный блок
 //////////
@@ -86,6 +87,7 @@ import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStat
 import { sadminApiClient } from '@/api/sadminApiClient';
 import { directorApiClient } from '@/api/directorApiClient';
 import { computed } from 'vue';
+import { unixToDate } from '@/utils/time/dateUtils.js';
 const serviceStationsStore = useSadminServiceStationsStore();
 const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 
@@ -153,18 +155,6 @@ watch(sortOption, (newVal) => {
   }
 }, { immediate: true });
 
-function unixToDate(unixTime) {
-  const date = new Date(unixTime * 1000); // Умножаем на 1000, так как в JavaScript время измеряется в миллисекундах, а не в секундах, как в Unix
-
-  const day = String(date.getDate()).padStart(2, '0'); // День месяца с ведущим нулём, если нужно
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяц с ведущим нулём, так как в JavaScript месяцы нумеруются с 0
-  const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, '0'); // Часы с ведущим нулём, если нужно
-  const minutes = String(date.getMinutes()).padStart(2, '0'); // Минуты с ведущим нулём, если нужно
-
-  const formattedDate = `${day}.${month}.${year} ${hours}:${minutes}`;
-  return formattedDate;
-}
 
 function toggleDetails(event) {
   // Проверяем, что клик был не по самому элементу <summary>,
@@ -211,15 +201,26 @@ function truncateText(text, maxLength) {
   }
   return text;
 }
+
 async function saveData(){
+  let saveTitle = `Отзывы ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value)}`;
   const tableData = convertToTableFormat(
-    `Отзывы ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value)}`,
+  saveTitle,
     columns.value,
     items.value
   );
-  const saveResponse = await apiClient.post('/report-save',tableData);
-  console.log(saveResponse);
+  const saveResponse = await apiClient.post('/report-save',
+  tableData,
+  { responseType: 'arraybuffer' });
+  try{
+    handleFileDownload(saveResponse.data, `${saveTitle}.xlsx`);
+  }
+  catch (error) {
+    console.error('Error saving the table and downloading the file', error);
+  }
 }
+
+
 async function sendData(){
   const tableData = convertToTableFormat(
     `Отзывы ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value)}`,

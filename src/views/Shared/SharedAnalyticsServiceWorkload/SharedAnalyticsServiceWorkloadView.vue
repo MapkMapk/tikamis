@@ -60,11 +60,11 @@
           <template v-else>
             <!-- Отображение блока "НЕ РАБ" -->
             <div class="block non-working" :style="{ width: '100%', height: '40px' }">
-              <div class="blocks-time">12ч 00м</div>
+              <div class="blocks-time">{{timeSlots.length}}ч 00м</div>
               <div>НЕ РАБ</div>
             </div>
           </template>
-          <div v-for="n in 24" :key="`empty-${n}`" class="empty-cell flex-half border border-gray-d9d9d9" :style="{ width: '4.167%' }"></div>
+          <div v-for="n in timeSlots.length*2" :key="`empty-${n}`" class="empty-cell flex-half border border-gray-d9d9d9" :style="{ width: `${100/(timeSlots.length*2)}%` }"></div>
         </div>
       </div>
     </div>
@@ -116,6 +116,17 @@ const sadminStationsStore = useSadminServiceStationsStore();
 const apiClientIsSadmin = ref(isEnv('sadmin'));
 import { useStore } from '@/stores/main.js';
 
+
+const timeSlots = computed(() => {
+  const slots = [];
+  let __start = Math.round(shiftStart.value/60);
+  let __end = Math.round(shiftEnd.value/60)-1;
+  for (let hour = __start; hour <= __end; hour++) {
+    slots.push(`${hour}:00`);
+  }
+  return slots;
+});
+
 const Store = useStore();
 
 
@@ -130,6 +141,9 @@ const carCenterId = computed(() => {
 //////////
 
 let BASE_HOUR_WIDTH = 130;
+
+const shiftStart = ref(0);
+const shiftEnd = ref(0);
 
 const freeBlocks = ref([]);
 const freePostsCount = computed(() => freeBlocks.value.length);
@@ -201,6 +215,9 @@ const applyFilters = async () => {
     freeBlocks.value = [];
     totalFreeTime.value = 0;
 
+    shiftStart.value = response.shiftStart;
+    shiftEnd.value = response.shiftEnd;
+
     // Пересчитываем значения
     response.items.forEach((item) => {
       if (item.isActive) {
@@ -221,17 +238,23 @@ const applyFilters = async () => {
 
 function getBlockStyle(block) {
   // Рассчитываем ширину одного часа
-  const hourWidth = document.querySelector('.flex.items-center.justify-center.flex-1.h-\\[42px\\].border.border-gray-d9d9d9').offsetWidth-0.5;
+  let hourWidth = 1760/timeSlots.value.length;
   
   // Переводим время начала и окончания блока в минуты от начала рабочего дня
-  const blockStartMinutes = block.blockStart - 480; // 480 минут соответствует 8:00 утра
-  const blockEndMinutes = block.blockEnd - 480;
+  const blockStartMinutes = block.blockStart - shiftStart.value; // 480 минут соответствует 8:00 утра
+  const blockEndMinutes = block.blockEnd - shiftStart.value;
   
   // Вычисляем продолжительность блока в минутах
   const blockDurationMinutes = blockEndMinutes - blockStartMinutes;
   
   // Переводим продолжительность блока в пиксели
   const blockWidth = (blockDurationMinutes / 60) * hourWidth;
+  console.log("blockDurationMinutes");
+  console.log(blockDurationMinutes);
+  console.log("hourWidth");
+  console.log(hourWidth);
+  console.log("blockWidth");
+  console.log(blockWidth);
   
   // Вычисляем смещение блока относительно начала контейнера
   const blockOffset = (blockStartMinutes / 60) * hourWidth;
@@ -257,7 +280,7 @@ const formattedTotalFreeTime = computed(() => {
 
 function canDisplayPlate(block) {
   const duration = block.blockEnd - block.blockStart;
-  const width = (duration / 60) * document.querySelector('.flex.items-center.justify-center.flex-1.h-\\[42px\\].border.border-gray-d9d9d9').offsetWidth; // Ширина блока
+  const width = (duration / 60) * 1760/timeSlots.value.length; // Ширина блока
   const minWidthForPlate = 120; // Минимальная ширина блока, при которой номер машины еще читаем (примерное значение, нужно подобрать)
 
   return width >= minWidthForPlate;
@@ -295,13 +318,7 @@ function getBlockClass(type) {
   }[type];
 }
 
-const timeSlots = computed(() => {
-  const slots = [];
-  for (let hour = 8; hour <= 19; hour++) {
-    slots.push(`${hour}:00`);
-  }
-  return slots;
-});
+
 
 let modal = ref({});
 
@@ -316,6 +333,7 @@ function openModal(block, postNumber) {
 
 function closeModal() {
   showModal.value = false;
+  applyFilters();
 }
 
 let order = ref({});
@@ -331,6 +349,7 @@ function orderOpen(data){
 }
 function orderClose(){
   order.value.isVisible = false;
+  applyFilters();
   //Fake.value.isVisible = false;
 }
 

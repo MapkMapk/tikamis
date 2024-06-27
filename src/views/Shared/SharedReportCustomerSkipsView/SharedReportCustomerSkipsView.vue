@@ -28,7 +28,7 @@
       v-if="displayedItems.length>0"
       :key="item.orderId"
       :item="item"
-      style="grid-template-columns: 3fr 4fr 1fr 2fr 2fr 2fr;"
+      style="grid-template-columns: 3fr 5fr 1fr 2fr 1.5fr 1.5fr 3fr;"
       @click="toggleDetails(item)" 
       :open="item.detailsOpen"
     >
@@ -81,6 +81,16 @@
         </ul>
       </details>
         </TabularTableRowCell>
+        <TabularTableRowCell><p style="opacity: 0;">dsfdsfdsfsdsfsdfsd</p>
+        <details class="custom-details">
+        <summary class="flex" style="justify-content: space-between;" ><strong></strong></summary>
+        <ul>
+          <li v-for="work in item.works" :key="work.id">
+          {{ work.plate }}
+        </li>
+        </ul>
+      </details>
+        </TabularTableRowCell>
         <TabularTableRowCell>
         
         <div style="display: flex;justify-content: flex-end; padding-right: 10px">
@@ -93,7 +103,7 @@
         <summary class="flex" style="justify-content: space-between;" ><strong></strong></summary>
         <ul>
           <li v-for="work in item.works" :key="work.id">
-          {{ work.plate }}
+          {{ work.reason }}
         </li>
         </ul>
       </details>
@@ -124,6 +134,8 @@ import { useSadminServiceStationsStore } from '@/stores/sadmin/sadminServiceStat
 import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
 import FiltersNoData from '@/components/Tabular/FiltersNoData.vue';
 import { convertToLossTableFormat } from '@/api/sendFunctions/skips.js'
+import { unixToDate } from '@/utils/time/dateUtils.js';
+import handleFileDownload from '@/utils/fileDownload.js';
 const serviceStationsStore = useSadminServiceStationsStore();
 
 const items = ref([]);
@@ -146,21 +158,23 @@ function changeOrsOption(option){
   if (currentSort.value.option === 'itemsByPosts') {
     columns.value = [
       { header: 'Пост', size: '3fr' },
-      { header: 'Работы', size: '4fr' },
+      { header: 'Работы', size: '5fr' },
       { header: 'Потери', size: '1fr' },
       { header: 'Время записи', size: '2fr' },
-      { header: 'Телефон', size: '2fr' },
-      { header: 'Автомобиль', size: '2fr' },
+      { header: 'Телефон', size: '1.5fr' },
+      { header: 'Автомобиль', size: '1.5fr' },
+      { header: 'Причина отмены', size: '3fr' },
     ];
   } else {
     // Предполагаемая структура колонок для "mechanics"
     columns.value = [
       { header: 'Механик', size: '3fr' },
-      { header: 'Работы', size: '4fr' },
+      { header: 'Работы', size: '5fr' },
       { header: 'Потери', size: '1fr' },
       { header: 'Время записи', size: '2fr' },
-      { header: 'Телефон', size: '2fr' },
-      { header: 'Автомобиль', size: '2fr' },
+      { header: 'Телефон', size: '1.5fr' },
+      { header: 'Автомобиль', size: '1.5fr' },
+      { header: 'Причина отмены', size: '3fr' },
     ];
   }
 }
@@ -180,36 +194,27 @@ watch(currentSort.value.option, (newVal) => {
   if (newVal === 'itemsByPosts') {
     columns.value = [
       { header: 'Пост', size: '3fr' },
-      { header: 'Работы', size: '4fr' },
+      { header: 'Работы', size: '5fr' },
       { header: 'Потери', size: '1fr' },
       { header: 'Время записи', size: '2fr' },
-      { header: 'Телефон', size: '2fr' },
-      { header: 'Автомобиль', size: '2fr' },
+      { header: 'Телефон', size: '1.5fr' },
+      { header: 'Автомобиль', size: '1.5fr' },
+      { header: 'Причина отмены', size: '3fr' },
     ];
   } else {
     // Предполагаемая структура колонок для "mechanics"
     columns.value = [
       { header: 'Механик', size: '3fr' },
-      { header: 'Работы', size: '4fr' },
+      { header: 'Работы', size: '5fr' },
       { header: 'Потери', size: '1fr' },
       { header: 'Время записи', size: '2fr' },
-      { header: 'Телефон', size: '2fr' },
-      { header: 'Автомобиль', size: '2fr' },
+      { header: 'Телефон', size: '1.5fr' },
+      { header: 'Автомобиль', size: '1.5fr' },
+      { header: 'Причина отмены', size: '3fr' },
     ];
   }
 }, { immediate: true });
-function unixToDate(unixTime) {
-  const date = new Date(unixTime * 1000); // Умножаем на 1000, так как в JavaScript время измеряется в миллисекундах, а не в секундах, как в Unix
 
-  const day = String(date.getDate()).padStart(2, '0'); // День месяца с ведущим нулём, если нужно
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Месяц с ведущим нулём, так как в JavaScript месяцы нумеруются с 0
-  const year = date.getFullYear();
-  const hours = String(date.getHours()).padStart(2, '0'); // Часы с ведущим нулём, если нужно
-  const minutes = String(date.getMinutes()).padStart(2, '0'); // Минуты с ведущим нулём, если нужно
-
-  const formattedDate = `${day}.${month}.${year} ${hours}:${minutes}`;
-  return formattedDate;
-}
 
 function toggleDetails(item) {
   item.detailsOpen = !item.detailsOpen;
@@ -285,8 +290,13 @@ async function onSave(){
   let title = `Не приехавшие клиенты ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value) }`;
   let tableData = convertToLossTableFormat(title,displayedItems.value,currentSort.value.option);
   console.log(tableData)
-  const saveResponse = await apiClient.post('/report-save',tableData);
-  console.log(saveResponse);
+  const saveResponse = await apiClient.post('/report-save',tableData,{ responseType: 'arraybuffer' });
+  try{
+    handleFileDownload(saveResponse.data, `${title}.xlsx`);
+  }
+  catch (error) {
+    console.error('Error saving the table and downloading the file', error);
+  }
 }
 async function onSend(){
   const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
@@ -302,7 +312,9 @@ async function onSend(){
 .custom-details summary {
   list-style: none;
 }
-
+.tabletabletabletable{
+width: 2000px;}
+.jjjj{overflow-y: hidden;}
 .custom-details summary::-webkit-details-marker {
   display: none;
 }
@@ -338,4 +350,5 @@ async function onSend(){
 }
 p{cursor: pointer;}
 text{cursor: pointer;}
+
 </style>

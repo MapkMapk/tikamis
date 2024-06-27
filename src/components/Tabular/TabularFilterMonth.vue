@@ -34,7 +34,7 @@ const months = [
 const selectedDate = ref(new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth())));
 const startDate = ref(new Date(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth())));
 
-const customFormat = date => `${months[date.getUTCMonth()+1]} ${date.getUTCFullYear()}`;
+const customFormat = date => `${months[date.getMonth()]} ${date.getFullYear()}`;
 
 const emits = defineEmits(['updateDate']);
 function convertToUnixTime(dateObj) {

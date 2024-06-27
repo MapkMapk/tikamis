@@ -78,6 +78,7 @@ import { processData } from '@/api/sendFunctions/postsKpd';
 import unixToData from '@/utils/time/unixToData';
 import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
 import FiltersNoData from '@/components/Tabular/FiltersNoData.vue';
+import handleFileDownload from '@/utils/fileDownload.js';
 const serviceStationsStore = useSadminServiceStationsStore();
 const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 const apiUrl = '/analytics/get-posts-KPD';
@@ -191,21 +192,36 @@ function formatDeviation(value) {
   return value > 0 ? `+${value}` : value.toString();
 }
 
-async function onSaveTable() {
+async function onSendTable() {
   tableData.value = processData(columns.value, displayedItems.value, currentSortOption.value.option);
-  const kpdPostsDate = `Кпд постов ${unixToData(filterDate.value.date, false, filterPeriod)}`;
+  console.log(filterPeriod);
+  console.log(filterPeriod.value);
+  const kpdPostsDate = `Кпд постов ${unixToData(filterDate.value.date, false, filterPeriod.value.period)}`;
   const tableDataContent = tableData.value;
   const mailResponse = await apiClient.post('/report-emails', { title: kpdPostsDate, content: tableDataContent });
   console.log(mailResponse);
 }
 
-async function onSendTable() {
-  tableData.value = processData(columns.value, displayedItems.value, currentSortOption.value.option);
-  const kpdPostsDate = `Кпд постов ${unixToData(filterDate.value.date, false, filterPeriod)}`;
-  const tableDataContent = tableData.value;
-  const mailResponse = await apiClient.post('/report-save', { title: kpdPostsDate, content: tableDataContent });
-  console.log(mailResponse);
+async function onSaveTable() {
+  try {
+    tableData.value = processData(columns.value, displayedItems.value, currentSortOption.value.option);
+    const kpdPostsDate = `Кпд постов ${unixToData(filterDate.value.date, false, filterPeriod.value.period)}`;
+    const tableDataContent = tableData.value;
+
+    // Отправка запроса и получение бинарных данных
+    const response = await apiClient.post('/report-save', 
+      { title: kpdPostsDate, content: tableDataContent },
+      { responseType: 'arraybuffer' } // Важно указать, чтобы данные вернулись в виде ArrayBuffer
+    );
+
+    // Обработка и скачивание файла
+    handleFileDownload(response.data, `${kpdPostsDate}.xlsx`);
+  } catch (error) {
+    console.error('Error saving the table and downloading the file', error);
+  }
 }
+
+
 </script>
 
 <style scoped>

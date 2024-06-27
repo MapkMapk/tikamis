@@ -38,6 +38,8 @@ export const useMechanicOrderStore = defineStore(
       startDate.value = data.startDate;
       completionTimeHours.value = data.completionTimeHours;
       works.value = data.works;
+      console.log('orderGetNext:');
+      console.log(data);
     }
 
     async function orderStart() {

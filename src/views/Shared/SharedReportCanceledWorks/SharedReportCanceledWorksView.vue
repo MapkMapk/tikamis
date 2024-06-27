@@ -94,7 +94,7 @@ import FiltersNoData from '@/components/Tabular/FiltersNoData.vue';
 //import { convertToTableFormat }  from '@/api/sendFunctions/reviews.js'
 import { convertToLossTableFormatV2 } from '@/api/sendFunctions/skips.js'
 import { unixToDatePeriodHeader, getUnixToday } from '@/utils/time/dateUtils.js';
-
+import handleFileDownload from '@/utils/fileDownload.js';
 const sadminServiceStationsStore = useSadminServiceStationsStore();
 const apiClient = isEnv('sadmin') ? sadminApiClient : directorApiClient;
 
@@ -200,7 +200,14 @@ async function onSave(){
   let title = `Заказанные, но не выполненные работы ${ unixToDatePeriodHeader(filterDateStart.value, filterPeriod.value) }`;
   let tableData = convertToLossTableFormatV2(title,displayedItems.value,currentSort.value);
   console.log(tableData)
-  const saveResponse = await apiClientic.post('/report-save',tableData);
+  const saveResponse = await apiClientic.post('/report-save',tableData,
+  { responseType: 'arraybuffer' });
+  try{
+    handleFileDownload(saveResponse.data, `${title}.xlsx`);
+  }
+  catch (error) {
+    console.error('Error saving the table and downloading the file', error);
+  }
   console.log(saveResponse);
 }
 async function onSend(){
