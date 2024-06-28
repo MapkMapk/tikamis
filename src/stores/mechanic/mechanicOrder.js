@@ -33,7 +33,7 @@ export const useMechanicOrderStore = defineStore(
     async function orderGetNext() {
       try {
         const response = await mechanicApiClient.get(`/order/get-next`);
-        if (response.status === 477) {
+        if (response.status === 205) {
           const mechanicUserStore = useMechanicUserStore(); // Получаем экземпляр механика
           mechanicUserStore.$lowreset(); // Вызываем $reset
           await router.push('/mechanic/human-select');
