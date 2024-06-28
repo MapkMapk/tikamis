@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { mechanicApiClient } from '@/api/mechanicApiClient.js';
+import { useMechanicUserStore } from '@/stores/mechanic/mechanicUser'
 import router from '@/router/index.js'
 
 export const useMechanicOrderStore = defineStore(
@@ -30,16 +31,26 @@ export const useMechanicOrderStore = defineStore(
     });
 
     async function orderGetNext() {
-      const { data } = await mechanicApiClient.get(`/order/get-next`);
-      orderId.value = data.orderId;
-      isOrderAccepted.value = data.isOrderAccepted;
-      plateNumber.value = data.plateNumber;
-      startTimeUnix.value = data.startTimeUnix;
-      startDate.value = data.startDate;
-      completionTimeHours.value = data.completionTimeHours;
-      works.value = data.works;
-      console.log('orderGetNext:');
-      console.log(data);
+      try {
+        const response = await mechanicApiClient.get(`/order/get-next`);
+        if (response.status === 477) {
+          const mechanicUserStore = useMechanicUserStore(); // Получаем экземпляр механика
+          mechanicUserStore.$lowreset(); // Вызываем $reset
+          await router.push('/mechanic/human-select');
+        } else {
+          const data = response.data;
+          orderId.value = data.orderId;
+          isOrderAccepted.value = data.isOrderAccepted;
+          plateNumber.value = data.plateNumber;
+          startTimeUnix.value = data.startTimeUnix;
+          startDate.value = data.startDate;
+          completionTimeHours.value = data.completionTimeHours;
+          works.value = data.works;
+        }
+        console.log('response:', response.status);
+      } catch (error) {
+        console.error('Error fetching next order:', error);
+      }
     }
 
     async function orderStart() {

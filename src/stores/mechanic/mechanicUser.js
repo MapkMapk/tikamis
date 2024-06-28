@@ -15,8 +15,12 @@ export const useMechanicUserStore = defineStore(
       accessToken.value = '';
       refreshToken.value = '';
     }
+    function $lowreset() {
+      activeMechanicId.value = '';
+      activeMechanicName.value = '';
+    }
 
-    return { activeMechanicId, activeMechanicName, accessToken, refreshToken, $reset };
+    return { activeMechanicId, activeMechanicName, accessToken, refreshToken, $reset, $lowreset };
   },
   {
     persist: true
