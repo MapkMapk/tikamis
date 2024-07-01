@@ -3,6 +3,7 @@ import index from '@/views/index.vue';
 import { mechanicBeforeEach, mechanicRoutes } from '@/router/mechanic.js';
 import { sadminBeforeEach, sadminRoutes } from '@/router/sadmin.js';
 import { directorBeforeEach, directorRoutes } from '@/router/director.js';
+import { monitorRoutes } from '@/router/monitor.js';
 
 // ПРИ ИЗМЕНЕНИИ КАКИХ-ЛИБО РОУТОВ ЗДЕСЬ (ПУТЕЙ) НЕОБХОДИМО
 // ТАКЖЕ НЕ ЗАБЫТЬ ИЗМЕНИТЬ ИХ В КОМПОНЕНТЕ "MainHeaderMenu"
@@ -20,6 +21,7 @@ const router = createRouter({
     sadminRoutes,
     directorRoutes,
     mechanicRoutes,
+    monitorRoutes,
     {
       path: '/:pathMatch(.*)*',
       redirect: '/'

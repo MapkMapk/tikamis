@@ -18,6 +18,12 @@
     >
       Механик
     </router-link>
+    <router-link
+      to="/monitor/"
+      class="bg-green font-semibold text-white w-[300px] flex justify-center items-center rounded mb-4 py-5"
+    >
+      Монитор очереди
+    </router-link>
   </section>
 </template>
 <script setup></script>
