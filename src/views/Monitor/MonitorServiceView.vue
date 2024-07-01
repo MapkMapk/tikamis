@@ -69,6 +69,8 @@
   
   function formatTimeAndDate(unixTimestamp) {
     const date = new Date(unixTimestamp * 1000);
+    const hours = date.getUTCHours().toString().padStart(2, '0');
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
     const optionsTime = { hour: '2-digit', minute: '2-digit', hour12: false };
     const optionsDate = { weekday: 'long', day: 'numeric' };
     const monthsGenitive = [
@@ -84,7 +86,7 @@
     return {
       dayOfWeek: dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1),
       currentDate: `${dayOfMonth} ${month} ${year}`,
-      currentTime: date.toLocaleTimeString('ru-RU', optionsTime),
+      currentTime: `${hours}:${minutes}`
     };
   }
   
